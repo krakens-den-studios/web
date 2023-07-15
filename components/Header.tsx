@@ -48,7 +48,7 @@ const Header = () => {
   return (
     <header className="w-full fixed z-10 flex justify-center">
       <div
-        className={`duration-1000 pointer-events-none user-select-none transition-opacity opacity-0 ${
+        className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${
           isScrolled ? 'opacity-100' : ''
         } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
       />
@@ -115,13 +115,13 @@ const Header = () => {
 
         <div className="absolute lg:hidden">
           <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <div className="relative flex w-full flex-col items-end px-3 py-5">
+            <div className="relative flex w-full flex-col items-end px-3 py-5 gap-4">
               <RiCloseLine
                 className="text-white h-14 w-14 cursor-pointer hover:text-turquoise-400"
                 onClick={() => setIsDialogOpen(false)}
               />
 
-              <div className="relative flex w-full flex-col items-center p-6">
+              <div className="relative flex w-full flex-col items-center p-6 gap-4">
                 <Link href={Route.HOME} className="outline-none w-full p-4">
                   <p
                     className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${

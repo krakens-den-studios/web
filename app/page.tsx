@@ -18,7 +18,7 @@ export default function Home() {
         <div className="relative w-full h-1/2 lg:h-full">
           <Image
             src="/heartweaverCover.png"
-            className="object-cover lg:object-[24vw] 3xl:object-contain 3xl:object-[38vw] brightness-75 select-none"
+            className="object-cover lg:object-[24vw] 3xl:object-contain 3xl:object-[38vw] select-none"
             alt="Heart Weaver cover"
             fill
           />

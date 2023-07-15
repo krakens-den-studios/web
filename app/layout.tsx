@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import type { Metadata } from 'next';
 import { Lora, Roboto } from 'next/font/google';
-import './globals.scss';
+import './globals.css';
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700', '900'],
