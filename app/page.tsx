@@ -1,10 +1,19 @@
+'use client';
+
 import Button from '@/components/Button';
+import { useIsScrolled } from '@/hooks/useIsScrolled';
 import Image from 'next/image';
 import { TiArrowSortedDown } from 'react-icons/ti';
 
 export default function Home() {
+  const onScrollClick = () => {
+    window?.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+  };
+
+  const isScrolled = useIsScrolled();
+
   return (
-    <main className="relative w-screen h-screen overflow-y-auto">
+    <main className="relative w-screen h-fit">
       <section className="relative w-full h-screen lg:h-2/3 flex flex-col items-center">
         <div className="relative w-full h-1/2 lg:h-full">
           <Image
@@ -25,8 +34,23 @@ export default function Home() {
             <Button label="SUBSCRIBE" />
           </div>
 
-          <TiArrowSortedDown className="text-white w-16 h-16 lg:hidden" />
+          <TiArrowSortedDown
+            onClick={onScrollClick}
+            className={`text-white duration-1000 transition-opacity ${
+              isScrolled ? '' : 'opacity-100'
+            } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400 opacity-0`}
+          />
         </div>
+      </section>
+
+      <section className="relative w-full flex flex-col items-center h-screen">
+        <Image
+          src="/logoColor.png"
+          className="max-w-[50%] w-48"
+          width={256}
+          height={256}
+          alt="Kraken's Den Studios logo "
+        />
       </section>
     </main>
   );
