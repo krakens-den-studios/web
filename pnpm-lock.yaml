@@ -11,6 +11,7 @@ specifiers:
   postcss: 8.4.26
   react: 18.2.0
   react-dom: 18.2.0
+  sass: ^1.63.6
   tailwindcss: 3.3.3
   typescript: 5.1.6
 
@@ -21,10 +22,11 @@ dependencies:
   autoprefixer: 10.4.14_postcss@8.4.26
   eslint: 8.45.0
   eslint-config-next: 13.4.10_ko3fmmbeyij36muomfgt2u76xu
-  next: 13.4.10_biqbaboplfbrettd7655fr4n2y
+  next: 13.4.10_63tktvor3xwbblcac5shyx4aca
   postcss: 8.4.26
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
+  sass: 1.63.6
   tailwindcss: 3.3.3
   typescript: 5.1.6
 
@@ -1437,6 +1439,10 @@ packages:
     engines: {node: '>= 4'}
     dev: false
 
+  /immutable/4.3.1:
+    resolution: {integrity: sha512-lj9cnmB/kVS0QHsJnYKD1uo3o39nrbKxszjnqS9Fr6NB7bZzW45U6WSGBPKXDL/CvDKqDNPA4r3DoDQ8GTxo2A==}
+    dev: false
+
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -1793,7 +1799,7 @@ packages:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: false
 
-  /next/13.4.10_biqbaboplfbrettd7655fr4n2y:
+  /next/13.4.10_63tktvor3xwbblcac5shyx4aca:
     resolution: {integrity: sha512-4ep6aKxVTQ7rkUW2fBLhpBr/5oceCuf4KmlUpvG/aXuDTIf9mexNSpabUD6RWPspu6wiJJvozZREhXhueYO36A==}
     engines: {node: '>=16.8.0'}
     hasBin: true
@@ -1818,6 +1824,7 @@ packages:
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      sass: 1.63.6
       styled-jsx: 5.1.1_react@18.2.0
       watchpack: 2.4.0
       zod: 3.21.4
@@ -2244,6 +2251,16 @@ packages:
       call-bind: 1.0.2
       get-intrinsic: 1.2.1
       is-regex: 1.1.4
+    dev: false
+
+  /sass/1.63.6:
+    resolution: {integrity: sha512-MJuxGMHzaOW7ipp+1KdELtqKbfAWbH7OLIdoSMnVe3EXPMTmxTmlaZDCTsgIpPCs3w99lLo9/zDKkOrJuT5byw==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      immutable: 4.3.1
+      source-map-js: 1.0.2
     dev: false
 
   /scheduler/0.23.0:
