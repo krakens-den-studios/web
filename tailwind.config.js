@@ -13,8 +13,12 @@ module.exports = {
       },
       colors: {
         purple: '#492A3D',
-        turquoise: '#11B4BB',
-        'dark-turquoise': '#043D40'
+        'turquoise-300': '#29e3eb',
+        'turquoise-400': '#11B4BB',
+        'turquoise-800': '#043D40'
+      },
+      screens: {
+        '3xl': '1920px'
       }
     }
   },

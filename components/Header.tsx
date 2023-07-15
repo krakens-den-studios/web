@@ -18,8 +18,8 @@ const Header = () => {
       <div className="h-14 gap-8 items-center hidden lg:flex">
         <Link href={Route.HOME}>
           <p
-            className={`text-white text-xl font-medium hover:text-turquoise ${
-              pathname === Route.HOME ? 'text-turquoise' : ''
+            className={`text-white text-xl font-medium hover:text-turquoise-400 ${
+              pathname === Route.HOME ? 'text-turquoise-400' : ''
             }`}
           >
             Home
@@ -28,8 +28,8 @@ const Header = () => {
 
         <Link href={Route.TEAM}>
           <p
-            className={`text-white text-xl font-medium hover:text-turquoise ${
-              pathname === Route.TEAM ? 'text-turquoise' : ''
+            className={`text-white text-xl font-medium hover:text-turquoise-400 ${
+              pathname === Route.TEAM ? 'text-turquoise-400' : ''
             }`}
           >
             About Us
@@ -38,33 +38,43 @@ const Header = () => {
 
         <Link href={Route.HEART_WEAVER}>
           <p
-            className={`text-white text-xl font-medium hover:text-turquoise ${
-              pathname === Route.HEART_WEAVER ? 'text-turquoise' : ''
+            className={`text-white text-xl font-medium hover:text-turquoise-400 ${
+              pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
             }`}
           >
             Games
           </p>
         </Link>
 
+        <Link href={Route.HOME}>
+          <p
+            className={`text-white text-xl font-medium hover:text-turquoise-400 ${
+              pathname === 'TODO' ? 'text-turquoise-400' : ''
+            }`}
+          >
+            Contact
+          </p>
+        </Link>
+
         <div className="h-full flex gap-3 items-center">
           <a href="https://example.com" className="" target="_blank">
-            <RiDiscordFill className="text-white h-6 w-6 hover:text-turquoise" />
+            <RiDiscordFill className="text-white h-6 w-6 hover:text-turquoise-400" />
           </a>
 
           <a href="https://example.com" className="" target="_blank">
-            <RiInstagramFill className="text-white h-6 w-6 hover:text-turquoise" />
+            <RiInstagramFill className="text-white h-6 w-6 hover:text-turquoise-400" />
           </a>
 
           <a href="https://example.com" className="" target="_blank">
-            <RiMailFill className="text-white h-6 w-6 hover:text-turquoise" />
+            <RiMailFill className="text-white h-6 w-6 hover:text-turquoise-400" />
           </a>
 
           <a href="https://example.com" className="" target="_blank">
-            <RiTwitterFill className="text-white h-6 w-6 hover:text-turquoise" />
+            <RiTwitterFill className="text-white h-6 w-6 hover:text-turquoise-400" />
           </a>
 
           <a href="https://example.com" className="" target="_blank">
-            <RiTiktokFill className="text-white h-6 w-6 hover:text-turquoise" />
+            <RiTiktokFill className="text-white h-6 w-6 hover:text-turquoise-400" />
           </a>
         </div>
       </div>
