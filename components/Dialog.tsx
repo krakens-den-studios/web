@@ -36,7 +36,7 @@ const Dialog = ({ children, title, open, onClose, ...rest }: DialogProps) => {
   return (
     <dialog
       onClick={onDialogClick}
-      className={`relative z-10 ml-auto bg-turquoise-800 w-fit h-fit  backdrop:opacity-90 backdrop:cursor-pointer`}
+      className={`z-10 ml-auto bg-turquoise-800 w-fit h-fit  backdrop:opacity-90 backdrop:cursor-pointer`}
       ref={dialogRef}
       onClose={closeDialog}
       {...rest}
