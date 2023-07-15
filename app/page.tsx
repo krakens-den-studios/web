@@ -7,7 +7,7 @@ import { TiArrowSortedDown } from 'react-icons/ti';
 
 export default function Home() {
   const onScrollClick = () => {
-    window?.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' });
+    window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
   };
 
   const isScrolled = useIsScrolled();
@@ -36,9 +36,9 @@ export default function Home() {
 
           <TiArrowSortedDown
             onClick={onScrollClick}
-            className={`text-white duration-1000 transition-opacity ${
-              isScrolled ? '' : 'opacity-100'
-            } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400 opacity-0`}
+            className={`text-white duration-300 transition-opacity ${
+              isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+            } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400`}
           />
         </div>
       </section>
