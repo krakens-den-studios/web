@@ -1,3 +1,4 @@
+import Header from '@/components/Header';
 import type { Metadata } from 'next';
 import { Lora, Roboto } from 'next/font/google';
 import './globals.scss';
@@ -22,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${lora.variable} font-roboto`}>{children}</body>
+      <body className={`${roboto.variable} ${lora.variable} font-roboto bg-black flex flex-col items-center`}>
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }

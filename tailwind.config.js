@@ -10,6 +10,15 @@ module.exports = {
       fontFamily: {
         roboto: ['var(--roboto)'],
         lora: ['var(--lora)']
+      },
+      colors: {
+        purple: '#492A3D',
+        'turquoise-300': '#29e3eb',
+        'turquoise-400': '#11B4BB',
+        'turquoise-800': '#043D40'
+      },
+      screens: {
+        '3xl': '1920px'
       }
     }
   },

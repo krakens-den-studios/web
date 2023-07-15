@@ -1,4 +1,4 @@
-# Krakendens Den Studios Website
+# Kraken's Den Studios Website
 
 www.krakensdenstudios.com
 
