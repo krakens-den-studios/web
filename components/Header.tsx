@@ -27,7 +27,7 @@ const Header = () => {
         <RiDiscordFill className="h-8 w-8" />
       </a>
 
-      <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      <a href="https://www.instagram.com/krakensdenstudios/" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiInstagramFill className="h-8 w-8" />
       </a>
 
@@ -35,11 +35,11 @@ const Header = () => {
         <RiMailFill className="h-8 w-8" />
       </a>
 
-      <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      <a href="https://twitter.com/krakensdenstd" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiTwitterFill className="h-8 w-8" />
       </a>
 
-      <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      <a href="https://tiktok.com/@krakensdenstudios" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiTiktokFill className="h-8 w-8" />
       </a>
     </div>
