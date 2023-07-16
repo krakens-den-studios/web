@@ -7,6 +7,7 @@ import { games } from '@/shared/Games';
 import { Route } from '@/shared/Route';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { TiArrowSortedDown } from 'react-icons/ti';
 
 export default function Home() {
@@ -15,6 +16,16 @@ export default function Home() {
   };
 
   const isScrolled = useIsScrolled();
+
+  const [currentGame, setCurrentGame] = useState(0);
+
+  const nextGame = () => {
+    setCurrentGame(currentGame === games.length - 1 ? 0 : currentGame + 1);
+  };
+
+  const prevGame = () => {
+    setCurrentGame(currentGame === 0 ? games.length - 1 : currentGame - 1);
+  };
 
   return (
     <main className="relative w-full h-fit">
@@ -78,13 +89,24 @@ export default function Home() {
           <h2 className="font-lora text-4xl balanced">{"Kraken's Games"}</h2>
         </Points>
 
-        <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center">
-          <TiArrowSortedDown className="absolute left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10" />
+        <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center overflow-hidden">
+          <TiArrowSortedDown
+            onClick={prevGame}
+            className={`absolute left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
+              currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+            }`}
+          />
 
-          {games.map(({ name, link, imageSrc }) => (
+          {games.map(({ name, link, imageSrc }, i) => (
             <div
-              key={name}
-              className="absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8"
+              key={`${name}_${i}`}
+              className={`absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8 transition-all duration-300 pointer-events-none ${
+                currentGame === i
+                  ? 'opacity-100 delay-200'
+                  : currentGame > i
+                  ? '-translate-x-36 opacity-0'
+                  : 'translate-x-36 opacity-0'
+              }`}
             >
               <div className="w-full justify-center flex relative h-full">
                 <Image
@@ -104,7 +126,12 @@ export default function Home() {
             </div>
           ))}
 
-          <TiArrowSortedDown className="absolute right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10" />
+          <TiArrowSortedDown
+            onClick={nextGame}
+            className={`absolute right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
+              currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+            }`}
+          />
         </div>
       </section>
     </main>
