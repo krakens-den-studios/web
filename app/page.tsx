@@ -92,7 +92,7 @@ export default function Home() {
         <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center overflow-hidden">
           <TiArrowSortedDown
             onClick={prevGame}
-            className={`absolute left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
+            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
               currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
             }`}
           />
@@ -100,15 +100,15 @@ export default function Home() {
           {games.map(({ name, link, imageSrc }, i) => (
             <div
               key={`${name}_${i}`}
-              className={`absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8 transition-all duration-300 pointer-events-none ${
+              className={`absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8 transition-all duration-300 ${
                 currentGame === i
-                  ? 'opacity-100 delay-200'
+                  ? 'opacity-100 delay-200 z-10'
                   : currentGame > i
-                  ? '-translate-x-36 opacity-0'
-                  : 'translate-x-36 opacity-0'
+                  ? '-translate-x-36 opacity-0 pointer-events-none'
+                  : 'translate-x-36 opacity-0 pointer-events-none'
               }`}
             >
-              <div className="w-full justify-center flex relative h-full">
+              <div className="w-full justify-center flex relative h-full pointer-events-none">
                 <Image
                   src={imageSrc}
                   className="select-none object-contain max-h-[24rem]"
@@ -128,7 +128,7 @@ export default function Home() {
 
           <TiArrowSortedDown
             onClick={nextGame}
-            className={`absolute right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
+            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
               currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
             }`}
           />
