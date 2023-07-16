@@ -1,8 +1,12 @@
 'use client';
 
 import Button from '@/components/Button';
+import Points from '@/components/Points';
 import { useIsScrolled } from '@/hooks/useIsScrolled';
+import { games } from '@/shared/Games';
+import { Route } from '@/shared/Route';
 import Image from 'next/image';
+import Link from 'next/link';
 import { TiArrowSortedDown } from 'react-icons/ti';
 
 export default function Home() {
@@ -13,8 +17,8 @@ export default function Home() {
   const isScrolled = useIsScrolled();
 
   return (
-    <main className="relative w-screen h-fit">
-      <section className="relative w-full h-screen lg:h-2/3 flex flex-col items-center">
+    <main className="relative w-full h-fit">
+      <section className="relative w-full h-2/3 flex flex-col items-center">
         <div className="relative w-full h-1/2 lg:h-full">
           <Image
             src="/heartweaverCover.png"
@@ -43,14 +47,65 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative w-full flex flex-col items-center h-screen">
-        <Image
-          src="/logoColor.png"
-          className="max-w-[50%] w-48"
-          width={256}
-          height={256}
-          alt="Kraken's Den Studios logo "
-        />
+      <section className="relative w-full flex flex-col items-center h-fit gap-8 pb-20">
+        <Points>
+          <Image
+            src="/logoColor.png"
+            className="max-w-[50%] w-48"
+            width={256}
+            height={256}
+            alt="Kraken's Den Studios logo "
+          />
+        </Points>
+
+        <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">Welcome to our Den</h2>
+
+        <p className="text-2xl w-4/5 max-w-3xl text-center opacity-80 balanced">
+          You are in the depths of the ocean, where the Kraken unveils the most immersive and thrilling tales.
+        </p>
+
+        <p className="text-2xl w-4/5 max-w-3xl text-center opacity-80 balanced">
+          Dive into realms of fantasy that transcend the limits of your imagination and let yourself be captivated.
+        </p>
+
+        <Link href={Route.TEAM}>
+          <Button label="MEET US!" />
+        </Link>
+      </section>
+
+      <section className="relative w-full flex flex-col items-center h-fit gap-8 bg-turquoise-800 py-20">
+        <Points>
+          <h2 className="font-lora text-4xl balanced">{"Kraken's Games"}</h2>
+        </Points>
+
+        <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center">
+          <TiArrowSortedDown className="absolute left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10" />
+
+          {games.map(({ name, link, imageSrc }) => (
+            <div
+              key={name}
+              className="absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8"
+            >
+              <div className="w-full justify-center flex relative h-full">
+                <Image
+                  src={imageSrc}
+                  className="select-none object-contain max-h-[24rem]"
+                  alt={`${name} cover`}
+                  height={252}
+                  width={451}
+                />
+              </div>
+
+              <div className="w-full h-fit relative flex items-center justify-center">
+                <Link href={link} className="w-fit">
+                  <Button label={name} />
+                </Link>
+              </div>
+            </div>
+          ))}
+
+          <TiArrowSortedDown className="absolute right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10" />
+        </div>
       </section>
     </main>
   );

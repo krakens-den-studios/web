@@ -19,7 +19,7 @@ const Button = ({ label, loading, disabled, ...rest }: ButtonProps) => {
       {loading && <Loading className="absolute" />}
 
       <div className={`flex items-center justify-center gap-2 ${loading ? 'opacity-0' : ''}`}>
-        {label && <p className="whitespace-nowrap text-xl font-lora font-bold">{label}</p>}
+        {label && <p className="whitespace-nowrap text-xl font-lora font-bold text-black">{label}</p>}
       </div>
     </button>
   );

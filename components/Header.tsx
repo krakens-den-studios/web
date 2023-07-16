@@ -6,8 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { HiMenu } from 'react-icons/hi';
-import { RiCloseLine, RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill } from 'react-icons/ri';
+import { HiMenu, HiOutlineX } from 'react-icons/hi';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill } from 'react-icons/ri';
 import Dialog from './Dialog';
 
 const Header = () => {
@@ -116,7 +116,7 @@ const Header = () => {
         <div className="absolute lg:hidden">
           <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
             <div className="relative flex w-full flex-col items-end px-3 py-5 gap-4">
-              <RiCloseLine
+              <HiOutlineX
                 className="text-white h-14 w-14 cursor-pointer hover:text-turquoise-400"
                 onClick={() => setIsDialogOpen(false)}
               />
