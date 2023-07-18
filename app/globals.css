@@ -15,6 +15,7 @@ body {
   width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: white;
 }
 
 img,
@@ -25,4 +26,8 @@ svg {
 
 a {
   text-decoration: none;
+}
+
+.balanced {
+  text-wrap: balance;
 }
