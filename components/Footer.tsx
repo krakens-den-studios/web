@@ -1,7 +1,7 @@
 const Footer = () => {
 
   return (
-    <footer className="w-full flex flex-col items-center justify-between font-lora">
+    <footer className="relative w-full h-fit flex flex-col items-center justify-between font-lora pt-10">
       <div>
         <h1 className="text-gray text-center">
           <p className="text-4xl">Let the <span className="font-bold">Kraken</span></p>
