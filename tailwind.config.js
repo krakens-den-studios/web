@@ -15,11 +15,17 @@ module.exports = {
         purple: '#492A3D',
         'turquoise-300': '#29e3eb',
         'turquoise-400': '#11B4BB',
-        'turquoise-800': '#043D40'
+        'turquoise-800': '#043D40',
+        gray: '#D9D9D9',
+        'gray-100': '#8A8A8A',
       },
       screens: {
         '3xl': '1920px'
-      }
+      },
+      fontSize: {
+        '3xl': '1.5rem',
+        '4xl': '2rem',
+      },
     }
   },
   plugins: []
