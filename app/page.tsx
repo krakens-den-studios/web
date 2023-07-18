@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <main className="relative w-full h-fit">
-      <section className="relative w-full h-2/3 flex flex-col items-center">
+      <section className="relative w-full h-screen md:h-[80vh] lg:h-[66vh] flex flex-col items-center">
         <div className="relative w-full h-1/2 lg:h-full">
           <Image
             src="/heartweaverCover.png"
