@@ -1,4 +1,37 @@
+'use client';
+import axios from 'axios';
+import { useState } from 'react';
+
+
 const Footer = () => {
+
+  const [email, setEmail] = useState('');
+
+  const handleChange = (event: any) => {
+    setEmail(event.target.value);
+  };
+
+  const addContact = async () => {
+    const options = {
+      method: 'POST',
+      url: 'https://api.brevo.com/v3/contacts',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'api-key': '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'
+      },
+      data: {
+        email: email,
+        emailBlacklisted: false,
+        smsBlacklisted: false,
+        listIds: [3],
+        updateEnabled: false,
+      }
+    };
+
+    const response = await axios.request(options)
+    setEmail('');
+  }
 
   return (
     <footer className="relative w-full h-fit flex flex-col items-center justify-between font-lora pt-10">
@@ -9,13 +42,12 @@ const Footer = () => {
         </h1>
       </div>
 
-      <div className="w-3/4 mt-8 flex flex-col items-center">
+      <div className="w-full lg:w-1/3 mt-8 flex flex-col items-center px-10" id="newsletter">
         <h2 className="text-white text-4xl">
           Newsletter
         </h2>
-
-        <input type="email" className="rounded-[0.75rem] text-center mt-3 px-3 py-2 bg-gray text-gray-100 font-inter w-full" placeholder="Introduce email adress" />
-        <button className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-3 py-2 w-full text-black font-semibold">
+        <input type="email" onChange={handleChange} className="rounded-[0.75rem] text-center mt-3 px-3 py-2 bg-gray text-gray-100 font-inter w-full" placeholder="Introduce email adress" />
+        <button onClick={addContact} className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-3 py-2 w-full font-semibold">
           Sign Up!
         </button>
       </div>

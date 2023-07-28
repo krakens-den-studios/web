@@ -46,7 +46,7 @@ const Header = () => {
   );
 
   return (
-    <header className="w-full fixed z-10 flex justify-center">
+    <header className="w-full fixed z-30 flex justify-center">
       <div
         className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${
           isScrolled ? 'opacity-100' : ''
