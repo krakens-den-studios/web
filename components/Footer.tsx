@@ -18,7 +18,7 @@ const Footer = () => {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'api-key': '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'
+        'api-key': process.env.NEXT_PUBLIC_BREVO_API_KEY
       },
       data: {
         email: email,
