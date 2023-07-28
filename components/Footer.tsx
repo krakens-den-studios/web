@@ -1,11 +1,11 @@
 const Footer = () => {
 
   return (
-    <footer className="relative w-full h-fit flex flex-col items-center justify-between font-lora pt-10">
+    <footer className="relative w-full h-fit flex flex-col items-center justify-between pt-10">
       <div>
         <h1 className="text-gray text-center">
-          <p className="text-4xl">Let the <span className="font-bold">Kraken</span></p>
-          <p className="text-4xl mt-1">catch <span className="font-bold">YOU</span></p>
+          <p className="text-4xl font-lora">Let the <span className="font-bold">Kraken</span></p>
+          <p className="text-4xl mt-1 font-lora">catch <span className="font-bold">YOU</span></p>
         </h1>
       </div>
 
@@ -14,7 +14,7 @@ const Footer = () => {
           Newsletter
         </h2>
 
-        <input type="email" className="rounded-[0.75rem] text-center mt-3 px-3 py-2 bg-gray text-gray-100 font-inter w-full" placeholder="Introduce email adress" />
+        <input type="email" className="rounded-[0.75rem] text-center mt-3 px-3 py-2 bg-gray text-gray-100 w-full" placeholder="Introduce email adress" />
         <button className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-3 py-2 w-full text-black font-semibold">
           Sign Up!
         </button>
