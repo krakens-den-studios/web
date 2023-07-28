@@ -9,11 +9,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { TiArrowSortedDown } from 'react-icons/ti';
+import { scroller } from 'react-scroll';
 
 export default function Home() {
   const onScrollClick = () => {
     window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
   };
+
+  const scrollToNewsletter = () => {
+    if (window) {
+      scroller.scrollTo('newsletter', {
+        duration: 800,
+        delay: 0,
+        smooth: 'easeInOutQuart'
+      })
+    }    
+  }
 
   const isScrolled = useIsScrolled();
 
@@ -46,7 +57,7 @@ export default function Home() {
 
           <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
             <Button label="EXPLORE" />
-            <Button label="SUBSCRIBE" />
+            <Button label="SUBSCRIBE" onClick={scrollToNewsletter} />
           </div>
 
           <TiArrowSortedDown
