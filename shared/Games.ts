@@ -11,15 +11,5 @@ export const games: Game[] = [
     name: 'HeartWeaver',
     imageSrc: '/heartweaverImage.png',
     link: Route.HEART_WEAVER
-  },
-  {
-    name: 'HeartWeaver',
-    imageSrc: '/heartweaverImage.png',
-    link: Route.HEART_WEAVER
-  },
-  {
-    name: 'HeartWeaver',
-    imageSrc: '/heartweaverImage.png',
-    link: Route.HEART_WEAVER
   }
 ];

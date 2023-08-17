@@ -23,17 +23,17 @@ const Header = () => {
 
   const socialLinks = (
     <div className="h-full flex items-center">
-      <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      {/* <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiDiscordFill className="h-8 w-8" />
-      </a>
+      </a> */}
 
       <a href="https://www.instagram.com/krakensdenstudios/" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiInstagramFill className="h-8 w-8" />
       </a>
 
-      <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      {/* <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiMailFill className="h-8 w-8" />
-      </a>
+      </a> */}
 
       <a href="https://twitter.com/krakensdenstd" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiTwitterFill className="h-8 w-8" />

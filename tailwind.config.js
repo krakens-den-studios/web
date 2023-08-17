@@ -26,6 +26,10 @@ module.exports = {
         '3xl': '1.5rem',
         '4xl': '2rem',
       },
+      backgroundImage: {
+        'footer-large': "url('/footerBgLarge.svg')",
+        'footer-mobile': "url('/footerBgMobile.svg')",
+      }
     }
   },
   plugins: []

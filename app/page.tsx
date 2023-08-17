@@ -23,7 +23,7 @@ export default function Home() {
         delay: 0,
         smooth: 'easeInOutQuart'
       })
-    }    
+    }
   }
 
   const isScrolled = useIsScrolled();
