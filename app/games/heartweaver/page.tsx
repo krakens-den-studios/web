@@ -113,7 +113,7 @@ export default function HeartWeaver() {
 
       <section className="relative w-full flex flex-col md:flex-row items-center h-fit gap-8 py-10 bg-purple text-center" id="game">
         <div className="md:order-2 md:relative md:w-1/2">
-          <p className="text-3xl text-center w-full font-bold pr-10">Decide Ace&apos;s Fate</p>
+          <p className="text-3xl text-center w-full font-bold md:pr-10">Decide Ace&apos;s Fate</p>
           <Image
             src="/decoratorLeft.svg"
             className="absolute left-3 top-10 md:hidden"
