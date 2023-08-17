@@ -55,14 +55,14 @@ export default function HeartWeaver() {
             className="absolute left-3"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator left"
           />
           <Image
             src="/decorator.svg"
             className="absolute right-3"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator right"
           />
         </Points>
 
@@ -88,19 +88,19 @@ export default function HeartWeaver() {
             className="absolute left-3"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator left"
           />
           <Image
             src="/decorator.svg"
             className="absolute right-3"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator right"
           />
         </Points>
 
         <div className="mt-10 text-xl font-light">
-          <p className="px-10">Embark on a captivating journey through this twisted realm ensnared by the imbalance of Ace's emotions.</p>
+          <p className="px-10">Embark on a captivating journey through this twisted realm ensnared by the imbalance of Ace&apos;s emotions.</p>
           <p className="mt-10 px-10">Help Ace embrace their emotions again and team up with Mark and their loved ones.</p>
         </div>
         <Image
@@ -113,26 +113,26 @@ export default function HeartWeaver() {
 
       <section className="relative w-full flex flex-col md:flex-row items-center h-fit gap-8 py-10 bg-purple text-center" id="game">
         <div className="md:order-2 md:relative md:w-1/2">
-          <p className="text-3xl text-center w-full font-bold pr-10">Decide Ace's Fate</p>
+          <p className="text-3xl text-center w-full font-bold pr-10">Decide Ace&apos;s Fate</p>
           <Image
             src="/decoratorLeft.svg"
             className="absolute left-3 top-10 md:hidden"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator left"
           />
           <Image
             src="/decorator.svg"
             className="absolute right-3 top-10 md:top-0"
             width={256}
             height={256}
-            alt="Kraken's Den Studios logo"
+            alt="Decorator right"
           />
         </div>
 
         <div className="mt-10 text-xl font-light md:order-1">
-          <p className="px-10">Hold the power to either restore Ace's emotions to their rightful harmony or let them fade forever...</p>
-          <p className="mt-10 px-10">... Ace's future rests in your hands.</p>
+          <p className="px-10">Hold the power to either restore Ace&apos;s emotions to their rightful harmony or let them fade forever...</p>
+          <p className="mt-10 px-10">... Ace&apos;s future rests in your hands.</p>
         </div>
 
         <Image

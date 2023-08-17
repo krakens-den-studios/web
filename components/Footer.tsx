@@ -194,7 +194,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="p-4 text-center">
-        <p>@ Kraken's Den Studios 2023</p>
+        <p>@ Kraken&apos;s Den Studios 2023</p>
       </div>
     </footer>
   );
