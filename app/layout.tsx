@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 import { Lora, Roboto } from 'next/font/google';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
 const roboto = Roboto({
   weight: ['100', '300', '400', '500', '700', '900'],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${roboto.variable} ${lora.variable} font-roboto bg-black flex flex-col items-center`}>
         <Header />
+        <Toaster position="top-right" />
         {children}
         <Footer />
       </body>
