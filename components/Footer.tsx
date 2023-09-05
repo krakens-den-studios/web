@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Route } from '@/shared/Route';
 import { usePathname } from 'next/navigation';
-import { RiInstagramFill, RiTwitterFill, RiTiktokFill } from 'react-icons/ri';
+import { RiInstagramFill, RiTwitterFill, RiTiktokFill, RiMailFill } from 'react-icons/ri';
 
 const newsletterCopies = [
   "Dive into the Kraken's Lair – our newsletter is the only sea monster approved source of gaming fun!",
@@ -119,6 +119,10 @@ const Footer = () => {
     <div className="h-full flex items-center w-full justify-evenly">
       <a href="https://www.instagram.com/krakensdenstudios/" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiInstagramFill className="h-8 w-8" />
+      </a>
+
+      <a href="mailto:krakensdenstudios@gmail.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+        <RiMailFill className="h-8 w-8" />
       </a>
 
       <a href="https://twitter.com/krakensdenstd" className="p-2 text-white hover:text-turquoise-400" target="_blank">

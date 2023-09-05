@@ -27,6 +27,8 @@ module.exports = {
         '4xl': '2rem',
       },
       backgroundImage: {
+        'heartweaver-cover': "url('/heartweaverCover.png')",
+        'heartweaver-cover-mobile': "url('/heartweaverCoverMobile.png')",
         'footer-large': "url('/footerBgLarge.svg')",
         'footer-mobile': "url('/footerBgMobile.svg')",
       }
