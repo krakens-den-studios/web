@@ -17,22 +17,30 @@ module.exports = {
         'turquoise-400': '#11B4BB',
         'turquoise-800': '#043D40',
         gray: '#D9D9D9',
-        'gray-100': '#8A8A8A',
+        'gray-100': '#8A8A8A'
       },
       screens: {
         '3xl': '1920px'
       },
       fontSize: {
         '3xl': '1.5rem',
-        '4xl': '2rem',
+        '4xl': '2rem'
       },
       backgroundImage: {
         'heartweaver-cover': "url('/heartweaverCover.png')",
         'heartweaver-cover-mobile': "url('/heartweaverCoverMobile.png')",
         'footer-large': "url('/footerBgLarge.svg')",
-        'footer-mobile': "url('/footerBgMobile.svg')",
+        'footer-mobile': "url('/footerBgMobile.svg')"
+      },
+      gridTemplateAreas: {
+        left: ['image story'],
+        right: ['story image']
+      },
+      gridTemplateColumns: {
+        left: 'minmax(0, 0.66fr) minmax(0, 1fr)',
+        right: 'minmax(0, 1fr) minmax(0, 0.66fr)'
       }
     }
   },
-  plugins: []
+  plugins: [require('@savvywombat/tailwindcss-grid-areas')]
 };
