@@ -12,6 +12,9 @@ import { TiArrowSortedDown } from 'react-icons/ti';
 import { scroller } from 'react-scroll';
 
 export default function Home() {
+  const goToHeartWeaver = () => {
+    Route.push(Route.HEARTWEAVER);
+  }
   const onScrollClick = () => {
     window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
   };
@@ -56,7 +59,9 @@ export default function Home() {
           </div>
 
           <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
-            <Button label="EXPLORE" />
+            <Link href={Route.HEART_WEAVER}>
+             <Button label="EXPLORE"/>
+            </Link>
             <Button label="SUBSCRIBE" onClick={scrollToNewsletter} />
           </div>
 
