@@ -12,9 +12,6 @@ import { TiArrowSortedDown } from 'react-icons/ti';
 import { scroller } from 'react-scroll';
 
 export default function Home() {
-  const goToHeartWeaver = () => {
-    Route.push(Route.HEARTWEAVER);
-  }
   const onScrollClick = () => {
     window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
   };
