@@ -48,9 +48,8 @@ const Header = () => {
   return (
     <header className="w-full fixed z-30 flex justify-center">
       <div
-        className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${
-          isScrolled ? 'opacity-100' : ''
-        } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
+        className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${isScrolled ? 'opacity-100' : ''
+          } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
       />
 
       <div className="flex w-full justify-between p-3 items-center z-20 max-w-7xl">
@@ -72,15 +71,14 @@ const Header = () => {
         <div className="h-14 gap-8 items-center hidden lg:flex">
           <Link href={Route.HOME}>
             <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${
-                pathname === Route.HOME ? 'text-turquoise-400' : ''
-              }`}
+              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                }`}
             >
               Home
             </p>
           </Link>
 
-          <Link href={Route.TEAM}>
+          {/* <Link href={Route.TEAM}>
             <p
               className={`text-white text-xl font-medium hover:text-turquoise-400 ${
                 pathname === Route.TEAM ? 'text-turquoise-400' : ''
@@ -88,13 +86,12 @@ const Header = () => {
             >
               About Us
             </p>
-          </Link>
+          </Link> */}
 
           <Link href={Route.HEART_WEAVER}>
             <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${
-                pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
-              }`}
+              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                }`}
             >
               Games
             </p>
@@ -102,9 +99,8 @@ const Header = () => {
 
           <Link href={Route.HOME}>
             <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${
-                pathname === 'TODO' ? 'text-turquoise-400' : ''
-              }`}
+              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === 'TODO' ? 'text-turquoise-400' : ''
+                }`}
             >
               Contact
             </p>
@@ -124,9 +120,8 @@ const Header = () => {
               <div className="relative flex w-full flex-col items-center p-6 gap-4">
                 <Link href={Route.HOME} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${
-                      pathname === Route.HOME ? 'text-turquoise-400' : ''
-                    }`}
+                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                      }`}
                   >
                     HOME
                   </p>
@@ -134,9 +129,8 @@ const Header = () => {
 
                 <Link href={Route.TEAM} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${
-                      pathname === Route.TEAM ? 'text-turquoise-400' : ''
-                    }`}
+                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
+                      }`}
                   >
                     ABOUT US
                   </p>
@@ -144,9 +138,8 @@ const Header = () => {
 
                 <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${
-                      pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
-                    }`}
+                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                      }`}
                   >
                     GAMES
                   </p>
@@ -154,9 +147,8 @@ const Header = () => {
 
                 <Link href={Route.HOME} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${
-                      pathname === 'TODO' ? 'text-turquoise-400' : ''
-                    }`}
+                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === 'TODO' ? 'text-turquoise-400' : ''
+                      }`}
                   >
                     CONTACT
                   </p>
