@@ -127,14 +127,14 @@ const Header = () => {
                   </p>
                 </Link>
 
-                <Link href={Route.TEAM} className="outline-none w-full p-4">
+                {/* <Link href={Route.TEAM} className="outline-none w-full p-4">
                   <p
                     className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
                       }`}
                   >
                     ABOUT US
                   </p>
-                </Link>
+                </Link> */}
 
                 <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
                   <p
