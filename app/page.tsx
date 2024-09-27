@@ -59,7 +59,10 @@ export default function Home() {
             <Link href={Route.HEART_WEAVER}>
              <Button label="EXPLORE"/>
             </Link>
-            <Button label="SUBSCRIBE" onClick={scrollToNewsletter} />
+            <a className="bg-[#05CE78] hover:bg-green-400 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl"
+            href="https://www.kickstarter.com/projects/krakensdenstudios/heartweaver-an-emotional-journey-3d-narrative-adventure"
+            target="_blank">
+              <span className="whitespace-nowrap text-xl font-lora font-bold text-white">KICKSTARTER</span></a>
           </div>
 
           <TiArrowSortedDown
