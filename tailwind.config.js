@@ -13,11 +13,23 @@ module.exports = {
       },
       colors: {
         purple: '#492A3D',
-        'turquoise-300': '#29e3eb',
-        'turquoise-400': '#11B4BB',
-        'turquoise-800': '#043D40',
-        gray: '#D9D9D9',
-        'gray-100': '#8A8A8A'
+        turquoise: {
+          300: '#29e3eb',
+          400: '#11B4BB',
+          800: '#043D40'
+        },
+        gray: {
+          DEFAULT: '#D9D9D9',
+          100: '#8A8A8A',
+          200: '#E5E7EB',
+          300: '#D1D5DB',
+          400: '#9CA3AF',
+          500: '#6B7280',
+          600: '#4B5563',
+          700: '#374151',
+          800: '#1F2937',
+          900: '#111827'
+        }
       },
       screens: {
         '3xl': '1920px'

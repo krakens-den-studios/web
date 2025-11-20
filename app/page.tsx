@@ -1,152 +1,111 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Button from '@/components/Button';
-import Points from '@/components/Points';
-import { useIsScrolled } from '@/hooks/useIsScrolled';
-import { games } from '@/shared/Games';
 import { Route } from '@/shared/Route';
-import Image from 'next/image';
+import { RiLockLine } from 'react-icons/ri';
 import Link from 'next/link';
-import { useState } from 'react';
-import { TiArrowSortedDown } from 'react-icons/ti';
-import { scroller } from 'react-scroll';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
+import Image from 'next/image';
+import FirstVisitModal from '@/components/FirstVisitModal';
 
-export default function Home() {
-  const onScrollClick = () => {
-    window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
-  };
+export default function Root() {
+  const { unlockedPages } = useUnlockedPages();
+  const [showContent, setShowContent] = useState(false);
+  const [visibleParagraphs, setVisibleParagraphs] = useState<number[]>([]);
 
-  const scrollToNewsletter = () => {
-    if (window) {
-      scroller.scrollTo('newsletter', {
-        duration: 800,
-        delay: 0,
-        smooth: 'easeInOutQuart'
-      })
+  useEffect(() => {
+    if (showContent) {
+      // Show paragraphs one by one with delays
+      const delays = [0, 800, 1600, 2400]; // 0ms, 800ms, 1600ms, 2400ms
+      
+      delays.forEach((delay, index) => {
+        setTimeout(() => {
+          setVisibleParagraphs(prev => [...prev, index]);
+          
+          // When all paragraphs are visible, dispatch event to show footer
+          if (index === delays.length - 1) {
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('contentReady'));
+            }, 1000); // Wait for fade-in animation to complete
+          }
+        }, delay);
+      });
     }
-  }
-
-  const isScrolled = useIsScrolled();
-
-  const [currentGame, setCurrentGame] = useState(0);
-
-  const nextGame = () => {
-    setCurrentGame(currentGame === games.length - 1 ? 0 : currentGame + 1);
-  };
-
-  const prevGame = () => {
-    setCurrentGame(currentGame === 0 ? games.length - 1 : currentGame - 1);
-  };
+  }, [showContent]);
 
   return (
-    <main className="relative w-full h-fit">
-      <section className="relative w-full h-screen md:h-[80vh] lg:h-[66vh] flex flex-col items-center">
-        <div className="relative w-full h-1/2 lg:h-full">
-          <Image
-            src="/heartweaverCover.png"
-            className="object-cover lg:object-[24vw] 3xl:object-contain 3xl:object-[38vw] select-none"
-            alt="Heart Weaver cover"
-            fill
-          />
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 lg:right-1/3 h-2/3 flex flex-col items-center gap-8">
-          <div className="relative w-2/3 h-2/5">
-            <Image src="/heartweaver.svg" className="max-w-sm m-auto select-none" fill alt="Heart Weaver title" />
-          </div>
-
-          <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
-            <Link href={Route.HEART_WEAVER}>
-             <Button label="EXPLORE"/>
-            </Link>
-            <Button label="SUBSCRIBE" onClick={scrollToNewsletter} />
-          </div>
-
-          <TiArrowSortedDown
-            onClick={onScrollClick}
-            className={`text-white duration-300 transition-opacity ${
-              isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400`}
-          />
-        </div>
-      </section>
-
-      <section className="relative w-full flex flex-col items-center h-fit gap-8 pb-20">
-        <Points>
+    <>
+      <FirstVisitModal onComplete={() => setShowContent(true)} />
+      {showContent && (
+        <main 
+          className="relative w-full h-screen flex items-center justify-center pt-32 md:pt-40 animate-fade-in"
+        >
+      
+      <div className="max-w-3xl text-center flex flex-col gap-8 items-center p-8">
+        <div 
+          className={`relative w-48 h-48 mb-4 transition-opacity duration-1000 ease-in-out ${
+            visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
           <Image
             src="/logoColor.png"
-            className="max-w-[50%] w-48"
-            width={256}
-            height={256}
-            alt="Kraken's Den Studios logo "
-          />
-        </Points>
-
-        <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">Welcome to our Den</h2>
-
-        <p className="text-2xl w-4/5 max-w-3xl text-center opacity-80 balanced">
-          You are in the depths of the ocean, where the Kraken unveils the most immersive and thrilling tales.
-        </p>
-
-        <p className="text-2xl w-4/5 max-w-3xl text-center opacity-80 balanced">
-          Dive into realms of fantasy that transcend the limits of your imagination and let yourself be captivated.
-        </p>
-
-        <Link href={Route.TEAM}>
-          <Button label="MEET US!" />
-        </Link>
-      </section>
-
-      <section className="relative w-full flex flex-col items-center h-fit gap-8 bg-turquoise-800 py-20">
-        <Points>
-          <h2 className="font-lora text-4xl balanced">{"Kraken's Games"}</h2>
-        </Points>
-
-        <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center overflow-hidden">
-          <TiArrowSortedDown
-            onClick={prevGame}
-            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
-              currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            }`}
-          />
-
-          {games.map(({ name, link, imageSrc }, i) => (
-            <div
-              key={`${name}_${i}`}
-              className={`absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8 transition-all duration-300 ${
-                currentGame === i
-                  ? 'opacity-100 delay-200 z-10'
-                  : currentGame > i
-                  ? '-translate-x-36 opacity-0 pointer-events-none'
-                  : 'translate-x-36 opacity-0 pointer-events-none'
-              }`}
-            >
-              <div className="w-full justify-center flex relative h-full pointer-events-none">
-                <Image
-                  src={imageSrc}
-                  className="select-none object-contain max-h-[24rem]"
-                  alt={`${name} cover`}
-                  height={252}
-                  width={451}
-                />
-              </div>
-
-              <div className="w-full h-fit relative flex items-center justify-center">
-                <Link href={link} className="w-fit">
-                  <Button label={name} />
-                </Link>
-              </div>
-            </div>
-          ))}
-
-          <TiArrowSortedDown
-            onClick={nextGame}
-            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
-              currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            }`}
+            alt="Kraken's Den Studios Logo"
+            width={192}
+            height={192}
+            className="object-contain"
           />
         </div>
-      </section>
+
+        <div className="flex flex-col gap-4">
+          <p 
+            className={`text-xl md:text-2xl text-turquoise-300 transition-opacity duration-1000 ease-in-out ${
+              visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            Dive Into the Kraken's Den
+          </p>
+
+          <p 
+            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
+              visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+          Where play becomes a gentle way to navigate big feelings.
+          </p>
+          
+          <p 
+            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
+              visibleParagraphs.includes(2) ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+          In this tiny corner of the ocean, nothing is "just a game".
+          Every click, every mini-challenge, every tiny kraken you collect is an invitation to slow down, notice how you feel, and move through it at your own pace.
+          </p>
+          
+          <p 
+            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
+              visibleParagraphs.includes(3) ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+          Collect <strong>Krakenlings</strong>, unlock <strong>therapies</strong> (mini-games), and uncover the hidden <strong>treasures</strong> of this den – including the most important one: <strong>you</strong>.
+          </p>
+        </div>
+
+        <div 
+          className={`flex flex-col gap-6 items-center mt-8 transition-opacity duration-1000 ease-in-out ${
+            visibleParagraphs.includes(3) ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {unlockedPages.home && (
+            <Link href={Route.HOME}>
+              <Button label="ENTER THE DEN" />
+            </Link>
+          )}
+        </div>
+      </div>
     </main>
+      )}
+    </>
   );
 }

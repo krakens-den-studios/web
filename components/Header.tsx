@@ -1,19 +1,26 @@
 'use client';
 
 import { useIsScrolled } from '@/hooks/useIsScrolled';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { Route } from '@/shared/Route';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiOutlineX } from 'react-icons/hi';
-import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill } from 'react-icons/ri';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiEmotionLine } from 'react-icons/ri';
 import Dialog from './Dialog';
+import KrakenTreasure from './KrakenTreasure';
+import OctopusCollector from './OctopusCollector';
+import { useOctopuses } from '@/hooks/useOctopuses';
+import { formatNumber } from '@/utils/formatNumber';
 
 const Header = () => {
   const pathname = usePathname();
-
+  const { isPageUnlocked } = useUnlockedPages();
+  const [showTreasure, setShowTreasure] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
 
   useEffect(() => {
     setIsDialogOpen(false);
@@ -47,13 +54,26 @@ const Header = () => {
 
   return (
     <header className="w-full fixed z-30 flex justify-center">
+      {/* Collectable krakenlings on all pages */}
+      <OctopusCollector
+        onCollect={collectOctopus}
+        collectedOctopuses={collectedOctopuses}
+      />
+      
+      {showTreasure && (
+        <KrakenTreasure
+          collectedOctopuses={octopusCount}
+          onOctopusChange={updateOctopusCount}
+          onClose={() => setShowTreasure(false)}
+        />
+      )}
       <div
         className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${isScrolled ? 'opacity-100' : ''
           } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
       />
 
-      <div className="flex w-full justify-between p-3 items-center z-20 max-w-7xl">
-        <Link href={Route.HOME}>
+      <div className="flex w-full justify-between py-4 px-6 md:px-8 items-center z-20 max-w-7xl">
+        <Link href={Route.ROOT} className="flex items-center">
           <Image
             src="/logoWhite.png"
             alt="Kraken's Den Logo"
@@ -63,48 +83,117 @@ const Header = () => {
           />
         </Link>
 
+        {/* krakenlings counter on mobile */}
+        <div className="flex items-center gap-2 text-white lg:hidden whitespace-nowrap">
+          <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
+          <span className="font-bold">{formatNumber(octopusCount)}</span>
+        </div>
+
         <HiMenu
           className="text-white h-14 w-14 lg:hidden cursor-pointer hover:text-turquoise-400"
           onClick={() => setIsDialogOpen(true)}
         />
 
         <div className="h-14 gap-8 items-center hidden lg:flex">
-          <Link href={Route.HOME}>
-            <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
-                }`}
-            >
-              Home
-            </p>
-          </Link>
+          {isPageUnlocked(Route.HOME) ? (
+            <Link href={Route.HOME}>
+              <p
+                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                  }`}
+              >
+                Home
+              </p>
+            </Link>
+          ) : (
+            <div className="relative group">
+              <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
+                Home <RiLockLine className="w-4 h-4" />
+              </span>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
 
-          {/* <Link href={Route.TEAM}>
-            <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${
-                pathname === Route.TEAM ? 'text-turquoise-400' : ''
-              }`}
-            >
-              About Us
-            </p>
-          </Link> */}
-
-          <Link href={Route.HEART_WEAVER}>
-            <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+          {isPageUnlocked(Route.TEAM) ? (
+            <Link href={Route.TEAM}>
+              <p
+                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${
+                  pathname === Route.TEAM ? 'text-turquoise-400' : ''
                 }`}
-            >
-              Games
-            </p>
-          </Link>
+              >
+                About Us
+              </p>
+            </Link>
+          ) : (
+            <div className="relative group">
+              <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
+                About Us <RiLockLine className="w-4 h-4" />
+              </span>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "About Us" in The Kraken's Treasure (1000 Krakenlings) to meet the team.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
 
-          <Link href={Route.HOME}>
-            <p
-              className={`text-white text-xl font-medium hover:text-turquoise-400 ${pathname === 'TODO' ? 'text-turquoise-400' : ''
-                }`}
-            >
-              Contact
-            </p>
-          </Link>
+          {isPageUnlocked(Route.HEART_WEAVER) ? (
+            <Link href={Route.HEART_WEAVER}>
+              <p
+                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                  }`}
+              >
+                Games
+              </p>
+            </Link>
+          ) : (
+            <div className="relative group">
+              <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
+                Games <RiLockLine className="w-4 h-4" />
+              </span>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
+
+          {isPageUnlocked('newsletter') ? (
+            <Link href={Route.HOME}>
+              <p
+                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                  }`}
+              >
+                Contact
+              </p>
+            </Link>
+          ) : (
+            <div className="relative group">
+              <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
+                Contact <RiLockLine className="w-4 h-4" />
+              </span>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
+
+          {/* krakenlings counter on desktop */}
+          <div className="flex items-center gap-2 text-white whitespace-nowrap">
+            <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
+            <span className="font-bold">{formatNumber(octopusCount)}</span>
+          </div>
+          <button
+            onClick={() => setShowTreasure(true)}
+            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap"
+            title="Open The Kraken's Treasure"
+          >
+            <span className="font-lora font-bold text-black text-xl">
+              The Kraken's Treasure
+            </span>
+          </button>
 
           {socialLinks}
         </div>
@@ -118,41 +207,101 @@ const Header = () => {
               />
 
               <div className="relative flex w-full flex-col items-center p-6 gap-4">
-                <Link href={Route.HOME} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    HOME
-                  </p>
-                </Link>
+                {isPageUnlocked(Route.HOME) ? (
+                  <Link href={Route.HOME} className="outline-none w-full p-4">
+                    <p
+                      className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                        }`}
+                    >
+                      HOME
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="outline-none w-full p-4 relative group">
+                    <p className="font-lora text-gray-300 text-2xl font-medium select-none text-center flex items-center justify-center gap-2 cursor-not-allowed">
+                      HOME <RiLockLine className="w-5 h-5" />
+                    </p>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                      Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                    </div>
+                  </div>
+                )}
 
-                <Link href={Route.TEAM} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    ABOUT US
-                  </p>
-                </Link>
+                {isPageUnlocked(Route.TEAM) ? (
+                  <Link href={Route.TEAM} className="outline-none w-full p-4">
+                    <p
+                      className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
+                        }`}
+                    >
+                      ABOUT US
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="relative group w-full p-4">
+                    <span className="font-lora text-gray-300 text-2xl font-medium select-none text-center flex items-center justify-center gap-2 cursor-not-allowed">
+                      ABOUT US <RiLockLine className="w-5 h-5" />
+                    </span>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                      Locked. Get "About Us" in The Kraken's Treasure (1000 Krakenlings) to meet the team.
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                    </div>
+                  </div>
+                )}
 
-                <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    GAMES
-                  </p>
-                </Link>
+                {isPageUnlocked(Route.HEART_WEAVER) ? (
+                  <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
+                    <p
+                      className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                        }`}
+                    >
+                      GAMES
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="outline-none w-full p-4 relative group">
+                    <p className="font-lora text-gray-300 text-2xl font-medium select-none text-center flex items-center justify-center gap-2 cursor-not-allowed">
+                      GAMES <RiLockLine className="w-5 h-5" />
+                    </p>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
 
-                <Link href={Route.HOME} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === 'TODO' ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    CONTACT
+          {isPageUnlocked('newsletter') ? (
+                  <Link href={Route.HOME} className="outline-none w-full p-4">
+                    <p
+                      className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                        }`}
+                    >
+                      CONTACT
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="outline-none w-full p-4 relative group">
+                    <p className="font-lora text-white text-2xl font-medium select-none text-center opacity-60 flex items-center justify-center gap-2 cursor-not-allowed">
+                      CONTACT <RiLockLine className="w-5 h-5" />
+                    </p>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Locked. Get "Newsletter" in The Kraken's Treasure (2000 Krakenlings) to receive soft, story-driven updates.
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+              </div>
+            </div>
+          )}
+
+                <button
+                  onClick={() => {
+                    setShowTreasure(true);
+                    setIsDialogOpen(false);
+                  }}
+                  className="outline-none w-full p-4 bg-turquoise-400 hover:bg-turquoise-300 rounded-xl flex items-center justify-center gap-2 transition-all"
+                >
+                  <p className="font-lora text-black text-2xl font-bold select-none text-center">
+                    THE KRAKEN'S TREASURE
                   </p>
-                </Link>
+                </button>
               </div>
 
               <div className="w-full h-fit px-2">{socialLinks}</div>

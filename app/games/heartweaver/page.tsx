@@ -1,12 +1,33 @@
 'use client';
 
 import Title from '@/components/Title';
+import EmotionJourney from '@/components/EmotionJourney';
 import { useIsScrolled } from '@/hooks/useIsScrolled';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import Image from 'next/image';
 import { TiArrowSortedDown } from 'react-icons/ti';
 import { scroller } from 'react-scroll';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Route } from '@/shared/Route';
 
 export default function HeartWeaver() {
+  const [showJourney, setShowJourney] = useState(false);
+  const { isPageUnlocked } = useUnlockedPages();
+  const router = useRouter();
+
+  // If page is not unlocked, redirect to home
+  useEffect(() => {
+    if (!isPageUnlocked(Route.HEART_WEAVER)) {
+      router.push(Route.HOME);
+    }
+  }, [isPageUnlocked, router]);
+
+  // Don't render anything if not unlocked (while redirecting)
+  if (!isPageUnlocked(Route.HEART_WEAVER)) {
+    return null;
+  }
+
   const scrollToGame = () => {
     if (window) {
       scroller.scrollTo('game', {
@@ -21,6 +42,7 @@ export default function HeartWeaver() {
 
   return (
     <main className="w-full">
+      {showJourney && <EmotionJourney onComplete={() => setShowJourney(false)} />}
       <section className="relative w-full h-screen md:h-[90vh] flex flex-col items-center">
         <div className="relative w-full h-1/2 md:h-2/3">
           <Image
@@ -57,11 +79,11 @@ export default function HeartWeaver() {
           <div className="relative flex flex-col gap-6 items-center md:items-start md:grid-in-story w-fit">
             <Title title="A Story Begins..." />
 
-            <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
+            <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left text-white">
               HeartWeaver is an emotional story-driven, action adventure with a dynamic ability system.
             </p>
 
-            <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
+            <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left text-white">
               Loss and guilt have made Ace wish they could never feel anything again...
             </p>
           </div>

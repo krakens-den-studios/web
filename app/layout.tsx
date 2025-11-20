@@ -1,5 +1,4 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import LayoutWrapper from '@/components/LayoutWrapper';
 import type { Metadata } from 'next';
 import { Lora, Roboto } from 'next/font/google';
 import './globals.css';
@@ -26,10 +25,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${roboto.variable} ${lora.variable} font-roboto bg-black flex flex-col items-center`}>
-        <Header />
-        <Toaster position="top-right" />
-        {children}
-        <Footer />
+        <LayoutWrapper>
+          <Toaster position="top-right" />
+          {children}
+        </LayoutWrapper>
       </body>
     </html>
   );

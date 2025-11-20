@@ -5,7 +5,9 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Route } from '@/shared/Route';
 import { usePathname } from 'next/navigation';
-import { RiInstagramFill, RiTwitterFill, RiTiktokFill, RiMailFill } from 'react-icons/ri';
+import { RiInstagramFill, RiTwitterFill, RiTiktokFill, RiMailFill, RiLockLine } from 'react-icons/ri';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
+import EmotionJourney from './EmotionJourney';
 
 const newsletterCopies = [
   "Dive into the Kraken's Lair – our newsletter is the only sea monster approved source of gaming fun!",
@@ -75,6 +77,8 @@ const randomizeQuote = () => {
 
 const Footer = () => {
   const pathname = usePathname();
+  const { isPageUnlocked } = useUnlockedPages();
+  const [showJourney, setShowJourney] = useState(false);
 
   const [email, setEmail] = useState('');
 
@@ -137,6 +141,7 @@ const Footer = () => {
 
   return (
     <footer className="w-full">
+      {showJourney && <EmotionJourney onComplete={() => setShowJourney(false)} />}
       <div className="relative w-full flex flex-col md:flex-row items-center justify-center pt-10 pb-1 bg-footer-mobile bg-no-repeat bg-bottom md:bg-footer-large md:bg-bottom md:bg-contain md:bg-repeat-x">
         <div className="md:w-1/2">
           <h1 className="text-gray text-center">
@@ -148,50 +153,113 @@ const Footer = () => {
         </div>
 
         <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col items-center" id="newsletter">
-          <div className="w-3/4 md:w-1/2">
-            <h2 className="text-white text-4xl text-center">
-              Newsletter
-            </h2>
-            <input type="email" value={email} onChange={handleChange} className="rounded-[0.75rem] text-center mt-3 px-4 py-3 bg-gray text-gray-100 w-full" placeholder="Introduce email adress" />
-            <button onClick={addContact} disabled={email==''} className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-4 py-3 w-full font-semibold">
-              Sign Up!
-            </button>
-          </div>
-          <div className="xl:h-96 lg:h-48 md:h-36 py-10 px-10">
-            <p className="text-center">🐙 {randomNewsletterCopy}</p>
-          </div>
+          {isPageUnlocked('newsletter') ? (
+            <>
+              <div className="w-3/4 md:w-1/2">
+                <h2 className="text-white text-4xl text-center">
+                  Newsletter
+                </h2>
+                <input type="email" value={email} onChange={handleChange} className="rounded-[0.75rem] text-center mt-3 px-4 py-3 bg-gray text-gray-100 w-full" placeholder="Introduce email adress" />
+                <button onClick={addContact} disabled={email==''} className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-4 py-3 w-full font-semibold">
+                  Sign Up!
+                </button>
+              </div>
+              <div className="xl:h-96 lg:h-48 md:h-36 py-10 px-10">
+                <p className="text-center">🐙 {randomNewsletterCopy}</p>
+              </div>
+            </>
+          ) : (
+            <div className="w-3/4 md:w-1/2 flex flex-col items-center gap-6">
+              <div className="relative group">
+                <h2 className="text-gray-300 text-4xl text-center flex items-center justify-center gap-3">
+                  Newsletter <RiLockLine className="w-8 h-8" />
+                </h2>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                  Complete the Healing therapy in the Emotional Journey to unlock
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                </div>
+              </div>
+              <div className="w-full rounded-[0.75rem] bg-gray bg-opacity-30 text-center mt-3 px-4 py-8 border-2 border-gray-500 border-dashed">
+                <p className="text-white text-lg mb-2">
+                  The newsletter is locked
+                </p>
+                <p className="text-gray-200 text-sm">
+                  Locked. Get "Newsletter" in The Kraken's Treasure (2000 Krakenlings) to receive soft, story-driven updates.
+                </p>
+              </div>
+              <div className="xl:h-96 lg:h-48 md:h-36 py-10 px-10">
+                <p className="text-center text-gray-400">🐙 Healing is a continuous journey. Join our community by unlocking the newsletter in The Kraken's Treasure.</p>
+              </div>
+            </div>
+          )}
           <div className="h-48 md:hidden"></div>
           <div className="lg:h-48 h-24 flex flex-col justify-bottom items-bottom">
             <div className="gap-8 items-end flex justify-bottom pt-3 md:pt-10">
-              <Link href={Route.HOME}>
-                <p
-                  className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
-                    pathname === Route.HOME ? 'text-turquoise-400' : ''
-                  }`}
-                >
-                  Home
-                </p>
-              </Link>
+              {isPageUnlocked(Route.HOME) ? (
+                <Link href={Route.HOME}>
+                  <p
+                    className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
+                      pathname === Route.HOME ? 'text-turquoise-400' : ''
+                    }`}
+                  >
+                    Home
+                  </p>
+                </Link>
+              ) : (
+                <div className="relative group">
+                  <span className="text-gray-300 text-md md:text-xl font-light md:font-medium flex items-center gap-2 cursor-not-allowed">
+                    Home <RiLockLine className="w-4 h-4" />
+                  </span>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                  </div>
+                </div>
+              )}
 
-              <Link href={Route.TEAM}>
-                <p
-                  className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
-                    pathname === Route.TEAM ? 'text-turquoise-400' : ''
-                  }`}
-                >
-                  About Us
-                </p>
-              </Link>
+              {isPageUnlocked(Route.TEAM) ? (
+                <Link href={Route.TEAM}>
+                  <p
+                    className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
+                      pathname === Route.TEAM ? 'text-turquoise-400' : ''
+                    }`}
+                  >
+                    About Us
+                  </p>
+                </Link>
+              ) : (
+                <div className="relative group">
+                  <span className="text-gray-300 text-md md:text-xl font-light md:font-medium flex items-center gap-2 cursor-not-allowed">
+                    About Us <RiLockLine className="w-4 h-4" />
+                  </span>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Locked. Get "About Us" in The Kraken's Treasure (1000 Krakenlings) to meet the team.
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                  </div>
+                </div>
+              )}
 
-              <Link href={Route.HEART_WEAVER}>
-                <p
-                  className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
-                    pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
-                  }`}
-                >
-                  Games
-                </p>
-              </Link>
+              {isPageUnlocked(Route.HEART_WEAVER) ? (
+                <Link href={Route.HEART_WEAVER}>
+                  <p
+                    className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
+                      pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                    }`}
+                  >
+                    Games
+                  </p>
+                </Link>
+              ) : (
+                <div className="relative group">
+                  <span className="text-gray-300 text-md md:text-xl font-light md:font-medium flex items-center gap-2 cursor-not-allowed">
+                    Games <RiLockLine className="w-4 h-4" />
+                  </span>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
+                  </div>
+                </div>
+              )}
             </div>
             {socialLinks}
           </div>
