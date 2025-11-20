@@ -16,8 +16,10 @@ import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [showJourney, setShowJourney] = useState(false);
+  const [currentGame, setCurrentGame] = useState(0);
   const { unlockedPages, isPageUnlocked } = useUnlockedPages();
   const router = useRouter();
+  const isScrolled = useIsScrolled();
 
   // If page is not unlocked, redirect to root
   if (typeof window !== 'undefined' && !isPageUnlocked(Route.HOME)) {
@@ -38,10 +40,6 @@ export default function Home() {
       })
     }
   }
-
-  const isScrolled = useIsScrolled();
-
-  const [currentGame, setCurrentGame] = useState(0);
 
   const nextGame = () => {
     setCurrentGame(currentGame === games.length - 1 ? 0 : currentGame + 1);
@@ -84,7 +82,7 @@ export default function Home() {
                   <p className="whitespace-nowrap text-xl font-lora font-bold text-white">EXPLORE 🔒</p>
                 </button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                  Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                  Locked. Get &quot;Games Page&quot; in The Kraken&apos;s Treasure (500 Krakenlings) to access all therapies and experiences in one place.
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                 </div>
               </div>
@@ -100,7 +98,7 @@ export default function Home() {
                   <p className="whitespace-nowrap text-xl font-lora font-bold text-white">SUBSCRIBE 🔒</p>
                 </button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                  Locked. Get "Newsletter" in The Kraken's Treasure (2000 Krakenlings) to receive soft, story-driven updates.
+                  Locked. Get &quot;Newsletter&quot; in The Kraken&apos;s Treasure (2000 Krakenlings) to receive soft, story-driven updates.
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                 </div>
               </div>
@@ -154,7 +152,7 @@ export default function Home() {
               <p className="whitespace-nowrap text-xl font-lora font-bold text-white">MEET US! 🔒</p>
             </button>
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              Locked. Get "About Us" in The Kraken's Treasure (1000 Krakenlings) to meet the team.
+              Locked. Get &quot;About Us&quot; in The Kraken&apos;s Treasure (1000 Krakenlings) to meet the team.
               <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
             </div>
           </div>
@@ -209,7 +207,7 @@ export default function Home() {
                       <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{name} 🔒</p>
                     </button>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                      Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                      Locked. Get &quot;Games Page&quot; in The Kraken&apos;s Treasure (500 Krakenlings) to access all therapies and experiences in one place.
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                     </div>
                   </div>

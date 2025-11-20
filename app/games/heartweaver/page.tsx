@@ -15,6 +15,7 @@ export default function HeartWeaver() {
   const [showJourney, setShowJourney] = useState(false);
   const { isPageUnlocked } = useUnlockedPages();
   const router = useRouter();
+  const isScrolled = useIsScrolled();
 
   // If page is not unlocked, redirect to home
   useEffect(() => {
@@ -22,11 +23,6 @@ export default function HeartWeaver() {
       router.push(Route.HOME);
     }
   }, [isPageUnlocked, router]);
-
-  // Don't render anything if not unlocked (while redirecting)
-  if (!isPageUnlocked(Route.HEART_WEAVER)) {
-    return null;
-  }
 
   const scrollToGame = () => {
     if (window) {
@@ -38,7 +34,10 @@ export default function HeartWeaver() {
     }
   };
 
-  const isScrolled = useIsScrolled();
+  // Don't render anything if not unlocked (while redirecting)
+  if (!isPageUnlocked(Route.HEART_WEAVER)) {
+    return null;
+  }
 
   return (
     <main className="w-full">
