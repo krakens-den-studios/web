@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 const OCTOPUS_COUNT_KEY = 'octopus-count';
 const OCTOPUS_COLLECTED_KEY = 'octopus-collected-ids';
+const OCTOPUS_PICKED_COUNT_KEY = 'octopus-picked-count'; // Total manually picked krakenlings
 const AGENTS_STORAGE_KEY = 'agents-progress';
 const UNLOCKABLES_STORAGE_KEY = 'unlockables-progress';
 
@@ -29,6 +30,7 @@ export function useOctopuses() {
     
     const savedCount = localStorage.getItem(OCTOPUS_COUNT_KEY);
     const savedCollected = localStorage.getItem(OCTOPUS_COLLECTED_KEY);
+    const savedPickedCount = localStorage.getItem(OCTOPUS_PICKED_COUNT_KEY);
     
     if (savedCount) {
       try {
@@ -45,6 +47,11 @@ export function useOctopuses() {
         setCollectedOctopuses([]);
       }
     }
+    
+    // Initialize picked count if it doesn't exist
+    if (!savedPickedCount) {
+      localStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, '0');
+    }
   }, []);
 
   const updateOctopusCount = (newCount: number) => {
@@ -57,16 +64,55 @@ export function useOctopuses() {
   const collectOctopus = (octopusId: string) => {
     if (!collectedOctopuses.includes(octopusId)) {
       const newCollected = [...collectedOctopuses, octopusId];
-      const newCount = octopusCount + 1;
+      
+      // Get current fractional count from localStorage to maintain precision
+      const currentFractional = parseFloat(localStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
+      
+      // Get total manually picked krakenlings (not from agents)
+      const pickedCount = parseFloat(localStorage.getItem(OCTOPUS_PICKED_COUNT_KEY) || '0');
+      const pickedTotal = Math.floor(pickedCount);
+      
+      // Calculate collection value based on upgrades
+      // Base: 1 Krakenling
+      let collectionValue = 1;
+      
+      try {
+        const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
+        if (savedUnlockables) {
+          const unlockables: any[] = JSON.parse(savedUnlockables);
+          const collectionUpgrades = unlockables.filter(
+            u => u.type === 'upgrade' && u.upgradeType === 'collection-multiplier' && u.unlocked && u.multiplierManualValue !== undefined
+          );
+          
+          // Use only the highest multiplier (not sum them)
+          if (collectionUpgrades.length > 0) {
+            const maxMultiplier = Math.max(...collectionUpgrades.map(u => u.multiplierManualValue || 1));
+            collectionValue += pickedTotal * maxMultiplier;
+          }
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+      
+      const newFractionalCount = currentFractional + collectionValue;
+      const newCount = Math.floor(newFractionalCount);
+      
+      // Update picked count (only the base 1, not the multipliers)
+      const newPickedCount = pickedCount + 1;
       
       setCollectedOctopuses(newCollected);
       setOctopusCount(newCount);
       
       if (typeof window !== 'undefined') {
         localStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
-        localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+        localStorage.setItem(OCTOPUS_COUNT_KEY, newFractionalCount.toString());
+        localStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, newPickedCount.toString());
       }
+      
+      // Return the value for display purposes
+      return collectionValue;
     }
+    return 1;
   };
 
   // Listen for changes in localStorage from other tabs

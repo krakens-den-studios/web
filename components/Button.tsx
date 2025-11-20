@@ -1,5 +1,8 @@
+'use client';
+
 import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react';
 import Loading from './Loading';
+import { useAudio } from '@/hooks/useAudio';
 
 export interface ButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
   label: string;
@@ -7,10 +10,20 @@ export interface ButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTML
   disabled?: boolean;
 }
 
-const Button = ({ label, loading, disabled, ...rest }: ButtonProps) => {
+const Button = ({ label, loading, disabled, onClick, ...rest }: ButtonProps) => {
+  const { playButtonClick } = useAudio();
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    playButtonClick();
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
   return (
     <button
       disabled={disabled || loading}
+      onClick={handleClick}
       {...rest}
       className={`bg-turquoise-400 hover:bg-turquoise-300 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl ${
         loading ? 'pointer-events-none' : ''

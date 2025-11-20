@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
+import { useAudio } from '@/hooks/useAudio';
 
 interface HopeMinigameProps {
   onComplete: () => void;
@@ -26,12 +27,16 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
   const [numPoints, setNumPoints] = useState(5);
   const [pointSize, setPointSize] = useState(48);
   const [activationDistance, setActivationDistance] = useState(5);
+  const { playMinigameSound } = useAudio();
 
   useEffect(() => {
     setGameState('playing');
     setGameProgress(0);
     setCurrentPointIndex(0);
     setIsHolding(false);
+    
+    // Play minigame sound
+    playMinigameSound('hope');
     
     // Randomize game parameters for variety
     const randomNumPoints = Math.floor(Math.random() * 4) + 4; // 4-7 points
@@ -46,17 +51,41 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
     setTimeout(() => {
       if (gameAreaRef.current) {
         const newPoints: Point[] = [];
+        const minDistance = 15; // Minimum distance between points in percentage
+        
         for (let i = 0; i < randomNumPoints; i++) {
+          let attempts = 0;
+          let validPosition = false;
+          let x = 0;
+          let y = 0;
+          
+          // Try to find a position that doesn't overlap with existing points
+          while (!validPosition && attempts < 100) {
+            x = Math.random() * 80 + 10; // Between 10% and 90%
+            y = Math.random() * 60 + 20; // Between 20% and 80%
+            
+            // Check distance from all existing points
+            validPosition = newPoints.every(point => {
+              const distance = Math.sqrt(
+                Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2)
+              );
+              return distance >= minDistance;
+            });
+            
+            attempts++;
+          }
+          
           newPoints.push({
             id: i,
-            x: Math.random() * 80 + 10, // Between 10% and 90%
-            y: Math.random() * 60 + 20, // Between 20% and 80%
+            x: x,
+            y: y,
             completed: false
           });
         }
         setPoints(newPoints);
       }
     }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -74,6 +103,28 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
       setMousePosition({ x: clampedX, y: clampedY });
       
       if (isHolding && currentPointIndex < points.length) {
+        // Check if player passes through any point that is not the current one
+        for (let i = 0; i < points.length; i++) {
+          if (i !== currentPointIndex && !points[i].completed) {
+            const point = points[i];
+            const distance = Math.sqrt(
+              Math.pow(clampedX - point.x, 2) + Math.pow(clampedY - point.y, 2)
+            );
+            
+            // If player passes through a wrong point, they lose
+            if (distance < activationDistance) {
+              // Reset game
+              const updatedPoints = points.map(p => ({ ...p, completed: false }));
+              setPoints(updatedPoints);
+              setCurrentPointIndex(0);
+              setGameProgress(0);
+              setIsHolding(false);
+              return;
+            }
+          }
+        }
+        
+        // Check if player reaches the correct current point
         const currentPoint = points[currentPointIndex];
         const distance = Math.sqrt(
           Math.pow(clampedX - currentPoint.x, 2) + Math.pow(clampedY - currentPoint.y, 2)
@@ -94,7 +145,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
             setGameState('success');
             setTimeout(() => {
               onComplete();
-            }, 500);
+            }, 1000);
           }
         }
       }
@@ -136,6 +187,28 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
       setMousePosition({ x: clampedX, y: clampedY });
       
       if (isHolding && currentPointIndex < points.length) {
+        // Check if player passes through any point that is not the current one
+        for (let i = 0; i < points.length; i++) {
+          if (i !== currentPointIndex && !points[i].completed) {
+            const point = points[i];
+            const distance = Math.sqrt(
+              Math.pow(clampedX - point.x, 2) + Math.pow(clampedY - point.y, 2)
+            );
+            
+            // If player passes through a wrong point, they lose
+            if (distance < activationDistance) {
+              // Reset game
+              const updatedPoints = points.map(p => ({ ...p, completed: false }));
+              setPoints(updatedPoints);
+              setCurrentPointIndex(0);
+              setGameProgress(0);
+              setIsHolding(false);
+              return;
+            }
+          }
+        }
+        
+        // Check if player reaches the correct current point
         const currentPoint = points[currentPointIndex];
         const distance = Math.sqrt(
           Math.pow(clampedX - currentPoint.x, 2) + Math.pow(clampedY - currentPoint.y, 2)
@@ -155,7 +228,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
             setGameState('success');
             setTimeout(() => {
               onComplete();
-            }, 500);
+            }, 1000);
           }
         }
       }

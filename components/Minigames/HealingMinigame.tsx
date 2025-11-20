@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
+import { useAudio } from '@/hooks/useAudio';
 
 interface HealingMinigameProps {
   onComplete: () => void;
@@ -23,13 +24,27 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
   const pulseIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const pulseStartTimeRef = useRef<number>(Date.now());
   const targetRhythmRef = useRef<number>(1000);
+  const clickedInWindowRef = useRef<boolean>(false); // Track if user clicked during the current click window
+  const previousCanClickRef = useRef<boolean>(false); // Track previous canClick state
+  const clicksRef = useRef<number>(0); // Track clicks count for interval access
+  const gameStateRef = useRef<'idle' | 'playing' | 'success'>('idle'); // Track game state for interval access
+  const lastClickTimeRef = useRef<number>(0); // Track when the last click happened
+  const lastSuccessfulClickTimeRef = useRef<number>(0); // Track when the last successful click happened
+  const { playMinigameSound } = useAudio();
 
   useEffect(() => {
     setGameState('playing');
+    gameStateRef.current = 'playing';
     setClicks(0);
+    clicksRef.current = 0;
     setGameProgress(0);
+    
+    // Play minigame sound
+    playMinigameSound('healing');
     setCanClick(true); // First click is always valid
-    lastClickRef.current = Date.now();
+    const now = Date.now();
+    lastClickRef.current = now;
+    lastSuccessfulClickTimeRef.current = now;
     
     // Randomize game parameters for variety
     const randomTargetClicks = Math.floor(Math.random() * 3) + 4; // 4-6 clicks
@@ -69,6 +84,43 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
         // Determine if we're in the "click window" (when pulse is near peak)
         // Allow clicks in the top 40% of the pulse cycle (when sin is high)
         const isClickWindow = Math.sin(phase) > 0.6;
+        
+        // Check if we just entered a click window (transition from false to true)
+        if (isClickWindow && !previousCanClickRef.current) {
+          // Reset the click flag for this new window
+          // Only reset if enough time has passed since last successful click
+          const timeSinceLastSuccessfulClick = now - lastSuccessfulClickTimeRef.current;
+          const minTimeSinceClick = targetRhythmRef.current * 0.5; // Wait at least 50% of rhythm before checking for new window
+          
+          if (timeSinceLastSuccessfulClick > minTimeSinceClick) {
+            clickedInWindowRef.current = false;
+          }
+        }
+        
+        // Check if we just left a click window (transition from true to false)
+        if (!isClickWindow && previousCanClickRef.current) {
+          // Only check for missed click if enough time has passed since last successful click
+          // This prevents false positives when user clicks correctly
+          const timeSinceLastSuccessfulClick = now - lastSuccessfulClickTimeRef.current;
+          const minTimeBetweenClicks = targetRhythmRef.current * 0.8; // At least 80% of rhythm must pass before checking for missed click
+          
+          // If user didn't click during the window and has already made at least one click, they lose
+          // But only if enough time has passed since the last successful click (to avoid false positives)
+          if (!clickedInWindowRef.current && clicksRef.current > 0 && gameStateRef.current === 'playing' && timeSinceLastSuccessfulClick > minTimeBetweenClicks) {
+            // User missed the click window - restart
+            setClicks(0);
+            clicksRef.current = 0;
+            setGameProgress(0);
+            const resetTime = Date.now();
+            lastClickRef.current = resetTime;
+            lastClickTimeRef.current = resetTime;
+            lastSuccessfulClickTimeRef.current = resetTime;
+            setError(true);
+            setTimeout(() => setError(false), 500);
+          }
+        }
+        
+        previousCanClickRef.current = isClickWindow;
         setCanClick(isClickWindow);
       }, 16); // ~60fps
       
@@ -90,16 +142,23 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
     const now = Date.now();
     const timeSinceLastClick = now - lastClickRef.current;
     
+    // Mark that user clicked during the current window
+    clickedInWindowRef.current = true;
+    lastClickTimeRef.current = now;
+    
     // First click is always valid
     if (clicks === 0) {
       const newClicks = clicks + 1;
       setClicks(newClicks);
+      clicksRef.current = newClicks;
       setGameProgress((newClicks / targetClicks) * 100);
       lastClickRef.current = now;
+      lastSuccessfulClickTimeRef.current = now;
       setError(false);
       
       if (newClicks >= targetClicks) {
         setGameState('success');
+        gameStateRef.current = 'success';
         setTimeout(() => {
           onComplete();
         }, 1000);
@@ -111,12 +170,15 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
     if (timeSinceLastClick >= rhythmWindow.min && timeSinceLastClick <= rhythmWindow.max) {
       const newClicks = clicks + 1;
       setClicks(newClicks);
+      clicksRef.current = newClicks;
       setGameProgress((newClicks / targetClicks) * 100);
       lastClickRef.current = now;
+      lastSuccessfulClickTimeRef.current = now; // Update successful click time
       setError(false);
       
       if (newClicks >= targetClicks) {
         setGameState('success');
+        gameStateRef.current = 'success';
         setTimeout(() => {
           onComplete();
         }, 1000);
@@ -124,8 +186,11 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
     } else {
       // Incorrect rhythm: restart
       setClicks(0);
+      clicksRef.current = 0;
       setGameProgress(0);
       lastClickRef.current = now;
+      lastClickTimeRef.current = now;
+      lastSuccessfulClickTimeRef.current = now;
       setError(true);
       setTimeout(() => setError(false), 500);
     }
@@ -169,11 +234,6 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
               <p className="text-white text-sm mt-2 text-center">
                 Correct clicks: {clicks} / {targetClicks}
               </p>
-              {error && (
-                <p className="text-red-400 text-sm mt-2 text-center animate-pulse">
-                  Incorrect rhythm. Try to follow the pulse.
-                </p>
-              )}
             </div>
 
             <div className="flex flex-col items-center gap-8 flex-1 justify-center min-h-[400px]">

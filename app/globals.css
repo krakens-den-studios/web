@@ -113,3 +113,18 @@ a {
 .animate-fade-in {
   animation: fade-in 1.5s ease-in-out;
 }
+
+@keyframes float-up {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -64px);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1.5s ease-out forwards;
+}

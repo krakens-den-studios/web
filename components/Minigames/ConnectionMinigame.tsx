@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
+import { useAudio } from '@/hooks/useAudio';
 
 interface ConnectionMinigameProps {
   onComplete: () => void;
@@ -50,7 +51,9 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
   const [selectedWord, setSelectedWord] = useState<string>('');
   const [shuffledLetters, setShuffledLetters] = useState<string[]>([]);
   const userSequenceRef = useRef<string[]>([]);
+  const clickedIndicesRef = useRef<number[]>([]); // Track which shuffled letter indices have been clicked
   const [letterSize, setLetterSize] = useState(96);
+  const { playMinigameSound } = useAudio();
 
   useEffect(() => {
     // Select a random word
@@ -68,16 +71,27 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
     
     setGameState('playing');
     userSequenceRef.current = [];
+    clickedIndicesRef.current = [];
     setCurrentStep(0);
     setGameProgress(0);
+    
+    // Play minigame sound
+    playMinigameSound('connection');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLetterClick = (letter: string) => {
+  const handleLetterClick = (letter: string, shuffledIndex: number) => {
     if (gameState !== 'playing') return;
+    
+    // Check if this letter has already been clicked
+    if (clickedIndicesRef.current.includes(shuffledIndex)) {
+      return; // Ignore clicks on already used letters
+    }
 
     const expectedLetter = selectedWord[userSequenceRef.current.length];
     if (letter === expectedLetter) {
       userSequenceRef.current.push(letter);
+      clickedIndicesRef.current.push(shuffledIndex);
       const newStep = userSequenceRef.current.length;
       setCurrentStep(newStep);
       setGameProgress((newStep / selectedWord.length) * 100);
@@ -92,6 +106,7 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
     } else {
       // Error: restart
       userSequenceRef.current = [];
+      clickedIndicesRef.current = [];
       setCurrentStep(0);
       setGameProgress(0);
       setError(true);
@@ -104,23 +119,8 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
     const expectedLetter = selectedWord[currentExpectedIndex];
     const isNext = letter === expectedLetter;
     
-    // Check if this letter has been completed (count how many times this letter should appear before current position)
-    let completedCount = 0;
-    for (let i = 0; i < currentExpectedIndex; i++) {
-      if (selectedWord[i] === letter) {
-        completedCount++;
-      }
-    }
-    
-    // Count how many times this letter appears in user sequence so far
-    let userCount = 0;
-    for (let i = 0; i < userSequenceRef.current.length; i++) {
-      if (userSequenceRef.current[i] === letter) {
-        userCount++;
-      }
-    }
-    
-    const isCompleted = userCount > 0 && userCount <= completedCount;
+    // Check if this specific letter instance has been clicked
+    const isCompleted = clickedIndicesRef.current.includes(shuffledIndex);
     const isWrong = !isNext && !isCompleted && error;
     
     return { isNext, isCompleted, isWrong };
@@ -177,7 +177,8 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
                 return (
                   <button
                     key={`${letter}-${index}`}
-                    onClick={() => handleLetterClick(letter)}
+                    onClick={() => handleLetterClick(letter, index)}
+                    disabled={isCompleted}
                     className={`rounded-full text-2xl md:text-3xl font-bold transition-all select-none ${
                       isCompleted
                         ? 'bg-green-400 text-black opacity-60'

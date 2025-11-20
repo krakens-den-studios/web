@@ -13,16 +13,16 @@ import { Route } from '@/shared/Route';
 
 export default function HeartWeaver() {
   const [showJourney, setShowJourney] = useState(false);
-  const { isPageUnlocked } = useUnlockedPages();
+  const { isPageUnlocked, isLoading } = useUnlockedPages();
   const router = useRouter();
   const isScrolled = useIsScrolled();
 
-  // If page is not unlocked, redirect to home
+  // If page is not unlocked, redirect to home (wait for loading to complete)
   useEffect(() => {
-    if (!isPageUnlocked(Route.HEART_WEAVER)) {
+    if (!isLoading && !isPageUnlocked(Route.HEART_WEAVER)) {
       router.push(Route.HOME);
     }
-  }, [isPageUnlocked, router]);
+  }, [isLoading, isPageUnlocked, router]);
 
   const scrollToGame = () => {
     if (window) {
@@ -34,8 +34,8 @@ export default function HeartWeaver() {
     }
   };
 
-  // Don't render anything if not unlocked (while redirecting)
-  if (!isPageUnlocked(Route.HEART_WEAVER)) {
+  // Don't render anything while loading or if not unlocked (while redirecting)
+  if (isLoading || !isPageUnlocked(Route.HEART_WEAVER)) {
     return null;
   }
 

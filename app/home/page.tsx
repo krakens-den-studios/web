@@ -9,7 +9,7 @@ import { games } from '@/shared/Games';
 import { Route } from '@/shared/Route';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TiArrowSortedDown } from 'react-icons/ti';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/navigation';
@@ -17,13 +17,19 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const [showJourney, setShowJourney] = useState(false);
   const [currentGame, setCurrentGame] = useState(0);
-  const { unlockedPages, isPageUnlocked } = useUnlockedPages();
+  const { unlockedPages, isPageUnlocked, isLoading } = useUnlockedPages();
   const router = useRouter();
   const isScrolled = useIsScrolled();
 
-  // If page is not unlocked, redirect to root
-  if (typeof window !== 'undefined' && !isPageUnlocked(Route.HOME)) {
-    router.push('/');
+  // Wait for loading to complete before checking unlock status
+  useEffect(() => {
+    if (!isLoading && typeof window !== 'undefined' && !isPageUnlocked(Route.HOME)) {
+      router.push('/');
+    }
+  }, [isLoading, isPageUnlocked, router]);
+
+  // Don't render anything while loading or if not unlocked
+  if (isLoading || (typeof window !== 'undefined' && !isPageUnlocked(Route.HOME))) {
     return null;
   }
 
@@ -128,15 +134,7 @@ export default function Home() {
         <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">Welcome to the Heart of the Den</h2>
 
         <p className="text-2xl w-4/5 max-w-3xl text-center text-white balanced">
-        You’re deep under the surface now – in a place where stories, emotions, and games are all tangled together like drifting seaweed.
-        </p>
-
-        <p className="text-2xl w-4/5 max-w-3xl text-center text-white balanced">
-        Explore the site, collect wandering Krakenlings, and spend them in The Kraken’s Treasure to unlock new pages, therapies, and helpers. The more you dare to play, the more the den reveals itself to you.
-        </p>
-
-        <p className="text-2xl w-4/5 max-w-3xl text-center text-white balanced">
-        There is no rush and no “right way” to play here. This den is meant to be a soft place to land when your feelings feel too big, too messy, or too heavy to carry alone.
+        Collect Krakenlings, unlock therapies, and discover treasures. Play at your own pace.
         </p>
 
         {unlockedPages.team ? (

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
+import { useAudio } from '@/hooks/useAudio';
 
 interface CourageMinigameProps {
   onComplete: () => void;
@@ -14,35 +15,54 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
   const holdButtonRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
   const [duration, setDuration] = useState(3000);
+  const durationRef = useRef<number>(3000);
   const [buttonSize, setButtonSize] = useState(192);
+  const { playMinigameSound } = useAudio();
 
   useEffect(() => {
     setGameState('playing');
     setGameProgress(0);
+    
+    // Play minigame sound
+    playMinigameSound('courage');
     
     // Randomize game parameters for variety
     const randomDuration = Math.floor(Math.random() * 1500) + 2500; // 2.5-4 seconds
     const randomButtonSize = Math.floor(Math.random() * 48) + 160; // 160-208px
     
     setDuration(randomDuration);
+    durationRef.current = randomDuration; // Store in ref for interval access
     setButtonSize(randomButtonSize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMouseDown = () => {
     if (gameState !== 'playing') return;
     
+    // Clear any existing interval
+    if (holdButtonRef.current) {
+      clearInterval(holdButtonRef.current);
+    }
+    
     startTimeRef.current = Date.now();
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
-      const progress = Math.min((elapsed / duration) * 100, 100);
+      const progress = Math.min((elapsed / durationRef.current) * 100, 100);
       setGameProgress(progress);
       
       if (progress >= 100) {
         clearInterval(interval);
-        setGameState('success');
+        holdButtonRef.current = null;
+        // Ensure progress is exactly 100% before showing success
+        setGameProgress(100);
+        // Wait a bit for the visual to catch up, then show success
         setTimeout(() => {
-          onComplete();
-        }, 500);
+          setGameState('success');
+          // Show success message for longer before completing
+          setTimeout(() => {
+            onComplete();
+          }, 2000);
+        }, 100);
       }
     }, 16); // ~60fps
     
@@ -96,14 +116,9 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
             <div className="mb-8">
               <div className="w-full bg-gray-700 rounded-full h-8">
                 <div
-                  className="bg-turquoise-400 h-8 rounded-full transition-all duration-100 flex items-center justify-center"
+                  className="bg-turquoise-400 h-8 rounded-full transition-all duration-100"
                   style={{ width: `${gameProgress}%` }}
                 >
-                  {gameProgress > 0 && (
-                    <span className="text-black font-bold text-sm">
-                      {Math.round(gameProgress)}%
-                    </span>
-                  )}
                 </div>
               </div>
             </div>

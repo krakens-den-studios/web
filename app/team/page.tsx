@@ -55,18 +55,18 @@ const teamMembers: TeamMember[] = [
 ];
 
 export default function Team() {
-  const { isPageUnlocked } = useUnlockedPages();
+  const { isPageUnlocked, isLoading } = useUnlockedPages();
   const router = useRouter();
 
   useEffect(() => {
-    // If page is not unlocked, redirect to root
-    if (!isPageUnlocked(Route.TEAM)) {
+    // If page is not unlocked, redirect to root (wait for loading to complete)
+    if (!isLoading && !isPageUnlocked(Route.TEAM)) {
       router.push('/');
     }
-  }, [isPageUnlocked, router]);
+  }, [isLoading, isPageUnlocked, router]);
 
   // If page is not unlocked, don't show content
-  if (!isPageUnlocked(Route.TEAM)) {
+  if (isLoading || !isPageUnlocked(Route.TEAM)) {
     return null;
   }
 

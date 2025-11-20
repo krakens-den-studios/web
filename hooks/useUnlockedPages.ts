@@ -59,10 +59,14 @@ export function useUnlockedPages() {
     team: false,
     newsletter: false
   });
+  const [isLoading, setIsLoading] = useState(true);
   
   // Load from localStorage on client side only
   useEffect(() => {
-    setUnlockedPages(loadUnlockedPages());
+    if (typeof window !== 'undefined') {
+      setUnlockedPages(loadUnlockedPages());
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -100,5 +104,5 @@ export function useUnlockedPages() {
     return false;
   };
 
-  return { unlockedPages, isPageUnlocked };
+  return { unlockedPages, isPageUnlocked, isLoading };
 }

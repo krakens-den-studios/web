@@ -71,7 +71,7 @@ export default function Root() {
               visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
             }`}
           >
-          Where play becomes a gentle way to navigate big feelings.
+          Where play helps navigate big feelings.
           </p>
           
           <p 
@@ -79,16 +79,7 @@ export default function Root() {
               visibleParagraphs.includes(2) ? 'opacity-100' : 'opacity-0'
             }`}
           >
-          In this tiny corner of the ocean, nothing is "just a game".
-          Every click, every mini-challenge, every tiny kraken you collect is an invitation to slow down, notice how you feel, and move through it at your own pace.
-          </p>
-          
-          <p 
-            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
-              visibleParagraphs.includes(3) ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-          Collect <strong>Krakenlings</strong>, unlock <strong>therapies</strong> (mini-games), and uncover the hidden <strong>treasures</strong> of this den – including the most important one: <strong>you</strong>.
+          Collect <strong>Krakenlings</strong>, unlock <strong>therapies</strong>, and discover <strong>treasures</strong>.
           </p>
         </div>
 
@@ -97,6 +88,15 @@ export default function Root() {
             visibleParagraphs.includes(3) ? 'opacity-100' : 'opacity-0'
           }`}
         >
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('openTreasure'));
+            }}
+            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-8 py-4 shadow-lg transition-all flex items-center gap-2 group font-lora font-bold text-black text-xl"
+            title="Open Treasure"
+          >
+            Open Treasure
+          </button>
           {unlockedPages.home && (
             <Link href={Route.HOME}>
               <Button label="ENTER THE DEN" />

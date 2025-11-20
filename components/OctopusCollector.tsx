@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { RiEmotionLine } from 'react-icons/ri';
+import FloatingText from './FloatingText';
+import { useAudio } from '@/hooks/useAudio';
+import { usePathname } from 'next/navigation';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 
 interface Octopus {
   id: string;
@@ -15,6 +19,13 @@ interface Octopus {
   particles?: Array<{ angle: number; distance: number }>; // Partículas para el efecto
 }
 
+interface FloatingTextData {
+  id: string;
+  value: number;
+  x: number;
+  y: number;
+}
+
 interface OctopusCollectorProps {
   onCollect: (octopusId: string) => void;
   collectedOctopuses: string[];
@@ -22,6 +33,58 @@ interface OctopusCollectorProps {
 
 export default function OctopusCollector({ onCollect, collectedOctopuses }: OctopusCollectorProps) {
   const [octopuses, setOctopuses] = useState<Octopus[]>([]);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingTextData[]>([]);
+  const { playCollect } = useAudio();
+  const pathname = usePathname();
+  const { unlockedPages } = useUnlockedPages();
+  
+  // Check if shop was just closed using a timestamp in localStorage
+  const wasShopJustClosed = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    const shopClosedTime = localStorage.getItem('shop-closed-time');
+    if (!shopClosedTime) return false;
+    const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
+    // Consider "just closed" if less than 1 second ago (minimum delay)
+    return timeSinceClose < 1000;
+  }, []);
+  
+  // Check if current page is unlocked and calculate spawn rate and max limit
+  const getSpawnInfo = useCallback(() => {
+    const unlockedCount = Object.values(unlockedPages).filter(Boolean).length;
+    
+    // Root page always allows krakenlings
+    if (pathname === '/') {
+      const multiplier = 1 + unlockedCount; // Base +1 for each unlocked page
+      const maxLimit = 10 + (unlockedCount * 10); // Base 10 + 10 per unlocked page
+      return { shouldSpawn: true, multiplier, maxLimit };
+    }
+    
+    // Check if on an unlocked page
+    const isOnUnlockedPage = 
+      (pathname === '/home' && unlockedPages.home) ||
+      (pathname === '/games/heartweaver' && unlockedPages.games) ||
+      (pathname === '/team' && unlockedPages.team);
+    
+    if (!isOnUnlockedPage) {
+      return { shouldSpawn: false, multiplier: 0, maxLimit: 0 };
+    }
+    
+    // Calculate multiplier based on unlocked pages
+    let multiplier = 1 + unlockedCount; // Base +1 for each unlocked page
+    
+    // Additional multiplier if on a specific unlocked page
+    if (pathname === '/home' && unlockedPages.home) multiplier += 1;
+    if (pathname === '/games/heartweaver' && unlockedPages.games) multiplier += 1;
+    if (pathname === '/team' && unlockedPages.team) multiplier += 1;
+    
+    // Calculate max limit: base 10 + 10 per unlocked page + 10 if on specific unlocked page
+    let maxLimit = 10 + (unlockedCount * 10);
+    if (pathname === '/home' && unlockedPages.home) maxLimit += 10;
+    if (pathname === '/games/heartweaver' && unlockedPages.games) maxLimit += 10;
+    if (pathname === '/team' && unlockedPages.team) maxLimit += 10;
+    
+    return { shouldSpawn: true, multiplier, maxLimit };
+  }, [unlockedPages, pathname]);
 
   const generateOctopus = useCallback((): Octopus => {
     const now = Date.now();
@@ -30,67 +93,111 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
       x: Math.random() * 90 + 5, // Entre 5% y 95%
       y: Math.random() * 90 + 5,
       collected: false,
-      size: Math.random() * 15 + 20, // Entre 20px y 35px
+      size: 35, // Fixed size - always the maximum size
       fading: false,
       createdAt: now
     };
   }, []);
 
   useEffect(() => {
-    // Generate initial krakenlings
-    const initialOctopuses = Array.from({ length: 3 }, () => generateOctopus());
-    setOctopuses(initialOctopuses);
-
-    // Generate new krakenlings every 3-5 seconds
-    const interval = setInterval(() => {
-      setOctopuses(prev => {
-        // Clean up krakenlings that have completely disappeared
-        const active = prev.filter(o => !o.fading || (o.collectedAt && Date.now() - o.collectedAt < 2000));
-        if (active.length < 5) { // Maximum 5 active krakenlings
-          return [...active, generateOctopus()];
+    // Always start with empty array
+    setOctopuses([]);
+    
+    const spawnInfo = getSpawnInfo();
+    
+    if (!spawnInfo.shouldSpawn) {
+      // Clear all krakenlings if not on an unlocked page
+      return;
+    }
+    
+    const multiplier = spawnInfo.multiplier;
+    const maxLimit = spawnInfo.maxLimit;
+    
+    // Check if shop was just closed
+    const shopJustClosed = wasShopJustClosed();
+    
+    // Calculate delay before starting to spawn
+    let spawnDelay = 0;
+    if (shopJustClosed) {
+      // If shop was just closed, wait at least 1 second before spawning
+      const shopClosedTime = typeof window !== 'undefined' ? localStorage.getItem('shop-closed-time') : null;
+      if (shopClosedTime) {
+        const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
+        const remainingDelay = Math.max(0, 1000 - timeSinceClose);
+        spawnDelay = remainingDelay;
+        
+        // Clear the timestamp after checking
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('shop-closed-time');
         }
-        return active;
-      });
-    }, 3000 + Math.random() * 2000);
+      }
+    } else {
+      // Normal behavior: generate initial krakenlings after a small delay
+      spawnDelay = 100;
+    }
+    
+    // Generate initial krakenlings after delay (only a few, not up to maxLimit)
+    const initialSpawnTimeout = setTimeout(() => {
+      if (!shopJustClosed || spawnDelay >= 1000) {
+        const initialSpawnCount = 1; // Always spawn only 3 initially
+        const initialOctopuses = Array.from({ length: initialSpawnCount }, () => generateOctopus());
+        setOctopuses(initialOctopuses);
+      }
+    }, spawnDelay);
 
-    return () => clearInterval(interval);
-  }, [generateOctopus]);
-
-  // Effect to handle automatic fade out after a time without collecting
-  useEffect(() => {
-    const fadeInterval = setInterval(() => {
-      setOctopuses(prev => prev.map(o => {
-        // If not collected and a lot of time has passed, start automatic fade out
-        if (!o.collected && !o.fading) {
-          const timeSinceCreated = Date.now() - o.createdAt;
-          // Uncollected krakenlings disappear after 10 seconds
-          if (timeSinceCreated >= 10000) {
-            return { ...o, fading: true, collectedAt: Date.now() };
+    // Generate new krakenlings - slower spawn rate with reduced multiplier effect
+    // Also delay the interval start if shop was just closed
+    const baseInterval = 5000 + Math.random() * 3000; // Increased from 3000-5000ms to 5000-8000ms
+    const intervalStartDelay = shopJustClosed ? Math.max(1000, spawnDelay) : 0;
+    
+    // Reduce multiplier effect on spawn rate (use square root for slower growth)
+    const spawnRateMultiplier = 1 + (multiplier - 1) * 0.3; // Only 30% of multiplier effect
+    
+    let intervalId: NodeJS.Timeout | null = null;
+    const intervalTimeout = setTimeout(() => {
+      intervalId = setInterval(() => {
+        const currentSpawnInfo = getSpawnInfo();
+        if (!currentSpawnInfo.shouldSpawn) {
+          // Stop spawning if page is no longer unlocked
+          setOctopuses([]);
+          return;
+        }
+        
+        setOctopuses(prev => {
+          // Clean up krakenlings that have completely disappeared
+          const active = prev.filter(o => !o.fading || (o.collectedAt && Date.now() - o.collectedAt < 2000));
+          const currentMaxLimit = currentSpawnInfo.maxLimit;
+          // Only spawn if we haven't reached the max limit
+          if (active.length < currentMaxLimit) {
+            return [...active, generateOctopus()];
           }
-        }
-        // If collected by click, fade out already started immediately
-        // We don't need to do anything else here
-        return o;
-      }));
-    }, 50);
+          return active;
+        });
+      }, baseInterval / spawnRateMultiplier); // Slower spawn with reduced multiplier effect
+    }, intervalStartDelay);
 
-    return () => clearInterval(fadeInterval);
-  }, []);
+    return () => {
+      clearTimeout(initialSpawnTimeout);
+      clearTimeout(intervalTimeout);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [generateOctopus, getSpawnInfo, wasShopJustClosed]);
 
-  // Clean up krakenlings that have finished fading out
+
+
+  // Clean up krakenlings that have finished fading out (only collected ones)
   useEffect(() => {
     const cleanupInterval = setInterval(() => {
       setOctopuses(prev => prev.filter(o => {
+        // Only remove collected krakenlings after animation completes
         if (o.fading && o.collectedAt) {
           const timeSinceFadeStart = Date.now() - o.collectedAt;
-          // Eliminar después de 300ms de animación
+          // Remove after 300ms animation
           return timeSinceFadeStart < 300;
         }
-        // Si no está fading pero lleva mucho tiempo sin recolectar, eliminarlo
-        if (!o.collected && !o.fading) {
-          const timeSinceCreated = Date.now() - o.createdAt;
-          return timeSinceCreated < 12000; // Máximo 12 segundos (10s + 2s de margen)
-        }
+        // Never remove uncollected krakenlings automatically
         return true;
       }));
     }, 100);
@@ -98,9 +205,74 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     return () => clearInterval(cleanupInterval);
   }, []);
 
+  // Listen for shop open/close events
+  useEffect(() => {
+    const handleShopOpen = () => {
+      // Clear all krakenlings when shop opens
+      setOctopuses([]);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('shop-closed-time');
+      }
+    };
+
+    const handleShopClose = () => {
+      // Mark timestamp when shop closes
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('shop-closed-time', Date.now().toString());
+      }
+    };
+
+    window.addEventListener('shopOpened', handleShopOpen);
+    window.addEventListener('shopClosed', handleShopClose);
+
+    return () => {
+      window.removeEventListener('shopOpened', handleShopOpen);
+      window.removeEventListener('shopClosed', handleShopClose);
+    };
+  }, []);
+
   const handleOctopusClick = (octopus: Octopus) => {
     if (!octopus.collected && !collectedOctopuses.includes(octopus.id) && !octopus.fading) {
+      // Calculate collection value based on manually picked count and upgrades
+      let collectionValue = 1; // Base: 1 Krakenling
+      
+      try {
+        if (typeof window !== 'undefined') {
+          // Get total manually picked krakenlings (not from agents)
+          const pickedCount = parseFloat(localStorage.getItem('octopus-picked-count') || '0');
+          const pickedTotal = Math.floor(pickedCount);
+          
+          const savedUnlockables = localStorage.getItem('unlockables-progress');
+          if (savedUnlockables) {
+            const unlockables: any[] = JSON.parse(savedUnlockables);
+            const collectionUpgrades = unlockables.filter(
+              u => u.type === 'upgrade' && u.upgradeType === 'collection-multiplier' && u.unlocked && u.multiplierManualValue !== undefined
+            );
+            
+            // Use only the highest multiplier (not sum them)
+            if (collectionUpgrades.length > 0) {
+              const maxMultiplier = Math.max(...collectionUpgrades.map(u => u.multiplierManualValue || 1));
+              collectionValue += pickedTotal * maxMultiplier;
+            }
+          }
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+      
       onCollect(octopus.id);
+      
+      // Play collect sound
+      playCollect();
+      
+      // Show floating text with value
+      setFloatingTexts(prev => [...prev, {
+        id: `floating-${octopus.id}-${Date.now()}`,
+        value: collectionValue,
+        x: octopus.x,
+        y: octopus.y
+      }]);
+      
       // Generar partículas para el efecto
       const particles = Array.from({ length: 8 }, (_, i) => ({
         angle: (i * 360) / 8, // Distribuir en círculo
@@ -120,8 +292,24 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     }
   };
 
+  const removeFloatingText = (id: string) => {
+    setFloatingTexts(prev => prev.filter(t => t.id !== id));
+  };
+
   return (
-    <div className="fixed inset-0 pointer-events-none z-[50]">
+    <>
+      {/* Floating texts - outside the pointer-events-none container */}
+      {floatingTexts.map(text => (
+        <FloatingText
+          key={text.id}
+          value={text.value}
+          x={text.x}
+          y={text.y}
+          onComplete={() => removeFloatingText(text.id)}
+        />
+      ))}
+      
+      <div className="fixed inset-0 pointer-events-none z-[50]">
       {octopuses
         .filter(o => {
           // Mostrar pulpitos no recolectados
@@ -233,7 +421,8 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
             </div>
           );
         })}
-    </div>
+      </div>
+    </>
   );
 }
 

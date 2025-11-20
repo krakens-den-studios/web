@@ -14,6 +14,7 @@ import KrakenTreasure from './KrakenTreasure';
 import OctopusCollector from './OctopusCollector';
 import { useOctopuses } from '@/hooks/useOctopuses';
 import { formatNumber } from '@/utils/formatNumber';
+import { useAudio } from '@/hooks/useAudio';
 
 const Header = () => {
   const pathname = usePathname();
@@ -21,10 +22,24 @@ const Header = () => {
   const [showTreasure, setShowTreasure] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
+  const { playButtonClick } = useAudio();
 
   useEffect(() => {
     setIsDialogOpen(false);
   }, [pathname]);
+
+  // Listen for custom event to open treasure
+  useEffect(() => {
+    const handleOpenTreasure = () => {
+      setShowTreasure(true);
+      // Dispatch event when shop opens
+      window.dispatchEvent(new CustomEvent('shopOpened'));
+    };
+    window.addEventListener('openTreasure', handleOpenTreasure);
+    return () => {
+      window.removeEventListener('openTreasure', handleOpenTreasure);
+    };
+  }, []);
 
   const isScrolled = useIsScrolled();
 
@@ -54,17 +69,23 @@ const Header = () => {
 
   return (
     <header className="w-full fixed z-30 flex justify-center">
-      {/* Collectable krakenlings on all pages */}
-      <OctopusCollector
-        onCollect={collectOctopus}
-        collectedOctopuses={collectedOctopuses}
-      />
+      {/* Collectable krakenlings on all pages - only show when treasure is closed */}
+      {!showTreasure && (
+        <OctopusCollector
+          onCollect={collectOctopus}
+          collectedOctopuses={collectedOctopuses}
+        />
+      )}
       
       {showTreasure && (
         <KrakenTreasure
           collectedOctopuses={octopusCount}
           onOctopusChange={updateOctopusCount}
-          onClose={() => setShowTreasure(false)}
+          onClose={() => {
+            setShowTreasure(false);
+            // Dispatch event when shop closes
+            window.dispatchEvent(new CustomEvent('shopClosed'));
+          }}
         />
       )}
       <div
@@ -91,7 +112,10 @@ const Header = () => {
 
         <HiMenu
           className="text-white h-14 w-14 lg:hidden cursor-pointer hover:text-turquoise-400"
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => {
+            playButtonClick();
+            setIsDialogOpen(true);
+          }}
         />
 
         <div className="h-14 gap-8 items-center hidden lg:flex">
@@ -186,13 +210,16 @@ const Header = () => {
             <span className="font-bold">{formatNumber(octopusCount)}</span>
           </div>
           <button
-            onClick={() => setShowTreasure(true)}
-            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap"
-            title="Open The Kraken's Treasure"
+            onClick={() => {
+              playButtonClick();
+              setShowTreasure(true);
+              // Dispatch event when shop opens
+              window.dispatchEvent(new CustomEvent('shopOpened'));
+            }}
+            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap font-lora font-bold text-black text-xl"
+            title="Open Treasure"
           >
-            <span className="font-lora font-bold text-black text-xl">
-              The Kraken's Treasure
-            </span>
+            Open Treasure
           </button>
 
           {socialLinks}
@@ -203,7 +230,10 @@ const Header = () => {
             <div className="relative flex w-full flex-col items-end px-3 py-5 gap-4">
               <HiOutlineX
                 className="text-white h-14 w-14 cursor-pointer hover:text-turquoise-400"
-                onClick={() => setIsDialogOpen(false)}
+                onClick={() => {
+                  playButtonClick();
+                  setIsDialogOpen(false);
+                }}
               />
 
               <div className="relative flex w-full flex-col items-center p-6 gap-4">
