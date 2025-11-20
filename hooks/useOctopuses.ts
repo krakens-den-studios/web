@@ -25,6 +25,8 @@ export function useOctopuses() {
   const [collectedOctopuses, setCollectedOctopuses] = useState<string[]>([]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const savedCount = localStorage.getItem(OCTOPUS_COUNT_KEY);
     const savedCollected = localStorage.getItem(OCTOPUS_COLLECTED_KEY);
     
@@ -47,7 +49,9 @@ export function useOctopuses() {
 
   const updateOctopusCount = (newCount: number) => {
     setOctopusCount(newCount);
-    localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+    }
   };
 
   const collectOctopus = (octopusId: string) => {
@@ -58,8 +62,10 @@ export function useOctopuses() {
       setCollectedOctopuses(newCollected);
       setOctopusCount(newCount);
       
-      localStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
-      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
+        localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      }
     }
   };
 
@@ -85,6 +91,8 @@ export function useOctopuses() {
   // Automatic agent collection system (works globally)
   // Also synchronizes counter from localStorage for external changes
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Use a ref to store fractional count to avoid losing precision
     // Always read from localStorage to sync with external changes (like purchases)
     const updateCount = () => {

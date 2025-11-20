@@ -13,6 +13,15 @@ interface UnlockedPages {
 }
 
 const loadUnlockedPages = (): UnlockedPages => {
+  if (typeof window === 'undefined') {
+    return {
+      home: false,
+      games: false,
+      team: false,
+      newsletter: false
+    };
+  }
+  
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
@@ -44,7 +53,17 @@ const loadUnlockedPages = (): UnlockedPages => {
 };
 
 export function useUnlockedPages() {
-  const [unlockedPages, setUnlockedPages] = useState<UnlockedPages>(loadUnlockedPages);
+  const [unlockedPages, setUnlockedPages] = useState<UnlockedPages>({
+    home: false,
+    games: false,
+    team: false,
+    newsletter: false
+  });
+  
+  // Load from localStorage on client side only
+  useEffect(() => {
+    setUnlockedPages(loadUnlockedPages());
+  }, []);
 
   useEffect(() => {
     const updateUnlockedPages = () => {

@@ -9,6 +9,8 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const [showFooter, setShowFooter] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Check if user has already seen the first visit modal
     const hasSeenFirstVisit = localStorage.getItem('has-seen-first-visit');
     if (hasSeenFirstVisit) {

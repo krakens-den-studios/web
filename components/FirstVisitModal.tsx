@@ -12,6 +12,8 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
   const [isCollecting, setIsCollecting] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Check if user has already seen the first visit modal
     const hasSeenFirstVisit = localStorage.getItem('has-seen-first-visit');
     if (!hasSeenFirstVisit) {
@@ -26,6 +28,8 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
     if (isCollecting) return;
     
     setIsCollecting(true);
+    
+    if (typeof window === 'undefined') return;
     
     // Mark as seen
     localStorage.setItem('has-seen-first-visit', 'true');

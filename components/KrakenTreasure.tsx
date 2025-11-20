@@ -254,6 +254,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
 
   // Actualizar el contador constantemente desde localStorage para incremento suave
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const updateInterval = setInterval(() => {
       const savedCount = parseInt(localStorage.getItem('octopus-count') || '0', 10);
       setDisplayOctopusCount(savedCount);
@@ -528,6 +530,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
   ]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Load saved progress
     const savedMinigames = localStorage.getItem(MINIGAMES_STORAGE_KEY);
     const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
@@ -658,21 +662,25 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     );
     
     setMinigames(updatedMinigames);
-    localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
-    
-    // Give krakenlings as reward
-    // Get current fractional count from localStorage to maintain precision
-    const currentFractional = parseFloat(localStorage.getItem('octopus-count') || '0');
-    const newFractionalCount = currentFractional + newReward;
-    const newCount = Math.floor(newFractionalCount);
-    onOctopusChange(newCount);
-    // Save fractional count to maintain precision
-    localStorage.setItem('octopus-count', newFractionalCount.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+      
+      // Give krakenlings as reward
+      // Get current fractional count from localStorage to maintain precision
+      const currentFractional = parseFloat(localStorage.getItem('octopus-count') || '0');
+      const newFractionalCount = currentFractional + newReward;
+      const newCount = Math.floor(newFractionalCount);
+      onOctopusChange(newCount);
+      // Save fractional count to maintain precision
+      localStorage.setItem('octopus-count', newFractionalCount.toString());
+    }
     
     setShowMinigame(null);
   };
 
   const handlePurchaseUnlockable = (unlockableId: string) => {
+    if (typeof window === 'undefined') return;
+    
     const unlockable = unlockables.find(u => u.id === unlockableId);
     if (!unlockable || unlockable.unlocked || displayOctopusCount < unlockable.cost) return;
 
@@ -688,9 +696,11 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     setUnlockables(updatedUnlockables);
     onOctopusChange(newCount);
     
-    localStorage.setItem(UNLOCKABLES_STORAGE_KEY, JSON.stringify(updatedUnlockables));
-    // Save fractional count to maintain precision
-    localStorage.setItem('octopus-count', newFractionalCount.toString());
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(UNLOCKABLES_STORAGE_KEY, JSON.stringify(updatedUnlockables));
+      // Save fractional count to maintain precision
+      localStorage.setItem('octopus-count', newFractionalCount.toString());
+    }
     
     // Handle upgrade purchases
     if (unlockable.type === 'upgrade') {
@@ -713,7 +723,9 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
           a.id === unlockable.targetAgentId ? { ...a, multiplier: finalMultiplier } : a
         );
         setAgents(updatedAgents);
-        localStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(updatedAgents));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(updatedAgents));
+        }
       } else if (unlockable.upgradeType === 'minigame-cooldown' && unlockable.targetMinigameId && unlockable.multiplierValue !== undefined) {
         // Apply cooldown reduction to the target minigame
         const updatedMinigames = minigames.map(m => {
@@ -725,7 +737,9 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
           return m;
         });
         setMinigames(updatedMinigames);
-        localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+        }
       }
       // Passive upgrades are handled in useOctopuses hook
     }
@@ -747,7 +761,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
       };
       
       const emotionId = emotionMap[unlockableId];
-      if (emotionId) {
+      if (emotionId && typeof window !== 'undefined') {
         const saved = localStorage.getItem(STORAGE_KEY);
         let progress: any = { emotions: [] };
         
@@ -780,11 +794,15 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         m.emotionId === emotionId ? { ...m, unlocked: true } : m
       );
       setMinigames(updatedMinigames);
-      localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+      }
     }
   };
 
   const handlePurchaseAgent = (agentId: string) => {
+    if (typeof window === 'undefined') return;
+    
     const agent = agents.find(a => a.id === agentId);
     if (!agent) return;
     

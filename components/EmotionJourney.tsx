@@ -125,6 +125,8 @@ export default function EmotionJourney({
   const userSequenceRef = useRef<number[]>([]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Load saved progress
     const saved = localStorage.getItem(STORAGE_KEY);
     const savedOctopuses = localStorage.getItem(OCTOPUS_STORAGE_KEY);
@@ -179,8 +181,10 @@ export default function EmotionJourney({
       setCollectedOctopuses(newCollected);
       setOctopusCount(newCount);
       
-      localStorage.setItem(OCTOPUS_STORAGE_KEY, JSON.stringify(newCollected));
-      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(OCTOPUS_STORAGE_KEY, JSON.stringify(newCollected));
+        localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      }
     }
   };
 
@@ -197,13 +201,15 @@ export default function EmotionJourney({
     setEmotions(updatedEmotions);
     setUnlockedCount(prev => prev + 1);
     
-    localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
-    const newUnlockedCount = unlockedCount + 1;
-    setUnlockedCount(newUnlockedCount);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      emotions: updatedEmotions,
-      unlockedCount: newUnlockedCount
-    }));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      const newUnlockedCount = unlockedCount + 1;
+      setUnlockedCount(newUnlockedCount);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        emotions: updatedEmotions,
+        unlockedCount: newUnlockedCount
+      }));
+    }
 
     window.dispatchEvent(new CustomEvent('emotionUnlocked'));
   };
@@ -363,10 +369,12 @@ export default function EmotionJourney({
   };
 
   const skipJourney = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      emotions: emotions.map(e => ({ ...e, unlocked: true })),
-      unlockedCount: emotions.length
-    }));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        emotions: emotions.map(e => ({ ...e, unlocked: true })),
+        unlockedCount: emotions.length
+      }));
+    }
     if (onComplete) {
       onComplete();
     } else if (onClose) {
