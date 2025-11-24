@@ -6,6 +6,7 @@ import Button from './Button';
 import OctopusCollector from './OctopusCollector';
 import EmotionShop from './EmotionShop';
 import { RiEmotionLine } from 'react-icons/ri';
+import { cookieStorage } from '@/utils/cookieStorage';
 
 interface Emotion {
   id: string;
@@ -128,9 +129,9 @@ export default function EmotionJourney({
     if (typeof window === 'undefined') return;
     
     // Load saved progress
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const savedOctopuses = localStorage.getItem(OCTOPUS_STORAGE_KEY);
-    const savedCount = localStorage.getItem(OCTOPUS_COUNT_KEY);
+    const saved = cookieStorage.getItem(STORAGE_KEY);
+    const savedOctopuses = cookieStorage.getItem(OCTOPUS_STORAGE_KEY);
+    const savedCount = cookieStorage.getItem(OCTOPUS_COUNT_KEY);
     
     if (saved) {
       try {
@@ -182,8 +183,8 @@ export default function EmotionJourney({
       setOctopusCount(newCount);
       
       if (typeof window !== 'undefined') {
-        localStorage.setItem(OCTOPUS_STORAGE_KEY, JSON.stringify(newCollected));
-        localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+        cookieStorage.setItem(OCTOPUS_STORAGE_KEY, JSON.stringify(newCollected));
+        cookieStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
       }
     }
   };
@@ -202,10 +203,10 @@ export default function EmotionJourney({
     setUnlockedCount(prev => prev + 1);
     
     if (typeof window !== 'undefined') {
-      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      cookieStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
       const newUnlockedCount = unlockedCount + 1;
       setUnlockedCount(newUnlockedCount);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      cookieStorage.setItem(STORAGE_KEY, JSON.stringify({
         emotions: updatedEmotions,
         unlockedCount: newUnlockedCount
       }));
@@ -370,7 +371,7 @@ export default function EmotionJourney({
 
   const skipJourney = () => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      cookieStorage.setItem(STORAGE_KEY, JSON.stringify({
         emotions: emotions.map(e => ({ ...e, unlocked: true })),
         unlockedCount: emotions.length
       }));

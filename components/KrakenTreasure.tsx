@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Button from './Button';
 import { RiLockLine, RiEmotionLine, RiGamepadLine, RiShoppingBagLine } from 'react-icons/ri';
-import { formatNumber } from '@/utils/formatNumber';
+import { formatNumber, formatKrakenValue } from '@/utils/formatNumber';
 import HopeMinigame from './Minigames/HopeMinigame';
 import CourageMinigame from './Minigames/CourageMinigame';
 import ConnectionMinigame from './Minigames/ConnectionMinigame';
@@ -12,39 +12,123 @@ import FloatingText from './FloatingText';
 import { Route } from '@/shared/Route';
 import Link from 'next/link';
 import { useAudio } from '@/hooks/useAudio';
+import { usePathname } from 'next/navigation';
+import { useUnlockedPages } from '@/hooks/useUnlockedPages';
+import { cookieStorage } from '@/utils/cookieStorage';
+import {
+  AgentState as Agent,
+  MinigameState as Minigame,
+  MissionState as Mission,
+  UnlockableState as Unlockable,
+  buildAgents,
+  buildMinigames,
+  buildMissions,
+  buildUnlockables,
+  deserializeAgents,
+  deserializeMinigames,
+  deserializeMissions,
+  deserializeUnlockables,
+  serializeAgentProgress,
+  serializeMinigameProgress,
+  serializeMissionProgress,
+  serializeUnlockableProgress
+} from '@/shared/gameData';
 
-interface Minigame {
-  id: string;
-  name: string;
-  description: string;
-  emotionId: string;
-  baseReward: number; // Base krakenlings given upon completion
-  reward: number; // Current reward (increases with each completion)
-  unlocked: boolean;
-  completed: boolean;
-  timesCompleted: number; // Number of times this minigame has been completed
-  lastPlayed: number; // Timestamp of last time played
-  baseCooldown: number; // Base cooldown in ms
-  cooldown: number; // Current cooldown in ms (reduced by upgrades)
-  cooldownReduction: number; // Percentage reduction (0-1)
-  rewardMultiplier: number; // Multiplier for rewards (starts at 1.0)
-}
+const persistMissionProgress = (missions: Mission[]) => {
+  const payload = serializeMissionProgress(missions);
+  if (payload.length === 0) {
+    cookieStorage.removeItem(MISSIONS_STORAGE_KEY);
+  } else {
+    cookieStorage.setItem(MISSIONS_STORAGE_KEY, JSON.stringify(payload));
+  }
+};
 
-interface Unlockable {
-  id: string;
-  name: string;
-  description: string;
-  cost: number;
-  unlocked: boolean;
-  route?: string;
-  type: 'page' | 'feature' | 'treasure' | 'upgrade';
-  upgradeType?: 'passive' | 'agent-multiplier' | 'minigame-cooldown' | 'minigame-reward-multiplier' | 'audio' | 'collection-multiplier'; // Para mejoras
-  targetAgentId?: string; // Para multiplicadores de agentes específicos
-  targetMinigameId?: string; // Para mejoras de minijuegos específicos
-  multiplierValue?: number; // Valor del multiplicador (para agentes y otros)
-  multiplierManualValue?: number; // Multiplicador para recolección manual
-  thresholdKps?: number; // Krakenlings por segundo requeridos para mostrar esta mejora
-}
+const defaultAudioSettings = {
+  buttonClickEnabled: false,
+  collectEnabled: false,
+  minigameSoundsEnabled: {
+    hope: false,
+    courage: false,
+    connection: false,
+    healing: false
+  },
+  musicEnabled: false
+};
+
+const getAudioSettingsFromCookie = () => {
+  const saved = cookieStorage.getItem(AUDIO_SETTINGS_KEY);
+  if (!saved) return { ...defaultAudioSettings };
+  try {
+    const parsed = JSON.parse(saved);
+    return {
+      buttonClickEnabled: !!parsed.buttonClickEnabled,
+      collectEnabled: !!parsed.collectEnabled,
+      minigameSoundsEnabled: {
+        hope: !!parsed.minigameSoundsEnabled?.hope,
+        courage: !!parsed.minigameSoundsEnabled?.courage,
+        connection: !!parsed.minigameSoundsEnabled?.connection,
+        healing: !!parsed.minigameSoundsEnabled?.healing
+      },
+      musicEnabled: !!parsed.musicEnabled
+    };
+  } catch (e) {
+    return { ...defaultAudioSettings };
+  }
+};
+
+const persistAudioSettings = (settings: typeof defaultAudioSettings) => {
+  cookieStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settings));
+};
+
+const updateAudioSettingsForUnlockable = (unlockableId: string) => {
+  const current = getAudioSettingsFromCookie();
+  let changed = false;
+  switch (unlockableId) {
+    case 'sound-button-click':
+      if (!current.buttonClickEnabled || !current.collectEnabled) {
+        current.buttonClickEnabled = true;
+        current.collectEnabled = true;
+        changed = true;
+      }
+      break;
+    case 'sound-minigame-hope':
+      if (!current.minigameSoundsEnabled.hope) {
+        current.minigameSoundsEnabled.hope = true;
+        changed = true;
+      }
+      break;
+    case 'sound-minigame-courage':
+      if (!current.minigameSoundsEnabled.courage) {
+        current.minigameSoundsEnabled.courage = true;
+        changed = true;
+      }
+      break;
+    case 'sound-minigame-connection':
+      if (!current.minigameSoundsEnabled.connection) {
+        current.minigameSoundsEnabled.connection = true;
+        changed = true;
+      }
+      break;
+    case 'sound-minigame-healing':
+      if (!current.minigameSoundsEnabled.healing) {
+        current.minigameSoundsEnabled.healing = true;
+        changed = true;
+      }
+      break;
+    case 'sound-music':
+      if (!current.musicEnabled) {
+        current.musicEnabled = true;
+        changed = true;
+      }
+      break;
+  }
+  if (changed) {
+    persistAudioSettings(current);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('audioSettingsChanged'));
+    }
+  }
+};
 
 interface KrakenTreasureProps {
   collectedOctopuses: number;
@@ -56,19 +140,8 @@ const STORAGE_KEY = 'emotion-journey-progress';
 const MINIGAMES_STORAGE_KEY = 'minigames-progress';
 const UNLOCKABLES_STORAGE_KEY = 'unlockables-progress';
 const AGENTS_STORAGE_KEY = 'agents-progress';
-
-interface Agent {
-  id: string;
-  name: string;
-  description: string;
-  baseCost: number; // Costo base
-  owned: number;
-  collectionRate: number; // Krakenlings per second
-  collectionInterval: number; // Intervalo en ms
-  costMultiplier: number; // Multiplicador exponencial para el precio
-  multiplier: number; // Multiplicador de eficiencia (starts at 1.0)
-  unlockRequirement?: string; // ID del agente que debe estar desbloqueado (owned > 0) para que este aparezca
-}
+const MISSIONS_STORAGE_KEY = 'missions-progress';
+const AUDIO_SETTINGS_KEY = 'audio-settings';
 
 // Función para calcular el precio actual de un agente basado en cuántos tiene
 const calculateAgentCost = (agent: Agent): number => {
@@ -84,175 +157,18 @@ const getAgentEfficiency = (agent: Agent): number => {
 
 export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, onClose }: KrakenTreasureProps) {
   const { playButtonClick } = useAudio();
-  const [activeTab, setActiveTab] = useState<'helpers' | 'treasures' | 'upgrades' | 'therapies'>('helpers');
+  const pathname = usePathname();
+  const [activeTab, setActiveTab] = useState<'helpers' | 'treasures' | 'upgrades' | 'therapies' | 'missions'>('therapies');
   const [displayOctopusCount, setDisplayOctopusCount] = useState(collectedOctopuses);
+  const [pickedCount, setPickedCount] = useState(0);
   const [showMinigame, setShowMinigame] = useState<string | null>(null);
   const [totalPulpitosPerSecond, setTotalPulpitosPerSecond] = useState(0);
   const [floatingTexts, setFloatingTexts] = useState<Array<{ id: string; value: number; x: number; y: number }>>([]);
-  const [minigames, setMinigames] = useState<Minigame[]>([
-    {
-      id: 'hope',
-      name: 'Hope – Follow the Light',
-      description: 'Follow the light. Focus on one step at a time.',
-      emotionId: 'hope',
-      baseReward: 10,
-      reward: 10,
-      unlocked: true,
-      completed: false,
-      timesCompleted: 0,
-      lastPlayed: 0,
-      baseCooldown: 30000, // 30 segundos
-      cooldown: 30000,
-      cooldownReduction: 0,
-      rewardMultiplier: 1.0
-    },
-    {
-      id: 'courage',
-      name: 'Courage – Hold the Pressure',
-      description: 'Hold the button. Stay with discomfort a little longer.',
-      emotionId: 'courage',
-      baseReward: 15,
-      reward: 15,
-      unlocked: false,
-      completed: false,
-      timesCompleted: 0,
-      lastPlayed: 0,
-      baseCooldown: 45000, // 45 segundos
-      cooldown: 45000,
-      cooldownReduction: 0,
-      rewardMultiplier: 1.0
-    },
-    {
-      id: 'connection',
-      name: 'Connection – Connect the Dots',
-      description: 'Connect the letters. Build the word.',
-      emotionId: 'connection',
-      baseReward: 20,
-      reward: 20,
-      unlocked: false,
-      completed: false,
-      timesCompleted: 0,
-      lastPlayed: 0,
-      baseCooldown: 60000, // 60 segundos
-      cooldown: 60000,
-      cooldownReduction: 0,
-      rewardMultiplier: 1.0
-    },
-    {
-      id: 'healing',
-      name: 'Healing – Breathing Rhythm',
-      description: 'Tap with the rhythm. Notice your breath.',
-      emotionId: 'healing',
-      baseReward: 25,
-      reward: 25,
-      unlocked: false,
-      completed: false,
-      timesCompleted: 0,
-      lastPlayed: 0,
-      baseCooldown: 75000, // 75 segundos
-      cooldown: 75000,
-      cooldownReduction: 0,
-      rewardMultiplier: 1.0
-    }
-  ]);
+  const [missions, setMissions] = useState<Mission[]>(buildMissions());
+  const [missionsLoaded, setMissionsLoaded] = useState(false);
+  const [minigames, setMinigames] = useState<Minigame[]>(buildMinigames());
 
-  const [agents, setAgents] = useState<Agent[]>([
-    {
-      id: 'baby-kraken',
-      name: 'Baby Kraken – Tiny Scout',
-      description: 'Collects 1 Krakenling per second.',
-      baseCost: 20,
-      owned: 0,
-      collectionRate: 1, // 1 krakenling per second
-      collectionInterval: 1000,
-      costMultiplier: 1.5, // Price increases 50% each time
-      multiplier: 1.0
-    },
-    {
-      id: 'young-kraken',
-      name: 'Young Kraken – Steady Guardian',
-      description: 'Collects 5 Krakenlings per second.',
-      baseCost: 100,
-      owned: 0,
-      collectionRate: 5, // 5 krakenlings per second (more efficient: 0.05 krakenlings per krakenling invested vs 0.033 for baby)
-      collectionInterval: 1000,
-      costMultiplier: 1.4, // Price increases 40% each time
-      multiplier: 1.0,
-      unlockRequirement: 'baby-kraken'
-    },
-    {
-      id: 'adult-kraken',
-      name: 'Adult Kraken – Deep Tide Keeper',
-      description: 'Collects 20 Krakenlings per second.',
-      baseCost: 500,
-      owned: 0,
-      collectionRate: 20, // 20 krakenlings per second (more efficient: 0.04 krakenlings per krakenling invested)
-      collectionInterval: 1000,
-      costMultiplier: 1.3, // Price increases 30% each time
-      multiplier: 1.0,
-      unlockRequirement: 'young-kraken'
-    },
-    {
-      id: 'elder-kraken',
-      name: 'Elder Kraken – Ancient Current',
-      description: 'Collects 50 Krakenlings per second.',
-      baseCost: 2000,
-      owned: 0,
-      collectionRate: 50,
-      collectionInterval: 1000,
-      costMultiplier: 1.25,
-      multiplier: 1.0,
-      unlockRequirement: 'adult-kraken'
-    },
-    {
-      id: 'guardian-kraken',
-      name: 'Guardian Kraken – Protector of Depths',
-      description: 'Collects 100 Krakenlings per second.',
-      baseCost: 5000,
-      owned: 0,
-      collectionRate: 100,
-      collectionInterval: 1000,
-      costMultiplier: 1.2,
-      multiplier: 1.0,
-      unlockRequirement: 'elder-kraken'
-    },
-    {
-      id: 'tide-master',
-      name: 'Tide Master – Keeper of Flow',
-      description: 'Collects 200 Krakenlings per second.',
-      baseCost: 10000,
-      owned: 0,
-      collectionRate: 200,
-      collectionInterval: 1000,
-      costMultiplier: 1.15,
-      multiplier: 1.0,
-      unlockRequirement: 'guardian-kraken'
-    },
-    {
-      id: 'den-keeper',
-      name: 'Den Keeper – Heart of the Abyss',
-      description: 'Collects 500 Krakenlings per second.',
-      baseCost: 25000,
-      owned: 0,
-      collectionRate: 500,
-      collectionInterval: 1000,
-      costMultiplier: 1.1,
-      multiplier: 1.0,
-      unlockRequirement: 'tide-master'
-    },
-    {
-      id: 'the-player',
-      name: 'You – The True Treasure',
-      description: 'Collects 1000 Krakenlings per second. You are the treasure.',
-      baseCost: 50000,
-      owned: 0,
-      collectionRate: 1000,
-      collectionInterval: 1000,
-      costMultiplier: 1.05,
-      multiplier: 1.0,
-      unlockRequirement: 'den-keeper'
-    }
-  ]);
+  const [agents, setAgents] = useState<Agent[]>(buildAgents());
 
   // State to update minigame cooldown in real time
   const [cooldownUpdate, setCooldownUpdate] = useState(0);
@@ -262,16 +178,19 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     setDisplayOctopusCount(collectedOctopuses);
   }, [collectedOctopuses]);
 
-  // Actualizar el contador constantemente desde localStorage para incremento suave
+  // Actualizar el contador constantemente desde cookies para incremento suave
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
     const updateInterval = setInterval(() => {
-      const savedCount = parseInt(localStorage.getItem('octopus-count') || '0', 10);
+      const savedCount = parseInt(cookieStorage.getItem('octopus-count') || '0', 10);
       setDisplayOctopusCount(savedCount);
       if (savedCount !== collectedOctopuses) {
         onOctopusChange(savedCount);
       }
+      // Update picked count (manually collected)
+      const picked = parseFloat(cookieStorage.getItem('octopus-picked-count') || '0');
+      setPickedCount(picked);
     }, 100); // Actualizar cada 100ms para incremento suave y constante
 
     return () => clearInterval(updateInterval);
@@ -284,571 +203,147 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     return () => clearInterval(interval);
   }, []);
 
-  const [unlockables, setUnlockables] = useState<Unlockable[]>([
-    {
-      id: 'home',
-      name: 'Home Page – "The First Light"',
-      description: 'Unlock the main page. More Krakenlings appear here.',
-      cost: 200,
-      unlocked: false,
-      route: Route.HOME,
-      type: 'page'
-    },
-    {
-      id: 'games',
-      name: 'Games Page – "The Echo of Play"',
-      description: 'Unlock the games page. More Krakenlings appear here.',
-      cost: 500,
-      unlocked: false,
-      route: Route.HEART_WEAVER,
-      type: 'page'
-    },
-    {
-      id: 'team',
-      name: 'About Us – "Faces Behind the Tentacles"',
-      description: 'Unlock the team page. More Krakenlings appear here.',
-      cost: 1000,
-      unlocked: false,
-      route: Route.TEAM,
-      type: 'page'
-    },
-    {
-      id: 'contact',
-      name: 'Contact & Newsletter – "Message in a Bottle"',
-      description: 'Unlock contact. More Krakenlings appear.',
-      cost: 2000,
-      unlocked: false,
-      route: Route.HOME,
-      type: 'page'
-    },
-    {
-      id: 'newsletter',
-      name: 'Newsletter',
-      description: 'Unlock newsletter. More Krakenlings appear.',
-      cost: 2000,
-      unlocked: false,
-      type: 'page'
-    },
-    {
-      id: 'courage-minigame',
-      name: 'Therapy: Courage',
-      description: 'Unlock Courage therapy.',
-      cost: 300,
-      unlocked: false,
-      type: 'feature'
-    },
-    {
-      id: 'connection-minigame',
-      name: 'Therapy: Connection',
-      description: 'Unlock Connection therapy.',
-      cost: 800,
-      unlocked: false,
-      type: 'feature'
-    },
-    {
-      id: 'healing-minigame',
-      name: 'Therapy: Healing',
-      description: 'Unlock Healing therapy.',
-      cost: 1500,
-      unlocked: false,
-      type: 'feature'
-    },
-    {
-      id: 'true-heart',
-      name: 'True Heart of the Den',
-      description: 'The final treasure. You were the treasure all along.',
-      cost: 100000,
-      unlocked: false,
-      type: 'treasure'
-    },
-    {
-      id: 'passive-collection-1',
-      name: 'Gentle Currents – Passive Collection I',
-      description: '+10% passive collection rate.',
-      cost: 1000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'passive',
-      multiplierValue: 0.1
-    },
-    {
-      id: 'passive-collection-2',
-      name: 'Flowing Tides – Passive Collection II',
-      description: '+25% passive collection rate.',
-      cost: 5000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'passive',
-      multiplierValue: 0.25,
-      thresholdKps: 10
-    },
-    {
-      id: 'passive-collection-3',
-      name: 'Deep Resonance – Passive Collection III',
-      description: '+50% passive collection rate.',
-      cost: 20000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'passive',
-      multiplierValue: 0.5,
-      thresholdKps: 50
-    },
-    {
-      id: 'baby-multiplier-1',
-      name: 'Baby Kraken Boost I',
-      description: 'Doubles Baby Kraken collection rate.',
-      cost: 500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'baby-kraken',
-      multiplierValue: 2.0,
-      thresholdKps: 5
-    },
-    {
-      id: 'young-multiplier-1',
-      name: 'Young Kraken Boost I',
-      description: 'Doubles Young Kraken collection rate.',
-      cost: 2000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'young-kraken',
-      multiplierValue: 2.0,
-      thresholdKps: 20
-    },
-    {
-      id: 'adult-multiplier-1',
-      name: 'Adult Kraken Boost I',
-      description: 'Doubles Adult Kraken collection rate.',
-      cost: 5000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'adult-kraken',
-      multiplierValue: 2.0,
-      thresholdKps: 50
-    },
-    {
-      id: 'elder-multiplier-1',
-      name: 'Elder Kraken Boost I',
-      description: 'Doubles Elder Kraken collection rate.',
-      cost: 15000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'elder-kraken',
-      multiplierValue: 2.0,
-      thresholdKps: 100
-    },
-    {
-      id: 'guardian-multiplier-1',
-      name: 'Guardian Kraken Boost I',
-      description: 'Doubles Guardian Kraken collection rate.',
-      cost: 30000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'guardian-kraken',
-      multiplierValue: 2.0,
-      thresholdKps: 200
-    },
-    {
-      id: 'tide-multiplier-1',
-      name: 'Tide Master Boost I',
-      description: 'Doubles Tide Master collection rate.',
-      cost: 60000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'tide-master',
-      multiplierValue: 2.0,
-      thresholdKps: 500
-    },
-    {
-      id: 'den-multiplier-1',
-      name: 'Den Keeper Boost I',
-      description: 'Doubles Den Keeper collection rate.',
-      cost: 100000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'den-keeper',
-      multiplierValue: 2.0,
-      thresholdKps: 1000
-    },
-    {
-      id: 'player-multiplier-1',
-      name: 'Your Light Shines Brighter I',
-      description: 'Doubles your collection rate.',
-      cost: 200000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'agent-multiplier',
-      targetAgentId: 'the-player',
-      multiplierValue: 2.0,
-      thresholdKps: 2000
-    },
-    {
-      id: 'hope-cooldown-1',
-      name: 'Hope: Quicker Return',
-      description: '-25% Hope therapy cooldown.',
-      cost: 500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-cooldown',
-      targetMinigameId: 'hope',
-      multiplierValue: 0.25,
-      thresholdKps: 5
-    },
-    {
-      id: 'courage-cooldown-1',
-      name: 'Courage: Faster Recovery',
-      description: '-25% Courage therapy cooldown.',
-      cost: 1000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-cooldown',
-      targetMinigameId: 'courage',
-      multiplierValue: 0.25,
-      thresholdKps: 10
-    },
-    {
-      id: 'connection-cooldown-1',
-      name: 'Connection: Closer Bonds',
-      description: '-25% Connection therapy cooldown.',
-      cost: 2000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-cooldown',
-      targetMinigameId: 'connection',
-      multiplierValue: 0.25,
-      thresholdKps: 20
-    },
-    {
-      id: 'healing-cooldown-1',
-      name: 'Healing: Quicker Breath',
-      description: '-25% Healing therapy cooldown.',
-      cost: 3000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-cooldown',
-      targetMinigameId: 'healing',
-      multiplierValue: 0.25,
-      thresholdKps: 30
-    },
-    // Minigame reward multipliers - to keep minigames relevant as KPS increases
-    {
-      id: 'hope-reward-1',
-      name: 'Hope: Brighter Rewards',
-      description: '2x Hope therapy rewards.',
-      cost: 1000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'hope',
-      multiplierValue: 2.0,
-      thresholdKps: 50
-    },
-    {
-      id: 'hope-reward-2',
-      name: 'Hope: Radiant Bounty',
-      description: '3x Hope therapy rewards.',
-      cost: 5000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'hope',
-      multiplierValue: 3.0,
-      thresholdKps: 200
-    },
-    {
-      id: 'courage-reward-1',
-      name: 'Courage: Stronger Rewards',
-      description: '2x Courage therapy rewards.',
-      cost: 1500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'courage',
-      multiplierValue: 2.0,
-      thresholdKps: 75
-    },
-    {
-      id: 'courage-reward-2',
-      name: 'Courage: Valiant Returns',
-      description: '3x Courage therapy rewards.',
-      cost: 7500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'courage',
-      multiplierValue: 3.0,
-      thresholdKps: 300
-    },
-    {
-      id: 'connection-reward-1',
-      name: 'Connection: Deeper Bonds',
-      description: '2x Connection therapy rewards.',
-      cost: 2000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'connection',
-      multiplierValue: 2.0,
-      thresholdKps: 100
-    },
-    {
-      id: 'connection-reward-2',
-      name: 'Connection: Sacred Links',
-      description: '3x Connection therapy rewards.',
-      cost: 10000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'connection',
-      multiplierValue: 3.0,
-      thresholdKps: 400
-    },
-    {
-      id: 'healing-reward-1',
-      name: 'Healing: Gentler Returns',
-      description: '2x Healing therapy rewards.',
-      cost: 2500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'healing',
-      multiplierValue: 2.0,
-      thresholdKps: 125
-    },
-    {
-      id: 'healing-reward-2',
-      name: 'Healing: Profound Restoration',
-      description: '3x Healing therapy rewards.',
-      cost: 12500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'healing',
-      multiplierValue: 3.0,
-      thresholdKps: 500
-    },
-    // Global minigame reward multipliers
-    {
-      id: 'all-therapies-reward-1',
-      name: 'Therapies: Universal Boost',
-      description: '+50% all therapy rewards.',
-      cost: 10000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'all',
-      multiplierValue: 1.5,
-      thresholdKps: 500
-    },
-    {
-      id: 'all-therapies-reward-2',
-      name: 'Therapies: Cosmic Amplification',
-      description: '2x all therapy rewards.',
-      cost: 50000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'minigame-reward-multiplier',
-      targetMinigameId: 'all',
-      multiplierValue: 2.0,
-      thresholdKps: 2000
-    },
-    // Audio upgrades
-    {
-      id: 'sound-button-click',
-      name: 'Sound Effects: Clicks & Collects',
-      description: 'Unlock button and collection sounds.',
-      cost: 50,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    {
-      id: 'sound-minigame-hope',
-      name: 'Sound Effects: Hope Therapy',
-      description: 'Unlock Hope therapy sounds.',
-      cost: 500,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    {
-      id: 'sound-minigame-courage',
-      name: 'Sound Effects: Courage Therapy',
-      description: 'Unlock Courage therapy sounds.',
-      cost: 5000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    {
-      id: 'sound-minigame-connection',
-      name: 'Sound Effects: Connection Therapy',
-      description: 'Unlock Connection therapy sounds.',
-      cost: 10000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    {
-      id: 'sound-minigame-healing',
-      name: 'Sound Effects: Healing Therapy',
-      description: 'Unlock Healing therapy sounds.',
-      cost: 20000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    {
-      id: 'sound-music',
-      name: 'Background Music',
-      description: 'Unlock background music.',
-      cost: 1000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'audio'
-    },
-    // Collection multiplier upgrades
-    {
-      id: 'collect-multiplier-1',
-      name: 'Collection Boost I',
-      description: '1x manual collection multiplier.',
-      cost: 100,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'collection-multiplier',
-      multiplierManualValue: 1
-    },
-    {
-      id: 'collect-multiplier-10',
-      name: 'Collection Boost II',
-      description: '10x manual collection multiplier.',
-      cost: 1000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'collection-multiplier',
-      multiplierManualValue: 10
-    },
-    {
-      id: 'collect-multiplier-100',
-      name: 'Collection Boost III',
-      description: '100x manual collection multiplier.',
-      cost: 10000,
-      unlocked: false,
-      type: 'upgrade',
-      upgradeType: 'collection-multiplier',
-      multiplierManualValue: 100
-    }
-  ]);
+  const [unlockables, setUnlockables] = useState<Unlockable[]>(buildUnlockables());
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
-    // Load saved progress
-    const savedMinigames = localStorage.getItem(MINIGAMES_STORAGE_KEY);
-    const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-    const savedAgents = localStorage.getItem(AGENTS_STORAGE_KEY);
-    
-    if (savedMinigames) {
-      try {
-        const loaded = JSON.parse(savedMinigames);
-        // Load unlockables to apply reward multipliers
-        const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-        let rewardMultiplierUpgrades: Unlockable[] = [];
-        if (savedUnlockables) {
-          try {
-            const allUnlockables: Unlockable[] = JSON.parse(savedUnlockables);
-            rewardMultiplierUpgrades = allUnlockables.filter(
-              u => u.type === 'upgrade' && 
-                   u.upgradeType === 'minigame-reward-multiplier' && 
-                   u.unlocked && 
-                   u.targetMinigameId && 
-                   u.multiplierValue !== undefined
-            );
-          } catch (e) {}
-        }
-        
-        setMinigames(loaded.map((m: any) => {
-          const baseMinigame = minigames.find(mg => mg.id === m.id);
-          // Calculate reward multiplier from upgrades
-          let calculatedMultiplier = 1.0;
-          rewardMultiplierUpgrades.forEach(upgrade => {
-            if (upgrade.targetMinigameId === 'all' || upgrade.targetMinigameId === m.id) {
-              calculatedMultiplier *= (upgrade.multiplierValue || 1.0);
-            }
-          });
-          
-          const finalMultiplier = m.rewardMultiplier || calculatedMultiplier;
-          // Recalculate reward with multiplier
-          const timesCompleted = m.timesCompleted || 0;
-          const baseReward = m.baseReward || baseMinigame?.baseReward || 10;
-          const calculatedReward = Math.floor(baseReward * (timesCompleted + 1) * finalMultiplier);
-          
-          return {
-            ...m,
-            baseReward: baseReward,
-            reward: m.reward || calculatedReward,
-            timesCompleted: timesCompleted,
-            lastPlayed: m.lastPlayed || 0,
-            baseCooldown: m.baseCooldown || baseMinigame?.baseCooldown || 30000,
-            cooldown: m.cooldown || m.baseCooldown || baseMinigame?.baseCooldown || 30000,
-            cooldownReduction: m.cooldownReduction || 0,
-            rewardMultiplier: finalMultiplier
-          };
-        }));
-      } catch (e) {}
+
+    const { state: agentState, shouldPersist: persistAgents } = deserializeAgents(
+      cookieStorage.getItem(AGENTS_STORAGE_KEY)
+    );
+    setAgents(agentState);
+    if (persistAgents) {
+      persistAgentProgress(agentState);
     }
-    
-    if (savedUnlockables) {
-      try {
-        setUnlockables(JSON.parse(savedUnlockables));
-      } catch (e) {}
+
+    const { state: unlockableState, shouldPersist: persistUnlockablesFlag } = deserializeUnlockables(
+      cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY)
+    );
+    setUnlockables(unlockableState);
+    if (persistUnlockablesFlag) {
+      persistUnlockableProgress(unlockableState);
     }
-    
-    if (savedAgents) {
-      try {
-        const loadedAgents = JSON.parse(savedAgents);
-        // Apply any unlocked agent multipliers from unlockables
-        const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-        if (savedUnlockables) {
-          try {
-            const unlockables: Unlockable[] = JSON.parse(savedUnlockables);
-            const agentMultiplierUpgrades = unlockables.filter(
-              u => u.type === 'upgrade' && u.upgradeType === 'agent-multiplier' && u.unlocked && u.targetAgentId && u.multiplierValue !== undefined
-            );
-            
-            // Apply multipliers to agents
-            const agentsWithMultipliers = loadedAgents.map((agent: Agent) => {
-              let finalMultiplier = agent.multiplier || 1.0;
-              // Find all upgrades for this agent
-              const upgradesForAgent = agentMultiplierUpgrades.filter(u => u.targetAgentId === agent.id);
-              // Apply each upgrade (they should stack multiplicatively)
-              upgradesForAgent.forEach(upgrade => {
-                if (upgrade.multiplierValue) {
-                  finalMultiplier = finalMultiplier * upgrade.multiplierValue;
-                }
-              });
-              return { ...agent, multiplier: finalMultiplier };
-            });
-            setAgents(agentsWithMultipliers);
-            // Save the updated agents with multipliers
-            localStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(agentsWithMultipliers));
-          } catch (e) {
-            // If there's an error applying multipliers, just use the loaded agents
-            setAgents(loadedAgents);
-          }
-        } else {
-          setAgents(loadedAgents);
-        }
-      } catch (e) {}
+
+    const { state: minigameState, shouldPersist: persistMinigamesFlag } = deserializeMinigames(
+      cookieStorage.getItem(MINIGAMES_STORAGE_KEY)
+    );
+    setMinigames(minigameState);
+    if (persistMinigamesFlag) {
+      persistMinigameProgress(minigameState);
+    }
+
+    const { state: missionState, shouldPersist: persistMissionFlag } = deserializeMissions(
+      cookieStorage.getItem(MISSIONS_STORAGE_KEY)
+    );
+    setMissions(missionState);
+    setMissionsLoaded(true);
+    if (persistMissionFlag) {
+      persistMissionProgress(missionState);
     }
   }, []);
+
+  // Check and update mission completion status
+  useEffect(() => {
+    if (typeof window === 'undefined' || !missionsLoaded) return;
+    
+    setMissions(prevMissions => {
+      let hasChanges = false;
+      
+      const updatedMissions = prevMissions.map(mission => {
+        if (mission.completed) return mission;
+        
+        if (mission.dependsOn && mission.dependsOn.length > 0) {
+          const prerequisitesMet = mission.dependsOn.every(depId => {
+            const dependency = prevMissions.find(m => m.id === depId);
+            return dependency?.claimed ? true : false;
+          });
+          if (!prerequisitesMet) {
+            return mission;
+          }
+        }
+        
+        let isCompleted: boolean = mission.completed;
+        
+        switch (mission.type) {
+          case 'visit-page': {
+            if (mission.target && pathname === mission.target) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'complete-therapy': {
+            const minigame = minigames.find(m => m.id === mission.target);
+            const requiredCount = mission.targetCount || 1;
+            if (minigame && minigame.timesCompleted >= requiredCount) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'collect-krakenlings': {
+            const targetCollectCount = parseInt(mission.target || '0', 10);
+            const pickedCount = parseFloat(cookieStorage.getItem('octopus-picked-count') || '0');
+            if (pickedCount >= targetCollectCount) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'reach-krakenlings': {
+            const targetTotalCount = parseInt(mission.target || '0', 10);
+            const totalCount = parseFloat(cookieStorage.getItem('octopus-count') || '0');
+            if (totalCount >= targetTotalCount) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'reach-kps': {
+            const targetKps = parseFloat(mission.target || '0');
+            if (totalPulpitosPerSecond >= targetKps) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'purchase-item': {
+            if (mission.target && unlockables.some(u => u.id === mission.target && u.unlocked)) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'mission-completed': {
+            const targetMission = prevMissions.find(m => m.id === mission.target);
+            if (targetMission?.claimed) {
+              isCompleted = true;
+            }
+            break;
+          }
+          case 'helpers-owned': {
+            const requiredHelpers = mission.targetCount ?? parseInt(mission.target || '1', 10);
+            const uniqueHelpersOwned = agents.filter(agent => agent.owned > 0).length;
+            if (uniqueHelpersOwned >= requiredHelpers) {
+              isCompleted = true;
+            }
+            break;
+          }
+        }
+        
+        if (isCompleted !== mission.completed) {
+          hasChanges = true;
+          return { ...mission, completed: isCompleted };
+        }
+        
+        return mission;
+      });
+      
+      if (hasChanges) {
+        persistMissionProgress(updatedMissions);
+        // Dispatch event when missions change
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('missionChanged'));
+        }
+      }
+
+      return updatedMissions;
+    });
+  }, [pathname, minigames, totalPulpitosPerSecond, missionsLoaded, unlockables, agents]);
 
   // Calculate total krakenlings per second (with multipliers)
   useEffect(() => {
@@ -892,6 +387,94 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     return Math.max(0, remaining);
   };
 
+  const handleClaimMission = (missionId: string) => {
+    if (!missionsLoaded) return;
+    const missionToClaim = missions.find(m => m.id === missionId);
+    if (!missionToClaim || !missionToClaim.completed || missionToClaim.claimed) {
+      return;
+    }
+    const rewardAmount = missionToClaim.reward || 0;
+    
+    setMissions(prevMissions => {
+      const updatedMissions = prevMissions.map(mission => {
+        if (mission.id === missionId && mission.completed && !mission.claimed) {
+          return { ...mission, claimed: true };
+        }
+        return mission;
+      });
+      persistMissionProgress(updatedMissions);
+      // Dispatch event when missions change
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('missionChanged'));
+      }
+      return updatedMissions;
+    });
+    
+    if (rewardAmount > 0) {
+      const currentFractional = parseFloat(cookieStorage.getItem('octopus-count') || '0');
+      const newFractional = currentFractional + rewardAmount;
+      cookieStorage.setItem('octopus-count', newFractional.toString());
+      const newCount = Math.floor(newFractional);
+      setDisplayOctopusCount(newCount);
+      onOctopusChange(newCount);
+      setFloatingTexts(prev => [
+        ...prev,
+        {
+          id: `mission-reward-${missionId}-${Date.now()}`,
+          value: rewardAmount,
+          x: 50,
+          y: 10
+        }
+      ]);
+    }
+  };
+
+  const persistAgentProgress = (state: Agent[]) => {
+    const payload = serializeAgentProgress(state);
+    if (payload.length === 0) {
+      cookieStorage.removeItem(AGENTS_STORAGE_KEY);
+    } else {
+      cookieStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(payload));
+    }
+  };
+
+  const persistUnlockableProgress = (state: Unlockable[]) => {
+    const payload = serializeUnlockableProgress(state);
+    if (payload.length === 0) {
+      cookieStorage.removeItem(UNLOCKABLES_STORAGE_KEY);
+    } else {
+      cookieStorage.setItem(UNLOCKABLES_STORAGE_KEY, JSON.stringify(payload));
+    }
+  };
+
+  const persistMinigameProgress = (state: Minigame[]) => {
+    const payload = serializeMinigameProgress(state);
+    if (payload.length === 0) {
+      cookieStorage.removeItem(MINIGAMES_STORAGE_KEY);
+    } else {
+      cookieStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(payload));
+    }
+  };
+
+  const isMissionCompleted = (missionId?: string): boolean => {
+    if (!missionId) return true;
+    if (!missionsLoaded) return false;
+    const mission = missions.find(m => m.id === missionId);
+    return mission?.claimed ? true : false;
+  };
+
+  const getMissionName = (missionId?: string): string => {
+    if (!missionId) return '';
+    if (!missionsLoaded) return '';
+    const mission = missions.find(m => m.id === missionId);
+    return mission?.name || '';
+  };
+
+  const getUnclaimedCompletedMissionsCount = (): number => {
+    if (!missionsLoaded) return 0;
+    return missions.filter(m => m.completed && !m.claimed).length;
+  };
+
   const handleMinigameComplete = (minigameId: string) => {
     const minigame = minigames.find(m => m.id === minigameId);
     if (!minigame) return;
@@ -912,7 +495,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     
     setMinigames(updatedMinigames);
     if (typeof window !== 'undefined') {
-      localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+      persistMinigameProgress(updatedMinigames);
       
       // Show floating text for reward
       setFloatingTexts(prev => [...prev, {
@@ -923,13 +506,17 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
       }]);
       
       // Give krakenlings as reward
-      // Get current fractional count from localStorage to maintain precision
-      const currentFractional = parseFloat(localStorage.getItem('octopus-count') || '0');
+      // Get current fractional count from cookies to maintain precision
+      const currentFractional = parseFloat(cookieStorage.getItem('octopus-count') || '0');
       const newFractionalCount = currentFractional + newReward;
       const newCount = Math.floor(newFractionalCount);
       onOctopusChange(newCount);
       // Save fractional count to maintain precision
-      localStorage.setItem('octopus-count', newFractionalCount.toString());
+      cookieStorage.setItem('octopus-count', newFractionalCount.toString());
+      
+      // Dispatch event to update mission badges when minigame is completed
+      // This will trigger mission completion checks
+      window.dispatchEvent(new CustomEvent('minigameCompleted', { detail: { minigameId } }));
     }
     
     setShowMinigame(null);
@@ -943,10 +530,13 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     if (typeof window === 'undefined') return;
     
     const unlockable = unlockables.find(u => u.id === unlockableId);
-    if (!unlockable || unlockable.unlocked || displayOctopusCount < unlockable.cost) return;
+    if (!unlockable || unlockable.unlocked) return;
+    
+    // Get current fractional count from cookies to check if can afford
+    let currentFractional = parseFloat(cookieStorage.getItem('octopus-count') || '0');
+    if (currentFractional < unlockable.cost) return;
 
-    // Get current fractional count from localStorage to maintain precision
-    const currentFractional = parseFloat(localStorage.getItem('octopus-count') || '0');
+    // Get current fractional count from cookies to maintain precision
     const newFractionalCount = currentFractional - unlockable.cost;
     const newCount = Math.floor(newFractionalCount);
     
@@ -958,9 +548,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     onOctopusChange(newCount);
     
     if (typeof window !== 'undefined') {
-      localStorage.setItem(UNLOCKABLES_STORAGE_KEY, JSON.stringify(updatedUnlockables));
-      // Save fractional count to maintain precision
-      localStorage.setItem('octopus-count', newFractionalCount.toString());
+      persistUnlockableProgress(updatedUnlockables);
+      cookieStorage.setItem('octopus-count', newFractionalCount.toString());
     }
     
     // Handle upgrade purchases
@@ -985,7 +574,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         );
         setAgents(updatedAgents);
         if (typeof window !== 'undefined') {
-          localStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(updatedAgents));
+          persistAgentProgress(updatedAgents);
         }
       } else if (unlockable.upgradeType === 'minigame-cooldown' && unlockable.targetMinigameId && unlockable.multiplierValue !== undefined) {
         // Apply cooldown reduction to the target minigame
@@ -999,7 +588,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         });
         setMinigames(updatedMinigames);
         if (typeof window !== 'undefined') {
-          localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+          persistMinigameProgress(updatedMinigames);
         }
       } else if (unlockable.upgradeType === 'minigame-reward-multiplier' && unlockable.targetMinigameId && unlockable.multiplierValue !== undefined) {
         // Apply reward multiplier to minigames
@@ -1017,10 +606,10 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         });
         setMinigames(updatedMinigames);
         if (typeof window !== 'undefined') {
-          localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+          persistMinigameProgress(updatedMinigames);
         }
       } else if (unlockable.upgradeType === 'audio') {
-        // Audio upgrades don't need special handling, just dispatch event to update audio settings
+        updateAudioSettingsForUnlockable(unlockable.id);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('unlockableChanged'));
         }
@@ -1046,7 +635,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
       
       const emotionId = emotionMap[unlockableId];
       if (emotionId && typeof window !== 'undefined') {
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = cookieStorage.getItem(STORAGE_KEY);
         let progress: any = { emotions: [] };
         
         if (saved) {
@@ -1066,20 +655,28 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
           progress.emotions.push({ id: emotionId, unlocked: true });
         }
         
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+        cookieStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
         window.dispatchEvent(new CustomEvent('emotionUnlocked'));
       }
     }
     
     // If it's a minigame, unlock it
     if (unlockable.type === 'feature' && unlockable.id.includes('minigame')) {
+      // Extract emotionId from unlockable id (e.g., 'courage-minigame' -> 'courage')
       const emotionId = unlockable.id.split('-')[0];
-      const updatedMinigames = minigames.map(m => 
-        m.emotionId === emotionId ? { ...m, unlocked: true } : m
-      );
+      const updatedMinigames = minigames.map(m => {
+        if (m.emotionId === emotionId) {
+          return { ...m, unlocked: true };
+        }
+        return m;
+      });
       setMinigames(updatedMinigames);
       if (typeof window !== 'undefined') {
-        localStorage.setItem(MINIGAMES_STORAGE_KEY, JSON.stringify(updatedMinigames));
+        persistMinigameProgress(updatedMinigames);
+        // Dispatch event to update UI
+        window.dispatchEvent(new CustomEvent('unlockableChanged'));
+        // Also dispatch emotionUnlocked for compatibility
+        window.dispatchEvent(new CustomEvent('emotionUnlocked'));
       }
     }
   };
@@ -1093,8 +690,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     const currentCost = calculateAgentCost(agent);
     if (displayOctopusCount < currentCost) return;
 
-    // Get current fractional count from localStorage to maintain precision
-    const currentFractional = parseFloat(localStorage.getItem('octopus-count') || '0');
+    // Get current fractional count from cookies to maintain precision
+    const currentFractional = parseFloat(cookieStorage.getItem('octopus-count') || '0');
     const newFractionalCount = currentFractional - currentCost;
     const newCount = Math.floor(newFractionalCount);
     
@@ -1105,9 +702,9 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     setAgents(updatedAgents);
     onOctopusChange(newCount);
     
-    localStorage.setItem(AGENTS_STORAGE_KEY, JSON.stringify(updatedAgents));
+    persistAgentProgress(updatedAgents);
     // Save fractional count to maintain precision
-    localStorage.setItem('octopus-count', newFractionalCount.toString());
+    cookieStorage.setItem('octopus-count', newFractionalCount.toString());
   };
 
   return (
@@ -1123,69 +720,94 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         />
       ))}
       
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-90">
-        <div className="relative bg-turquoise-800 rounded-2xl p-8 md:p-12 w-full max-w-5xl mx-4 border-2 border-turquoise-400 flex flex-col overflow-hidden" style={{ height: '85vh', minHeight: '85vh', maxHeight: '85vh' }}>
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-90 p-2 sm:p-4" style={{ overflow: 'visible' }}>
+        <div className="relative bg-turquoise-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-12 w-full max-w-5xl mx-2 sm:mx-4 border-2 border-turquoise-400 flex flex-col h-[90vh] max-h-[90vh]" style={{ overflow: 'visible' }}>
           <button
             onClick={() => {
               playButtonClick();
               onClose();
             }}
-            className="absolute top-4 right-4 z-10 text-white text-3xl font-bold opacity-60 hover:opacity-100 transition-opacity w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10"
+            className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 text-white text-2xl sm:text-3xl font-bold opacity-60 hover:opacity-100 transition-opacity w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10"
+            aria-label="Close"
           >
             ×
           </button>
 
-          <div className="text-center mb-6 flex-shrink-0">
-            <h2 className="font-lora text-4xl md:text-5xl font-bold text-turquoise-400 mb-4">
+          <div className="text-center mb-4 sm:mb-6 flex-shrink-0">
+            <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-turquoise-400 mb-2 sm:mb-4">
               The Kraken's Treasure
             </h2>
-            <p className="text-gray-300 text-sm md:text-base text-center mb-4">
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base text-center mb-2 sm:mb-4 px-2">
               Trade Krakenlings for helpers, treasures, and therapies.
             </p>
             <div className="flex flex-col items-center gap-2 min-w-0 w-full">
-              <div className="flex items-center gap-3 text-2xl min-w-0 w-full justify-center">
-                <RiEmotionLine className="text-turquoise-400 flex-shrink-0" />
+              <div className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl lg:text-2xl min-w-0 w-full justify-center px-2">
+                <RiEmotionLine className="text-turquoise-400 flex-shrink-0 text-sm sm:text-base md:text-lg" />
                 <span className="text-white font-bold truncate min-w-0">{formatNumber(Math.floor(displayOctopusCount))}</span>
-                <span className="text-gray-200 flex-shrink-0">krakenlings</span>
+                <span className="text-gray-200 flex-shrink-0 text-xs sm:text-sm md:text-base">krakenlings</span>
+                {pickedCount > 0 && (
+                  <span className="text-gray-400 flex-shrink-0 text-xs sm:text-sm md:text-base">
+                    ({formatNumber(Math.floor(pickedCount))} saved)
+                  </span>
+                )}
               </div>
               {totalPulpitosPerSecond > 0 && (
-                <div className="text-turquoise-300 text-sm whitespace-nowrap">
-                  +{formatNumber(Math.floor(totalPulpitosPerSecond))} krakenlings/second
+                <div className="text-turquoise-300 text-xs sm:text-sm whitespace-nowrap">
+                  +{formatKrakenValue(totalPulpitosPerSecond)} krakenlings/second
                 </div>
               )}
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-4 mb-6 border-b border-turquoise-400 flex-shrink-0">
+          <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-6 border-b border-turquoise-400 flex-shrink-0 overflow-x-auto scrollbar-hide" style={{ paddingTop: '12px', marginTop: '-12px', overflowY: 'visible' }}>
             <button
               onClick={() => {
                 playButtonClick();
-                setActiveTab('helpers');
+                setActiveTab('missions');
               }}
-              className={`px-6 py-3 font-lora text-xl font-bold transition-all relative ${
-                activeTab === 'helpers'
+              className={`px-3 sm:px-6 py-2 sm:py-3 font-lora text-sm sm:text-lg md:text-xl font-bold transition-all relative whitespace-nowrap ${
+                activeTab === 'missions'
+                  ? 'text-turquoise-400'
+                  : 'text-gray-300 hover:text-white'
+              } ${getUnclaimedCompletedMissionsCount() > 0 ? 'pr-6 sm:pr-8' : ''}`}
+              style={{ borderBottom: '2px solid', borderBottomColor: activeTab === 'missions' ? 'rgb(94 234 212)' : 'transparent' }}
+            >
+              Missions
+              {getUnclaimedCompletedMissionsCount() > 0 && (
+                <span className="absolute top-0 right-0 bg-turquoise-400 text-black text-[10px] sm:text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center z-50 transform translate-x-1/2 -translate-y-1/2">
+                  {getUnclaimedCompletedMissionsCount()}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => {
+                playButtonClick();
+                setActiveTab('therapies');
+              }}
+              className={`px-3 sm:px-6 py-2 sm:py-3 font-lora text-sm sm:text-lg md:text-xl font-bold transition-all relative whitespace-nowrap ${
+                activeTab === 'therapies'
                   ? 'text-turquoise-400'
                   : 'text-gray-300 hover:text-white'
               }`}
-              style={{ borderBottom: '2px solid', borderBottomColor: activeTab === 'helpers' ? 'rgb(94 234 212)' : 'transparent' }}
+              style={{ borderBottom: activeTab === 'therapies' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'therapies' ? 'rgb(94 234 212)' : 'transparent' }}
             >
-              <RiEmotionLine className="inline mr-2" />
-              Helpers
+              <RiGamepadLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
+              Therapies
             </button>
             <button
               onClick={() => {
                 playButtonClick();
                 setActiveTab('treasures');
               }}
-              className={`px-6 py-3 font-lora text-xl font-bold transition-all relative ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 font-lora text-sm sm:text-lg md:text-xl font-bold transition-all relative whitespace-nowrap ${
                 activeTab === 'treasures'
                   ? 'text-turquoise-400'
                   : 'text-gray-300 hover:text-white'
               }`}
               style={{ borderBottom: activeTab === 'treasures' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'treasures' ? 'rgb(94 234 212)' : 'transparent' }}
             >
-              <RiShoppingBagLine className="inline mr-2" />
+              <RiShoppingBagLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
               Treasures
             </button>
             <button
@@ -1193,307 +815,133 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                 playButtonClick();
                 setActiveTab('upgrades');
               }}
-              className={`px-6 py-3 font-lora text-xl font-bold transition-all relative ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 font-lora text-sm sm:text-lg md:text-xl font-bold transition-all relative whitespace-nowrap ${
                 activeTab === 'upgrades'
                   ? 'text-turquoise-400'
                   : 'text-gray-300 hover:text-white'
               }`}
               style={{ borderBottom: activeTab === 'upgrades' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'upgrades' ? 'rgb(94 234 212)' : 'transparent' }}
             >
-              <RiLockLine className="inline mr-2" />
+              <RiLockLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
               Upgrades
             </button>
             <button
               onClick={() => {
                 playButtonClick();
-                setActiveTab('therapies');
+                setActiveTab('helpers');
               }}
-              className={`px-6 py-3 font-lora text-xl font-bold transition-all relative ${
-                activeTab === 'therapies'
+              className={`px-3 sm:px-6 py-2 sm:py-3 font-lora text-sm sm:text-lg md:text-xl font-bold transition-all relative whitespace-nowrap ${
+                activeTab === 'helpers'
                   ? 'text-turquoise-400'
                   : 'text-gray-300 hover:text-white'
               }`}
-              style={{ borderBottom: activeTab === 'therapies' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'therapies' ? 'rgb(94 234 212)' : 'transparent' }}
+              style={{ borderBottom: '2px solid', borderBottomColor: activeTab === 'helpers' ? 'rgb(94 234 212)' : 'transparent' }}
             >
-              <RiGamepadLine className="inline mr-2" />
-              Therapies
+              <RiEmotionLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
+              Helpers
             </button>
           </div>
 
           {/* Contenido scrolleable */}
-          <div className="flex-1 overflow-y-scroll min-h-0 scrollbar-gutter-stable" style={{ minHeight: 0, maxHeight: '100%', contain: 'layout style paint' }}>
-          {/* Helpers Section */}
-          {activeTab === 'helpers' && (
+          <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-gutter-stable -mx-4 sm:-mx-6 md:-mx-12 px-4 sm:px-6 md:px-12">
+          {/* Missions Section */}
+          {activeTab === 'missions' && (
             <div className="pb-2" style={{ minHeight: '100%' }}>
-              <p className="text-gray-300 text-sm mb-4 px-2">
-                Hire helpers that automatically collect Krakenlings for you. The more you have, the more they gather.
-              </p>
-              <div className="space-y-2">
-                {agents.map((agent) => {
-                  const currentCost = calculateAgentCost(agent);
-                  const canAfford = displayOctopusCount >= currentCost;
-                  
-                  // Only show if previous agent is owned (except for first agent)
-                  const agentIndex = agents.findIndex(a => a.id === agent.id);
-                  const shouldShow = agentIndex === 0 || (agentIndex > 0 && agents[agentIndex - 1].owned > 0);
-
-                  if (!shouldShow) return null;
-
-                  return (
-                    <div
-                      key={agent.id}
-                      className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                        canAfford
-                          ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
-                          : 'bg-gray-800 border-gray-600 opacity-60'
-                      }`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-lora text-lg font-bold text-white">{agent.name}</h3>
-                        <p className="text-white opacity-70 text-xs mt-1">{agent.description}</p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div className="flex items-center gap-2">
-                            <RiEmotionLine className="text-turquoise-400" />
-                            <span className="text-white text-sm">+{agent.collectionRate * (agent.multiplier || 1.0)}/s</span>
-                          </div>
-                          {agent.owned > 0 && (
-                            <span className="text-gray-400 text-xs">Owned: {agent.owned}</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 ml-4">
-                        <div className="flex items-center gap-2">
-                          <RiEmotionLine className="text-turquoise-400" />
-                          <span className="text-white font-bold">{formatNumber(currentCost)}</span>
-                        </div>
-                        <button
-                          disabled={!canAfford}
-                          onClick={() => {
-                            playButtonClick();
-                            handlePurchaseAgent(agent.id);
-                          }}
-                          className={`relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl transition-all ${
-                            canAfford
-                              ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
-                              : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
-                          }`}
-                        >
-                          <p className="whitespace-nowrap text-xl font-lora font-bold text-black">GET</p>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="flex items-center justify-between mb-4 px-2">
+                <p className="text-gray-300 text-sm">
+                  Complete missions to unlock new helpers, treasures, and upgrades.
+                </p>
+                {getUnclaimedCompletedMissionsCount() > 0 && (
+                  <div className="bg-turquoise-400 bg-opacity-20 border border-turquoise-400 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                    <span className="text-turquoise-300 text-xs sm:text-sm font-semibold">
+                      {getUnclaimedCompletedMissionsCount()} ready to claim
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Treasures Section */}
-          {activeTab === 'treasures' && (
-            <div className="pb-2" style={{ minHeight: '100%' }}>
-              <p className="text-gray-300 text-sm mb-4 px-2">
-                Unlock new pages and special treasures that reveal more of the den.
-              </p>
+              {!missionsLoaded ? (
+                <div className="text-center text-gray-300 text-sm py-8">
+                  Loading missions...
+                </div>
+              ) : (
               <div className="space-y-2">
-                {unlockables.filter(u => {
-                  // Only show treasures and pages
-                  if (u.type !== 'treasure' && u.type !== 'page') return false;
-                  // Exclude unlocked items (they disappear when purchased)
-                  if (u.unlocked) return false;
-                  // Newsletter only appears if Contact is unlocked
-                  if (u.id === 'newsletter') {
-                    const contactUnlockable = unlockables.find(ul => ul.id === 'contact');
-                    return contactUnlockable?.unlocked || false;
-                  }
-                  // True Heart only appears when all other treasures and pages are unlocked
-                  if (u.id === 'true-heart') {
-                    const allOtherUnlockables = unlockables.filter(
-                      ul => (ul.type === 'page' || ul.type === 'treasure') && ul.id !== 'true-heart'
-                    );
-                    return allOtherUnlockables.every(ul => ul.unlocked);
-                  }
-                  return true;
-                }).sort((a, b) => a.cost - b.cost).map((unlockable) => (
+                {missions
+                  .filter(mission => {
+                    if (!mission.dependsOn || mission.dependsOn.length === 0) return true;
+                    return mission.dependsOn.every(dep => isMissionCompleted(dep));
+                  })
+                  .map((mission) => (
                   <div
-                    key={unlockable.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                      unlockable.unlocked
-                        ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
-                        : displayOctopusCount >= unlockable.cost
+                    key={mission.id}
+                    className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
+                      mission.claimed
+                        ? 'bg-green-800 bg-opacity-30 border-green-400'
+                        : mission.completed
                         ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
                         : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
                   >
-                    <div className="flex-1 min-w-0">
-                      {unlockable.unlocked ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-400 text-lg">✓</span>
-                          <div>
-                            <h3 className="font-lora text-lg font-bold text-white">{unlockable.name}</h3>
-                            <p className="text-gray-200 text-xs mt-1">{unlockable.description}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <h3 className="font-lora text-lg font-bold text-white">{unlockable.name}</h3>
-                          <p className="text-white opacity-70 text-xs mt-1">{unlockable.description}</p>
-                        </div>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-lora text-base sm:text-lg font-bold text-white">{mission.name}</h3>
+                        {mission.claimed && (
+                          <span className="text-green-400 text-sm">✓ Claimed</span>
+                        )}
+                        {mission.completed && !mission.claimed && (
+                          <span className="text-turquoise-400 text-sm">Ready to claim!</span>
+                        )}
+                      </div>
+                      <p className="text-white opacity-70 text-xs">{mission.description}</p>
+                      {mission.reward && (
+                        <p className="text-turquoise-300 text-[11px] sm:text-xs mt-1">
+                          Reward: +{formatKrakenValue(mission.reward)} Krakenlings
+                        </p>
                       )}
                     </div>
                     
-                    <div className="flex items-center gap-3 ml-4">
-                      {unlockable.unlocked ? (
-                        unlockable.route ? (
-                          <Link href={unlockable.route} onClick={() => onClose()}>
-                            <Button label="GO" />
-                          </Link>
-                        ) : (
-                          <span className="text-green-400 text-sm font-bold">UNLOCKED</span>
-                        )
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <RiEmotionLine className="text-turquoise-400" />
-                            <span className="text-white font-bold">{unlockable.cost}</span>
-                          </div>
-                          {(() => {
-                            const canAfford = displayOctopusCount >= unlockable.cost;
-                            return (
-                              <button
-                                disabled={!canAfford}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  playButtonClick();
-                                  if (canAfford) {
-                                    handlePurchaseUnlockable(unlockable.id);
-                                  }
-                                }}
-                                className={`relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl transition-all ${
-                                  canAfford
-                                    ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
-                                    : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
-                                }`}
-                              >
-                                <p className="whitespace-nowrap text-xl font-lora font-bold text-black">GET</p>
-                              </button>
-                            );
-                          })()}
-                        </>
-                      )}
-                    </div>
+                    {mission.completed && !mission.claimed && (
+                      <button
+                        onClick={() => {
+                          playButtonClick();
+                          handleClaimMission(mission.id);
+                        }}
+                        className="ml-4 bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 sm:px-6 py-2 sm:py-3 font-lora font-bold text-black text-sm sm:text-base transition-all"
+                      >
+                        CLAIM
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Upgrades Section */}
-          {activeTab === 'upgrades' && (
-            <div className="pb-2" style={{ minHeight: '100%' }}>
-              <p className="text-gray-300 text-sm mb-4 px-2">
-                Enhance your helpers and therapies with powerful upgrades.
-              </p>
-              <div className="space-y-2">
-                {unlockables.filter(u => {
-                  // Only show upgrades
-                  if (u.type !== 'upgrade') return false;
-                  // Exclude unlocked items (they disappear when purchased)
-                  if (u.unlocked) return false;
-                  // Upgrades only appear when threshold is met
-                  if (u.thresholdKps !== undefined) {
-                    return totalPulpitosPerSecond >= u.thresholdKps;
-                  }
-                  return true;
-                }).sort((a, b) => a.cost - b.cost).map((unlockable) => (
-                  <div
-                    key={unlockable.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                      unlockable.unlocked
-                        ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
-                        : displayOctopusCount >= unlockable.cost
-                        ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
-                        : 'bg-gray-800 border-gray-600 opacity-60'
-                    }`}
-                  >
-                    <div className="flex-1 min-w-0">
-                      {unlockable.unlocked ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-400 text-lg">✓</span>
-                          <div>
-                            <h3 className="font-lora text-lg font-bold text-white">{unlockable.name}</h3>
-                            <p className="text-gray-200 text-xs mt-1">{unlockable.description}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <h3 className="font-lora text-lg font-bold text-white">{unlockable.name}</h3>
-                          <p className="text-white opacity-70 text-xs mt-1">{unlockable.description}</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-3 ml-4">
-                      {unlockable.unlocked ? (
-                        <span className="text-green-400 text-sm font-bold">UNLOCKED</span>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-2">
-                            <RiEmotionLine className="text-turquoise-400" />
-                            <span className="text-white font-bold">{unlockable.cost}</span>
-                          </div>
-                          {(() => {
-                            const canAfford = displayOctopusCount >= unlockable.cost;
-                            return (
-                              <button
-                                disabled={!canAfford}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  playButtonClick();
-                                  if (canAfford) {
-                                    handlePurchaseUnlockable(unlockable.id);
-                                  }
-                                }}
-                                className={`relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl transition-all ${
-                                  canAfford
-                                    ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
-                                    : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
-                                }`}
-                              >
-                                <p className="whitespace-nowrap text-xl font-lora font-bold text-black">GET</p>
-                              </button>
-                            );
-                          })()}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              )}
             </div>
           )}
 
           {/* Therapies Section */}
           {activeTab === 'therapies' && (
             <div className="pb-2" style={{ minHeight: '100%' }}>
-              <p className="text-gray-300 text-sm mb-4 px-2">
-                Short, replayable experiences inspired by hope, courage, connection, and healing.
-              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {minigames.map((minigame) => {
                 const canPlay = canPlayMinigame(minigame);
                 const cooldownRemaining = getCooldownRemaining(minigame);
                 const cooldownSeconds = Math.ceil(cooldownRemaining / 1000);
+                
+                // Extract only the emotion name (e.g., "Hope" from "Hope – Follow the Light")
+                const getEmotionName = (name: string) => {
+                  const dashIndex = name.indexOf(' – ');
+                  return dashIndex !== -1 ? name.substring(0, dashIndex) : name;
+                };
+                const emotionName = getEmotionName(minigame.name);
 
                 return (
                   <div
                     key={minigame.id}
-                    className={`relative p-6 rounded-xl border-2 transition-all ${
+                    className={`relative p-4 sm:p-6 rounded-xl border-2 transition-all overflow-hidden ${
                       minigame.unlocked
                         ? canPlay
                           ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300 cursor-pointer'
                           : 'bg-gray-800 border-gray-600 opacity-70'
-                        : 'bg-transparent border-transparent'
+                        : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
                     onClick={() => {
                       if (minigame.unlocked && canPlay) {
@@ -1504,30 +952,28 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                   >
                     {minigame.unlocked ? (
                       <>
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-lora text-xl font-bold text-white flex items-center gap-2">
-                        {minigame.name}
+                    <div className="flex items-center justify-between mb-2 gap-2 overflow-hidden">
+                      <h3 className="font-lora text-base sm:text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate min-w-0">
+                        {emotionName}
                       </h3>
-                      <div className="flex items-center gap-2">
-                        <RiEmotionLine className="text-turquoise-400" />
-                        <span className="text-white font-bold">+{minigame.reward}</span>
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                        <RiEmotionLine className="text-turquoise-400 flex-shrink-0" />
+                        <span className="text-white font-bold text-xs sm:text-sm md:text-base whitespace-nowrap">+{formatKrakenValue(minigame.reward)}</span>
                         {minigame.timesCompleted > 0 && (
-                          <span className="text-gray-400 text-xs">({minigame.timesCompleted}x)</span>
+                          <span className="text-gray-400 text-xs whitespace-nowrap">({minigame.timesCompleted}x)</span>
                         )}
                       </div>
                     </div>
 
-                        <p className="text-gray-200 text-sm mb-4">{minigame.description}</p>
-
                         {canPlay && (
-                          <div className="text-center">
+                          <div className="text-left">
                             <Button label="PLAY" />
                           </div>
                         )}
                         
                         {!canPlay && (
-                          <div className="text-center">
-                            <p className="text-gray-300 text-sm mb-2">
+                          <div className="text-left">
+                            <p className="text-gray-300 text-xs sm:text-sm mb-2">
                               The therapy needs time to settle. Return in {cooldownSeconds}s
                             </p>
                             <div className="w-full bg-gray-700 rounded-full h-2">
@@ -1541,32 +987,81 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       </>
                     ) : (() => {
                       const unlockable = unlockables.find(u => u.type === 'feature' && u.id.includes(minigame.emotionId));
-                      if (!unlockable) return null;
+                      const missionRequirementId = unlockable?.missionRequirement || minigame.missionRequirement;
+                      const missionName = getMissionName(missionRequirementId);
+                      const missionCompleted = missionRequirementId ? isMissionCompleted(missionRequirementId) : false;
+                      
+                      if (!unlockable) {
+                        // Show locked minigame with only mission requirement
+                        return (
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between gap-2 overflow-hidden">
+                              <h3 className="font-lora text-base sm:text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate min-w-0">
+                                {emotionName}
+                              </h3>
+                              <RiLockLine className="text-gray-400 flex-shrink-0 text-lg sm:text-xl" />
+                            </div>
+                            {missionName && (
+                              <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3 sm:p-4 border border-gray-600">
+                                <p className="text-gray-400 text-xs sm:text-sm mb-1.5 sm:mb-2 font-semibold">Mission Required:</p>
+                                <p className={`text-sm sm:text-base font-bold ${missionCompleted ? 'text-green-400' : 'text-yellow-400'}`}>
+                                  {missionName}
+                                </p>
+                                {!missionCompleted && (
+                                  <p className="text-gray-500 text-xs sm:text-sm mt-1.5 sm:mt-2">
+                                    Complete this mission to unlock
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
                       
                       const canAfford = displayOctopusCount >= unlockable.cost;
+                      const canUnlock = canAfford && (missionCompleted || !missionRequirementId);
+                      
                       return (
-                        <div className="flex items-center justify-center">
-                          <div className="bg-gray-800 bg-opacity-90 rounded-xl p-4 border-2 border-gray-600 flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                              <RiEmotionLine className="text-turquoise-400" />
-                              <span className="text-white font-bold">{unlockable.cost}</span>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex items-center justify-between gap-2 overflow-hidden">
+                            <h3 className="font-lora text-base sm:text-lg md:text-xl font-bold text-white flex items-center gap-2 truncate min-w-0">
+                              {emotionName}
+                            </h3>
+                          </div>
+                          {missionName && (
+                            <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3 sm:p-4 border border-gray-600">
+                              <p className="text-gray-400 text-xs sm:text-sm mb-1.5 sm:mb-2 font-semibold">Mission Required:</p>
+                              <p className={`text-sm sm:text-base font-bold ${missionCompleted ? 'text-green-400' : 'text-yellow-400'}`}>
+                                {missionName}
+                              </p>
+                              {!missionCompleted && (
+                                <p className="text-gray-500 text-xs sm:text-sm mt-1.5 sm:mt-2">
+                                  Complete this mission to unlock
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                              <RiEmotionLine className="text-turquoise-400 flex-shrink-0" />
+                              <span className="text-white font-bold text-xs sm:text-sm md:text-base whitespace-nowrap">{formatNumber(unlockable.cost)}</span>
                             </div>
                             <button
-                              disabled={!canAfford}
+                              disabled={!canUnlock}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 playButtonClick();
-                                if (canAfford) {
+                                if (canUnlock) {
                                   handlePurchaseUnlockable(unlockable.id);
                                 }
                               }}
-                              className={`relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl transition-all ${
-                                canAfford
+                              className={`relative w-20 sm:w-24 md:w-32 lg:w-40 xl:w-56 py-2 sm:py-3 md:py-4 px-2 sm:px-3 md:px-4 lg:px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-xl sm:rounded-2xl transition-all flex-shrink-0 ${
+                                canUnlock
                                   ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
                                   : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
                               }`}
                             >
-                              <p className="whitespace-nowrap text-xl font-lora font-bold text-black">UNLOCK</p>
+                              <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">UNLOCK</p>
                             </button>
                           </div>
                         </div>
@@ -1575,6 +1070,334 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                   </div>
                 );
               })}
+              </div>
+            </div>
+          )}
+
+          {/* Helpers Section */}
+          {activeTab === 'helpers' && (
+            <div className="pb-2" style={{ minHeight: '100%' }}>
+              <p className="text-gray-300 text-sm mb-4 px-2">
+                Hire helpers that automatically collect Krakenlings for you. The more you have, the more they gather.
+              </p>
+              <div className="space-y-2">
+                {agents.map((agent) => {
+                  const currentCost = calculateAgentCost(agent);
+                  const canAfford = displayOctopusCount >= currentCost;
+                  
+                  // Check if previous agent is owned (except for first agent)
+                  const agentIndex = agents.findIndex(a => a.id === agent.id);
+                  const previousAgentOwned = agentIndex === 0 || (agentIndex > 0 && agents[agentIndex - 1].owned > 0);
+                  const previousAgent = agentIndex > 0 ? agents[agentIndex - 1] : null;
+
+                  const missionName = getMissionName(agent.missionRequirement);
+                  const missionCompleted = isMissionCompleted(agent.missionRequirement);
+                  
+                  const canPurchase = previousAgentOwned && missionCompleted && canAfford;
+                  const isAvailable = previousAgentOwned && missionCompleted;
+
+                  // Extract only the main name (before the dash)
+                  const getMainName = (fullName: string) => {
+                    const dashIndex = fullName.indexOf(' – ');
+                    return dashIndex !== -1 ? fullName.substring(0, dashIndex) : fullName;
+                  };
+                  
+                  const agentMainName = getMainName(agent.name);
+                  const previousAgentMainName = previousAgent ? getMainName(previousAgent.name) : null;
+
+                  return (
+                    <div
+                      key={agent.id}
+                      className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
+                        canPurchase
+                          ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                          : 'bg-gray-800 border-gray-600 opacity-60'
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        {isAvailable ? (
+                          <>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-lora text-base sm:text-lg font-bold text-white">
+                                {agentMainName}
+                                {agent.owned > 0 && (
+                                  <span className="text-gray-400 font-normal ml-1">({formatNumber(agent.owned)})</span>
+                                )}
+                              </h3>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <RiEmotionLine className="text-turquoise-400 text-sm sm:text-base" />
+                              <span className="text-white text-xs sm:text-sm">+{formatKrakenValue(agent.collectionRate * (agent.multiplier || 1.0))}/s</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h3 className="font-lora text-base sm:text-lg font-bold text-white">???</h3>
+                          </>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {/* Show requirements only if not all conditions are met */}
+                        {(!previousAgentOwned || !missionCompleted) && (
+                          <div className="text-right">
+                            <p className="text-gray-400 text-xs mb-1">Requires:</p>
+                            <div className="flex flex-col gap-1">
+                              {agentIndex > 0 && previousAgent && previousAgentMainName && !previousAgentOwned && (
+                                <p className="text-xs font-bold text-yellow-400 whitespace-nowrap">
+                                  Buy {previousAgentMainName}
+                                </p>
+                              )}
+                              {missionName && !missionCompleted && (
+                                <p className="text-xs font-bold text-yellow-400 whitespace-nowrap">
+                                  {missionName}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {isAvailable && (
+                          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <RiEmotionLine className="text-turquoise-400 text-sm sm:text-base flex-shrink-0" />
+                              <span className="text-white font-bold text-xs sm:text-sm md:text-base whitespace-nowrap">{formatNumber(currentCost)}</span>
+                            </div>
+                            <button
+                              disabled={!canAfford}
+                              onClick={() => {
+                                playButtonClick();
+                                handlePurchaseAgent(agent.id);
+                              }}
+                              className={`relative w-16 sm:w-24 md:w-32 lg:w-40 xl:w-56 py-2 sm:py-3 md:py-4 px-2 sm:px-3 md:px-4 lg:px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-xl sm:rounded-2xl transition-all flex-shrink-0 ${
+                                canAfford
+                                  ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
+                                  : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
+                              }`}
+                            >
+                              <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Treasures Section */}
+          {activeTab === 'treasures' && (
+            <div className="pb-2" style={{ minHeight: '100%' }}>
+              <div className="space-y-2">
+                {unlockables.filter(u => {
+                  // Only show treasures and pages
+                  if (u.type !== 'treasure' && u.type !== 'page') return false;
+                  // Newsletter only appears if Contact is unlocked
+                  if (u.id === 'newsletter') {
+                    const contactUnlockable = unlockables.find(ul => ul.id === 'contact');
+                    return contactUnlockable?.unlocked || false;
+                  }
+                  // True Heart only appears when all other treasures and pages are unlocked
+                  if (u.id === 'true-heart') {
+                    const allOtherUnlockables = unlockables.filter(
+                      ul => (ul.type === 'page' || ul.type === 'treasure') && ul.id !== 'true-heart'
+                    );
+                    return allOtherUnlockables.every(ul => ul.unlocked);
+                  }
+                  return true;
+                }).map((unlockable) => {
+                  const missionName = getMissionName(unlockable.missionRequirement);
+                  const missionCompleted = isMissionCompleted(unlockable.missionRequirement);
+                  
+                  return (
+                  <div
+                    key={unlockable.id}
+                    className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
+                      unlockable.unlocked
+                        ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
+                        : displayOctopusCount >= unlockable.cost
+                        ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                        : 'bg-gray-800 border-gray-600 opacity-60'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      {unlockable.unlocked ? (
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <span className="text-green-400 text-sm sm:text-base md:text-lg flex-shrink-0">✓</span>
+                          <div className="min-w-0">
+                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
+                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="min-w-0">
+                          {missionName && !missionCompleted ? (
+                            <>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">???</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">???</p>
+                            </>
+                          ) : (
+                            <>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      {missionName && !missionCompleted && (
+                        <div className="text-right">
+                          <p className="text-gray-400 text-xs">Requires:</p>
+                          <p className={`text-xs font-bold text-yellow-400 whitespace-nowrap`}>
+                            {missionName}
+                          </p>
+                        </div>
+                      )}
+                      {unlockable.unlocked ? (
+                        unlockable.route ? (
+                          <Link href={unlockable.route} onClick={() => onClose()}>
+                            <Button label="GO" />
+                          </Link>
+                        ) : (
+                          <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">UNLOCKED</span>
+                        )
+                      ) : (
+                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <RiEmotionLine className="text-turquoise-400 flex-shrink-0" />
+                            <span className="text-white font-bold text-xs sm:text-sm md:text-base whitespace-nowrap">{formatNumber(unlockable.cost)}</span>
+                          </div>
+                          {(() => {
+                            const canAfford = displayOctopusCount >= unlockable.cost;
+                            return (
+                              <button
+                                disabled={!canAfford || !missionCompleted}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  playButtonClick();
+                                  if (canAfford && missionCompleted) {
+                                    handlePurchaseUnlockable(unlockable.id);
+                                  }
+                                }}
+                                className={`relative w-16 sm:w-24 md:w-32 lg:w-40 xl:w-56 py-2 sm:py-3 md:py-4 px-2 sm:px-3 md:px-4 lg:px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-xl sm:rounded-2xl transition-all flex-shrink-0 ${
+                                  canAfford && missionCompleted
+                                    ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
+                                    : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
+                                }`}
+                              >
+                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Upgrades Section */}
+          {activeTab === 'upgrades' && (
+            <div className="pb-2" style={{ minHeight: '100%' }}>
+              <div className="space-y-2">
+                {unlockables.filter(u => u.type === 'upgrade').sort((a, b) => {
+                  // Sort: unlocked items first, then by cost
+                  if (a.unlocked !== b.unlocked) {
+                    return a.unlocked ? 1 : -1;
+                  }
+                  return a.cost - b.cost;
+                }).map((unlockable) => {
+                  const missionName = getMissionName(unlockable.missionRequirement);
+                  const missionCompleted = isMissionCompleted(unlockable.missionRequirement);
+                  
+                  return (
+                  <div
+                    key={unlockable.id}
+                    className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
+                      unlockable.unlocked
+                        ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
+                        : displayOctopusCount >= unlockable.cost
+                        ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                        : 'bg-gray-800 border-gray-600 opacity-60'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      {unlockable.unlocked ? (
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <span className="text-green-400 text-sm sm:text-base md:text-lg flex-shrink-0">✓</span>
+                          <div className="min-w-0">
+                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
+                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="min-w-0">
+                          {missionName && !missionCompleted ? (
+                            <>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">???</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">???</p>
+                            </>
+                          ) : (
+                            <>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      {missionName && !missionCompleted && (
+                        <div className="text-right">
+                          <p className="text-gray-400 text-xs">Requires:</p>
+                          <p className={`text-xs font-bold text-yellow-400 whitespace-nowrap`}>
+                            {missionName}
+                          </p>
+                        </div>
+                      )}
+                      {unlockable.unlocked ? (
+                        <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">UNLOCKED</span>
+                      ) : (
+                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <RiEmotionLine className="text-turquoise-400 flex-shrink-0" />
+                            <span className="text-white font-bold text-xs sm:text-sm md:text-base whitespace-nowrap">{formatNumber(unlockable.cost)}</span>
+                          </div>
+                          {(() => {
+                            const canAfford = displayOctopusCount >= unlockable.cost;
+                            return (
+                              <button
+                                disabled={!canAfford || !missionCompleted}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  playButtonClick();
+                                  if (canAfford && missionCompleted) {
+                                    handlePurchaseUnlockable(unlockable.id);
+                                  }
+                                }}
+                                className={`relative w-16 sm:w-24 md:w-32 lg:w-40 xl:w-56 py-2 sm:py-3 md:py-4 px-2 sm:px-3 md:px-4 lg:px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-xl sm:rounded-2xl transition-all flex-shrink-0 ${
+                                  canAfford && missionCompleted
+                                    ? 'bg-turquoise-400 hover:bg-turquoise-300 cursor-pointer'
+                                    : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
+                                }`}
+                              >
+                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  );
+                })}
               </div>
             </div>
           )}

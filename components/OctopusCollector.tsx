@@ -6,6 +6,8 @@ import FloatingText from './FloatingText';
 import { useAudio } from '@/hooks/useAudio';
 import { usePathname } from 'next/navigation';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
+import { cookieStorage } from '@/utils/cookieStorage';
+import { calculateTotalKps, deserializeAgents, deserializeUnlockables, resolveManualCollectionTier } from '@/shared/gameData';
 
 interface Octopus {
   id: string;
@@ -38,10 +40,10 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
   const pathname = usePathname();
   const { unlockedPages } = useUnlockedPages();
   
-  // Check if shop was just closed using a timestamp in localStorage
+  // Check if shop was just closed using a timestamp stored in cookies
   const wasShopJustClosed = useCallback(() => {
     if (typeof window === 'undefined') return false;
-    const shopClosedTime = localStorage.getItem('shop-closed-time');
+    const shopClosedTime = cookieStorage.getItem('shop-closed-time');
     if (!shopClosedTime) return false;
     const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
     // Consider "just closed" if less than 1 second ago (minimum delay)
@@ -54,8 +56,8 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     
     // Root page always allows krakenlings
     if (pathname === '/') {
-      const multiplier = 1 + unlockedCount; // Base +1 for each unlocked page
-      const maxLimit = 10 + (unlockedCount * 10); // Base 10 + 10 per unlocked page
+      const multiplier = unlockedCount;
+      const maxLimit = 10;
       return { shouldSpawn: true, multiplier, maxLimit };
     }
     
@@ -63,25 +65,22 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     const isOnUnlockedPage = 
       (pathname === '/home' && unlockedPages.home) ||
       (pathname === '/games/heartweaver' && unlockedPages.games) ||
-      (pathname === '/team' && unlockedPages.team);
+      (pathname === '/team' && unlockedPages.team) ||
+      (pathname === '/contact' && unlockedPages.contact);
     
     if (!isOnUnlockedPage) {
       return { shouldSpawn: false, multiplier: 0, maxLimit: 0 };
     }
     
     // Calculate multiplier based on unlocked pages
-    let multiplier = 1 + unlockedCount; // Base +1 for each unlocked page
-    
-    // Additional multiplier if on a specific unlocked page
-    if (pathname === '/home' && unlockedPages.home) multiplier += 1;
-    if (pathname === '/games/heartweaver' && unlockedPages.games) multiplier += 1;
-    if (pathname === '/team' && unlockedPages.team) multiplier += 1;
+    let multiplier = unlockedCount; // Base +1 for each unlocked page
     
     // Calculate max limit: base 10 + 10 per unlocked page + 10 if on specific unlocked page
-    let maxLimit = 10 + (unlockedCount * 10);
+    let maxLimit = 10;
     if (pathname === '/home' && unlockedPages.home) maxLimit += 10;
-    if (pathname === '/games/heartweaver' && unlockedPages.games) maxLimit += 10;
-    if (pathname === '/team' && unlockedPages.team) maxLimit += 10;
+    if (pathname === '/games/heartweaver' && unlockedPages.games) maxLimit += 20;
+    if (pathname === '/team' && unlockedPages.team) maxLimit += 30;
+    if (pathname === '/contact' && unlockedPages.contact) maxLimit += 40;
     
     return { shouldSpawn: true, multiplier, maxLimit };
   }, [unlockedPages, pathname]);
@@ -120,7 +119,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     let spawnDelay = 0;
     if (shopJustClosed) {
       // If shop was just closed, wait at least 1 second before spawning
-      const shopClosedTime = typeof window !== 'undefined' ? localStorage.getItem('shop-closed-time') : null;
+      const shopClosedTime = typeof window !== 'undefined' ? cookieStorage.getItem('shop-closed-time') : null;
       if (shopClosedTime) {
         const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
         const remainingDelay = Math.max(0, 1000 - timeSinceClose);
@@ -128,7 +127,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
         
         // Clear the timestamp after checking
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('shop-closed-time');
+          cookieStorage.removeItem('shop-closed-time');
         }
       }
     } else {
@@ -211,14 +210,14 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
       // Clear all krakenlings when shop opens
       setOctopuses([]);
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('shop-closed-time');
+        cookieStorage.removeItem('shop-closed-time');
       }
     };
 
     const handleShopClose = () => {
       // Mark timestamp when shop closes
       if (typeof window !== 'undefined') {
-        localStorage.setItem('shop-closed-time', Date.now().toString());
+        cookieStorage.setItem('shop-closed-time', Date.now().toString());
       }
     };
 
@@ -233,27 +232,17 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
 
   const handleOctopusClick = (octopus: Octopus) => {
     if (!octopus.collected && !collectedOctopuses.includes(octopus.id) && !octopus.fading) {
-      // Calculate collection value based on manually picked count and upgrades
-      let collectionValue = 1; // Base: 1 Krakenling
-      
+      let collectionValue = 1;
       try {
         if (typeof window !== 'undefined') {
-          // Get total manually picked krakenlings (not from agents)
-          const pickedCount = parseFloat(localStorage.getItem('octopus-picked-count') || '0');
-          const pickedTotal = Math.floor(pickedCount);
-          
-          const savedUnlockables = localStorage.getItem('unlockables-progress');
-          if (savedUnlockables) {
-            const unlockables: any[] = JSON.parse(savedUnlockables);
-            const collectionUpgrades = unlockables.filter(
-              u => u.type === 'upgrade' && u.upgradeType === 'collection-multiplier' && u.unlocked && u.multiplierManualValue !== undefined
-            );
-            
-            // Use only the highest multiplier (not sum them)
-            if (collectionUpgrades.length > 0) {
-              const maxMultiplier = Math.max(...collectionUpgrades.map(u => u.multiplierManualValue || 1));
-              collectionValue += pickedTotal * maxMultiplier;
-            }
+          const { state: unlockables } = deserializeUnlockables(cookieStorage.getItem('unlockables-progress'));
+          const tier = resolveManualCollectionTier(unlockables);
+          if (tier.kind === 'flat') {
+            collectionValue = tier.value;
+          } else {
+            const { state: agents } = deserializeAgents(cookieStorage.getItem('agents-progress'));
+            const totalKps = calculateTotalKps(agents, unlockables);
+            collectionValue = Math.max(1, Math.floor(totalKps * tier.percent));
           }
         }
       } catch (e) {

@@ -74,9 +74,6 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
     clickedIndicesRef.current = [];
     setCurrentStep(0);
     setGameProgress(0);
-    
-    // Play minigame sound
-    playMinigameSound('connection');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -98,6 +95,7 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
       setError(false);
       
       if (newStep === selectedWord.length) {
+        playMinigameSound('connection');
         setGameState('success');
         setTimeout(() => {
           onComplete();
@@ -128,7 +126,7 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center select-none">
-      <div className="relative bg-turquoise-800 rounded-2xl p-8 md:p-12 max-w-2xl mx-4 border-2 border-turquoise-400">
+      <div className="relative bg-turquoise-800 rounded-2xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-2xl mx-2 sm:mx-4 border-2 border-turquoise-400 w-full h-[90vh] max-h-[90vh] flex flex-col overflow-hidden" style={{ minHeight: '500px', maxHeight: '90vh' }}>
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white text-3xl font-bold opacity-60 hover:opacity-100 transition-opacity w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10 z-10 select-none"
@@ -136,41 +134,40 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
           ×
         </button>
 
-        <div className="text-center mb-8 select-none">
-          <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-4 select-none">
-            Connection: Connect the Word
+        <div className="text-center mb-3 sm:mb-4 md:mb-6 flex-shrink-0 select-none">
+          <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4 select-none">
+            Connection
           </h2>
-          <p className="text-white opacity-80 select-none">
-            Click the letters in order to form the word
-          </p>
         </div>
 
         {gameState === 'success' ? (
-          <div className="text-center select-none">
-            <p className="text-green-400 text-2xl font-bold mb-4 select-none">Completed!</p>
-            <p className="text-white opacity-80 select-none">You formed: <span className="text-turquoise-400 font-bold">{selectedWord}</span></p>
-            <p className="text-white opacity-80 mt-2 select-none">You have established the connection</p>
+          <div className="text-center flex-1 flex items-center justify-center min-h-0 select-none">
+            <div>
+              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4 select-none">Completed!</p>
+              <p className="text-white opacity-80 text-sm sm:text-base select-none">You formed: <span className="text-turquoise-400 font-bold">{selectedWord}</span></p>
+              <p className="text-white opacity-80 mt-2 text-xs sm:text-sm select-none">You have established the connection</p>
+            </div>
           </div>
         ) : (
-          <>
-            <div className="mb-6 select-none">
+          <div className="flex-1 flex flex-col justify-center min-h-0 overflow-y-auto">
+            <div className="mb-4 sm:mb-6 flex-shrink-0 select-none">
               <div className="w-full bg-gray-700 rounded-full h-4">
                 <div
                   className="bg-turquoise-400 h-4 rounded-full transition-all duration-300"
                   style={{ width: `${gameProgress}%` }}
                 />
               </div>
-              <p className="text-white text-sm mt-2 text-center select-none">
+              <p className="text-white text-xs sm:text-sm mt-2 text-center select-none">
                 Progress: {currentStep} / {selectedWord.length}
               </p>
               {error && (
-                <p className="text-red-400 text-sm mt-2 text-center animate-pulse select-none">
+                <p className="text-red-400 text-xs sm:text-sm mt-2 text-center animate-pulse select-none">
                   Incorrect order. Try again.
                 </p>
               )}
             </div>
 
-            <div className={`grid gap-4 ${selectedWord.length <= 4 ? 'grid-cols-2' : selectedWord.length <= 6 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+            <div className={`grid gap-2 sm:gap-3 md:gap-4 justify-items-center ${selectedWord.length <= 4 ? 'grid-cols-2' : selectedWord.length <= 6 ? 'grid-cols-3' : 'grid-cols-4'}`}>
               {shuffledLetters.map((letter, index) => {
                 const { isCompleted, isWrong } = getLetterState(letter, index);
                 
@@ -179,7 +176,7 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
                     key={`${letter}-${index}`}
                     onClick={() => handleLetterClick(letter, index)}
                     disabled={isCompleted}
-                    className={`rounded-full text-2xl md:text-3xl font-bold transition-all select-none ${
+                    className={`rounded-full text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all select-none flex items-center justify-center ${
                       isCompleted
                         ? 'bg-green-400 text-black opacity-60'
                         : isWrong && error
@@ -187,9 +184,13 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
                         : 'bg-gray-600 text-white hover:bg-gray-500'
                     }`}
                     style={{ 
-                      width: `${letterSize}px`, 
-                      height: `${letterSize}px`,
-                      fontSize: `${letterSize * 0.3}px`
+                      width: `min(${letterSize}px, 20vw, 15vh)`, 
+                      height: `min(${letterSize}px, 20vw, 15vh)`,
+                      fontSize: `min(${letterSize * 0.3}px, 5vw, 4vh)`,
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      minWidth: '48px',
+                      minHeight: '48px'
                     }}
                   >
                     {letter}
@@ -197,7 +198,7 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
                 );
               })}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

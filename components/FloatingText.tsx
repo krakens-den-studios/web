@@ -30,7 +30,7 @@ export default function FloatingText({ value, x, y, onComplete }: FloatingTextPr
       }}
     >
       <div className="text-turquoise-400 font-bold text-xl md:text-2xl drop-shadow-[0_0_8px_rgba(17,180,187,0.8)] whitespace-nowrap">
-        +{formatNumber(value)}
+        +{Number.isInteger(value) ? Math.floor(value) : formatNumber(value)}
       </div>
     </div>
   );

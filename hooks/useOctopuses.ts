@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { cookieStorage } from '@/utils/cookieStorage';
+import { calculateTotalKps, deserializeAgents, deserializeUnlockables, resolveManualCollectionTier } from '@/shared/gameData';
 
 const OCTOPUS_COUNT_KEY = 'octopus-count';
 const OCTOPUS_COLLECTED_KEY = 'octopus-collected-ids';
@@ -28,9 +30,9 @@ export function useOctopuses() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    const savedCount = localStorage.getItem(OCTOPUS_COUNT_KEY);
-    const savedCollected = localStorage.getItem(OCTOPUS_COLLECTED_KEY);
-    const savedPickedCount = localStorage.getItem(OCTOPUS_PICKED_COUNT_KEY);
+    const savedCount = cookieStorage.getItem(OCTOPUS_COUNT_KEY);
+    const savedCollected = cookieStorage.getItem(OCTOPUS_COLLECTED_KEY);
+    const savedPickedCount = cookieStorage.getItem(OCTOPUS_PICKED_COUNT_KEY);
     
     if (savedCount) {
       try {
@@ -50,14 +52,14 @@ export function useOctopuses() {
     
     // Initialize picked count if it doesn't exist
     if (!savedPickedCount) {
-      localStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, '0');
+      cookieStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, '0');
     }
   }, []);
 
   const updateOctopusCount = (newCount: number) => {
     setOctopusCount(newCount);
     if (typeof window !== 'undefined') {
-      localStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
+      cookieStorage.setItem(OCTOPUS_COUNT_KEY, newCount.toString());
     }
   };
 
@@ -65,30 +67,25 @@ export function useOctopuses() {
     if (!collectedOctopuses.includes(octopusId)) {
       const newCollected = [...collectedOctopuses, octopusId];
       
-      // Get current fractional count from localStorage to maintain precision
-      const currentFractional = parseFloat(localStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
+      // Get current fractional count from cookies to maintain precision
+      const currentFractional = parseFloat(cookieStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
       
       // Get total manually picked krakenlings (not from agents)
-      const pickedCount = parseFloat(localStorage.getItem(OCTOPUS_PICKED_COUNT_KEY) || '0');
-      const pickedTotal = Math.floor(pickedCount);
+      const pickedCount = parseFloat(cookieStorage.getItem(OCTOPUS_PICKED_COUNT_KEY) || '0');
       
       // Calculate collection value based on upgrades
-      // Base: 1 Krakenling
+      // Base: 1 Krakenling, incremented by unlocked upgrades
       let collectionValue = 1;
       
       try {
-        const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-        if (savedUnlockables) {
-          const unlockables: any[] = JSON.parse(savedUnlockables);
-          const collectionUpgrades = unlockables.filter(
-            u => u.type === 'upgrade' && u.upgradeType === 'collection-multiplier' && u.unlocked && u.multiplierManualValue !== undefined
-          );
-          
-          // Use only the highest multiplier (not sum them)
-          if (collectionUpgrades.length > 0) {
-            const maxMultiplier = Math.max(...collectionUpgrades.map(u => u.multiplierManualValue || 1));
-            collectionValue += pickedTotal * maxMultiplier;
-          }
+        const { state: unlockables } = deserializeUnlockables(cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY));
+        const tier = resolveManualCollectionTier(unlockables);
+        if (tier.kind === 'flat') {
+          collectionValue = tier.value;
+        } else {
+          const { state: agents } = deserializeAgents(cookieStorage.getItem(AGENTS_STORAGE_KEY));
+          const totalKps = calculateTotalKps(agents, unlockables);
+          collectionValue = Math.max(1, Math.floor(totalKps * tier.percent));
         }
       } catch (e) {
         // Ignore errors
@@ -104,9 +101,9 @@ export function useOctopuses() {
       setOctopusCount(newCount);
       
       if (typeof window !== 'undefined') {
-        localStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
-        localStorage.setItem(OCTOPUS_COUNT_KEY, newFractionalCount.toString());
-        localStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, newPickedCount.toString());
+        cookieStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
+        cookieStorage.setItem(OCTOPUS_COUNT_KEY, newFractionalCount.toString());
+        cookieStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, newPickedCount.toString());
       }
       
       // Return the value for display purposes
@@ -115,57 +112,34 @@ export function useOctopuses() {
     return 1;
   };
 
-  // Listen for changes in localStorage from other tabs
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === OCTOPUS_COUNT_KEY && e.newValue) {
-        setOctopusCount(parseInt(e.newValue, 10));
-      }
-      if (e.key === OCTOPUS_COLLECTED_KEY && e.newValue) {
-        try {
-          setCollectedOctopuses(JSON.parse(e.newValue));
-        } catch (e) {
-          setCollectedOctopuses([]);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
   // Automatic agent collection system (works globally)
-  // Also synchronizes counter from localStorage for external changes
+  // Also synchronizes counter from cookies for external changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
     // Use a ref to store fractional count to avoid losing precision
-    // Always read from localStorage to sync with external changes (like purchases)
+    // Always read from cookies to sync with external changes (like purchases)
     const updateCount = () => {
       try {
-        // Always sync fractional count from localStorage first to catch external changes
-        let fractionalCount = parseFloat(localStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
+        // Always sync fractional count from cookies first to catch external changes
+        let fractionalCount = parseFloat(cookieStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
         
         // First, collect from agents if they exist
-        const savedAgents = localStorage.getItem(AGENTS_STORAGE_KEY);
-        if (savedAgents) {
-          const agents: Agent[] = JSON.parse(savedAgents);
+        const { state: agents } = deserializeAgents(cookieStorage.getItem(AGENTS_STORAGE_KEY));
+        if (agents.length > 0) {
           const activeAgents = agents.filter(a => a.owned > 0);
           
           if (activeAgents.length > 0) {
             // Get passive collection upgrades
             let passiveMultiplier = 0;
             try {
-              const savedUnlockables = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-              if (savedUnlockables) {
-                const unlockables: any[] = JSON.parse(savedUnlockables);
-                const passiveUpgrades = unlockables.filter(
-                  u => u.type === 'upgrade' && u.upgradeType === 'passive' && u.unlocked
-                );
-                passiveMultiplier = passiveUpgrades.reduce((sum, upgrade) => {
-                  return sum + (upgrade.multiplierValue || 0);
-                }, 0);
-              }
+              const { state: unlockables } = deserializeUnlockables(cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY));
+              const passiveUpgrades = unlockables.filter(
+                u => u.type === 'upgrade' && u.upgradeType === 'passive' && u.unlocked
+              );
+              passiveMultiplier = passiveUpgrades.reduce((sum, upgrade) => {
+                return sum + (upgrade.multiplierValue || 0);
+              }, 0);
             } catch (e) {
               // Ignore errors
             }
@@ -186,15 +160,15 @@ export function useOctopuses() {
               fractionalCount = fractionalCount + increment;
               const newCountRounded = Math.floor(fractionalCount);
               
-              // Update state and localStorage with rounded value
+              // Update state and cookies with rounded value
               setOctopusCount(newCountRounded);
-              localStorage.setItem(OCTOPUS_COUNT_KEY, fractionalCount.toString());
+              cookieStorage.setItem(OCTOPUS_COUNT_KEY, fractionalCount.toString());
               return;
             }
           }
         }
         
-        // If no active agents, synchronize from localStorage
+        // If no active agents, synchronize from cookies
         const currentRounded = Math.floor(fractionalCount);
         setOctopusCount(prev => {
           if (prev !== currentRounded) {

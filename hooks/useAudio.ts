@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, MutableRefObject } from 'react';
+import { cookieStorage } from '@/utils/cookieStorage';
+import { deserializeUnlockables } from '@/shared/gameData';
 
 const UNLOCKABLES_STORAGE_KEY = 'unlockables-progress';
+const AUDIO_SETTINGS_KEY = 'audio-settings';
 
 interface AudioSettings {
   buttonClickEnabled: boolean;
@@ -88,66 +91,120 @@ export function useAudio() {
   const connectionSoundRef = useRef<HTMLAudioElement | null>(null);
   const healingSoundRef = useRef<HTMLAudioElement | null>(null);
 
-  // Load settings from localStorage
+  const defaultSettings: AudioSettings = {
+    buttonClickEnabled: false,
+    collectEnabled: false,
+    minigameSoundsEnabled: {
+      hope: false,
+      courage: false,
+      connection: false,
+      healing: false
+    },
+    musicEnabled: false
+  };
+
+  const mergeSettings = (overrides: Partial<AudioSettings>): AudioSettings => ({
+    buttonClickEnabled: overrides.buttonClickEnabled ?? defaultSettings.buttonClickEnabled,
+    collectEnabled: overrides.collectEnabled ?? defaultSettings.collectEnabled,
+    musicEnabled: overrides.musicEnabled ?? defaultSettings.musicEnabled,
+    minigameSoundsEnabled: {
+      hope: overrides.minigameSoundsEnabled?.hope ?? defaultSettings.minigameSoundsEnabled.hope,
+      courage: overrides.minigameSoundsEnabled?.courage ?? defaultSettings.minigameSoundsEnabled.courage,
+      connection: overrides.minigameSoundsEnabled?.connection ?? defaultSettings.minigameSoundsEnabled.connection,
+      healing: overrides.minigameSoundsEnabled?.healing ?? defaultSettings.minigameSoundsEnabled.healing,
+    }
+  });
+
+  const loadAudioSettingsFromCookie = (): AudioSettings | null => {
+    const saved = cookieStorage.getItem(AUDIO_SETTINGS_KEY);
+    if (!saved) return null;
+    try {
+      const parsed = JSON.parse(saved);
+      return mergeSettings({
+        buttonClickEnabled: !!parsed.buttonClickEnabled,
+        collectEnabled: !!parsed.collectEnabled,
+        musicEnabled: !!parsed.musicEnabled,
+        minigameSoundsEnabled: {
+          hope: !!parsed.minigameSoundsEnabled?.hope,
+          courage: !!parsed.minigameSoundsEnabled?.courage,
+          connection: !!parsed.minigameSoundsEnabled?.connection,
+          healing: !!parsed.minigameSoundsEnabled?.healing
+        }
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const persistAudioSettings = (settingsToSave: AudioSettings) => {
+    cookieStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settingsToSave));
+  };
+
+  const deriveSettingsFromUnlockables = (): AudioSettings | null => {
+    const raw = cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY);
+    if (!raw) return null;
+
+    const { state: unlockables } = deserializeUnlockables(raw);
+    const buttonClickEnabled = unlockables.some(u => u.id === 'sound-button-click' && u.unlocked);
+    const hopeEnabled = unlockables.some(u => u.id === 'sound-minigame-hope' && u.unlocked);
+    const courageEnabled = unlockables.some(u => u.id === 'sound-minigame-courage' && u.unlocked);
+    const connectionEnabled = unlockables.some(u => u.id === 'sound-minigame-connection' && u.unlocked);
+    const healingEnabled = unlockables.some(u => u.id === 'sound-minigame-healing' && u.unlocked);
+    const musicEnabled = unlockables.some(u => u.id === 'sound-music' && u.unlocked);
+
+    return {
+      buttonClickEnabled,
+      collectEnabled: buttonClickEnabled,
+      minigameSoundsEnabled: {
+        hope: hopeEnabled,
+        courage: courageEnabled,
+        connection: connectionEnabled,
+        healing: healingEnabled
+      },
+      musicEnabled
+    };
+  };
+
+  // Load settings from cookies
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const loadSettings = () => {
-      try {
-        const saved = localStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-        if (saved) {
-          const unlockables: any[] = JSON.parse(saved);
-          
-          const buttonClickEnabled = unlockables.some(u => u.id === 'sound-button-click' && u.unlocked);
-          const collectEnabled = unlockables.some(u => u.id === 'sound-button-click' && u.unlocked); // Same upgrade
-          const hopeEnabled = unlockables.some(u => u.id === 'sound-minigame-hope' && u.unlocked);
-          const courageEnabled = unlockables.some(u => u.id === 'sound-minigame-courage' && u.unlocked);
-          const connectionEnabled = unlockables.some(u => u.id === 'sound-minigame-connection' && u.unlocked);
-          const healingEnabled = unlockables.some(u => u.id === 'sound-minigame-healing' && u.unlocked);
-          const musicEnabled = unlockables.some(u => u.id === 'sound-music' && u.unlocked);
+    const applySettings = (newSettings: AudioSettings) => {
+      setSettings(newSettings);
+      settingsLoadedRef.current = true;
+      updateGlobalMusic(newSettings.musicEnabled);
+    };
 
-          setSettings({
-            buttonClickEnabled,
-            collectEnabled,
-            minigameSoundsEnabled: {
-              hope: hopeEnabled,
-              courage: courageEnabled,
-              connection: connectionEnabled,
-              healing: healingEnabled
-            },
-            musicEnabled
-          });
-          
-          settingsLoadedRef.current = true;
-          
-          // Update global music state only after loading from localStorage
-          updateGlobalMusic(musicEnabled);
-        } else {
-          // Even if no saved data, mark as loaded
-          settingsLoadedRef.current = true;
-        }
-      } catch (e) {
-        // Ignore errors
+    const loadSettings = () => {
+      const audioCookieSettings = loadAudioSettingsFromCookie();
+      if (audioCookieSettings) {
+        applySettings(audioCookieSettings);
+        return;
       }
+
+      const derived = deriveSettingsFromUnlockables();
+      if (derived) {
+        applySettings(derived);
+        persistAudioSettings(derived);
+        return;
+      }
+
+      applySettings({ ...defaultSettings });
+      persistAudioSettings(defaultSettings);
     };
 
     loadSettings();
 
-    // Listen for changes
-    const handleStorageChange = () => {
-      loadSettings();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    // Also listen for custom event when unlockables change
+    // Listen for custom event when unlockables change
     const handleUnlockableChange = () => {
       loadSettings();
     };
     window.addEventListener('unlockableChanged', handleUnlockableChange);
+    window.addEventListener('audioSettingsChanged', handleUnlockableChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('unlockableChanged', handleUnlockableChange);
+      window.removeEventListener('audioSettingsChanged', handleUnlockableChange);
     };
   }, []);
 
@@ -156,11 +213,29 @@ export function useAudio() {
     if (typeof window === 'undefined') return;
 
     buttonClickSoundRef.current = new Audio('/sounds/click.mp3');
+    buttonClickSoundRef.current.preload = 'auto';
+    buttonClickSoundRef.current.load();
+    
     collectSoundRef.current = new Audio('/sounds/collect.wav');
-    hopeSoundRef.current = new Audio('/sounds/hope.mp3');
-    courageSoundRef.current = new Audio('/sounds/courage.mp3');
-    connectionSoundRef.current = new Audio('/sounds/connection.mp3');
-    healingSoundRef.current = new Audio('/sounds/healing.mp3');
+    collectSoundRef.current.preload = 'auto';
+    collectSoundRef.current.volume = 0.15;
+    collectSoundRef.current.load();
+    
+    hopeSoundRef.current = new Audio('/sounds/hope.wav');
+    hopeSoundRef.current.preload = 'auto';
+    hopeSoundRef.current.load();
+    
+    courageSoundRef.current = new Audio('/sounds/courage.wav');
+    courageSoundRef.current.preload = 'auto';
+    courageSoundRef.current.load();
+    
+    connectionSoundRef.current = new Audio('/sounds/connection.wav');
+    connectionSoundRef.current.preload = 'auto';
+    connectionSoundRef.current.load();
+    
+    healingSoundRef.current = new Audio('/sounds/healing.wav');
+    healingSoundRef.current.preload = 'auto';
+    healingSoundRef.current.load();
     
     // Initialize global music if not already initialized
     initializeGlobalMusic();
@@ -177,58 +252,68 @@ export function useAudio() {
   }, []);
 
   // Handle music playback using global singleton
-  // Only update when settings actually change after loading from localStorage
+  // Only update when settings actually change after loading from cookies
   useEffect(() => {
-    // Only update if settings have been loaded from localStorage
+    // Only update if settings have been loaded from cookies
     // This prevents pausing music when components mount with default false values
     if (settingsLoadedRef.current) {
       updateGlobalMusic(settings.musicEnabled);
     }
   }, [settings.musicEnabled]);
 
-  const playButtonClick = () => {
-    if (settings.buttonClickEnabled && buttonClickSoundRef.current) {
-      buttonClickSoundRef.current.currentTime = 0;
-      buttonClickSoundRef.current.play().catch(() => {
-        // Ignore play errors
+  const playSoundEffect = (ref: MutableRefObject<HTMLAudioElement | null>) => {
+    const sound = ref.current;
+    if (!sound) return;
+    if (sound.readyState === 0) {
+      sound.load();
+    }
+    try {
+      sound.currentTime = 0;
+    } catch (e) {
+      // Some browsers may throw if the element isn't seekable yet; ignore.
+    }
+    sound.play().catch(() => {
+      const clone = sound.cloneNode(true) as HTMLAudioElement;
+      clone.play().catch(() => {
+        // Ignore play errors to avoid console noise
       });
+    });
+  };
+
+  const playButtonClick = () => {
+    if (settings.buttonClickEnabled) {
+      playSoundEffect(buttonClickSoundRef);
     }
   };
 
   const playCollect = () => {
-    if (settings.collectEnabled && collectSoundRef.current) {
-      collectSoundRef.current.currentTime = 0;
-      collectSoundRef.current.play().catch(() => {
-        // Ignore play errors
-      });
+    if (settings.collectEnabled) {
+      playSoundEffect(collectSoundRef);
     }
   };
 
   const playMinigameSound = (minigameId: 'hope' | 'courage' | 'connection' | 'healing') => {
     if (!settings.minigameSoundsEnabled[minigameId]) return;
 
-    let soundRef: HTMLAudioElement | null = null;
+    let soundRef: MutableRefObject<HTMLAudioElement | null>;
     switch (minigameId) {
       case 'hope':
-        soundRef = hopeSoundRef.current;
+        soundRef = hopeSoundRef;
         break;
       case 'courage':
-        soundRef = courageSoundRef.current;
+        soundRef = courageSoundRef;
         break;
       case 'connection':
-        soundRef = connectionSoundRef.current;
+        soundRef = connectionSoundRef;
         break;
       case 'healing':
-        soundRef = healingSoundRef.current;
+        soundRef = healingSoundRef;
         break;
+      default:
+        return;
     }
 
-    if (soundRef) {
-      soundRef.currentTime = 0;
-      soundRef.play().catch(() => {
-        // Ignore play errors
-      });
-    }
+    playSoundEffect(soundRef);
   };
 
   return {

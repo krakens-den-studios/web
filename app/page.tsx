@@ -8,11 +8,15 @@ import Link from 'next/link';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import Image from 'next/image';
 import FirstVisitModal from '@/components/FirstVisitModal';
+import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
+import { useMissionChecker } from '@/hooks/useMissionChecker';
 
 export default function Root() {
   const { unlockedPages } = useUnlockedPages();
   const [showContent, setShowContent] = useState(false);
   const [visibleParagraphs, setVisibleParagraphs] = useState<number[]>([]);
+  const unclaimedMissionsCount = useUnclaimedMissions();
+  useMissionChecker(); // Check missions even when shop is closed
 
   useEffect(() => {
     if (showContent) {
@@ -23,12 +27,7 @@ export default function Root() {
         setTimeout(() => {
           setVisibleParagraphs(prev => [...prev, index]);
           
-          // When all paragraphs are visible, dispatch event to show footer
-          if (index === delays.length - 1) {
-            setTimeout(() => {
-              window.dispatchEvent(new CustomEvent('contentReady'));
-            }, 1000); // Wait for fade-in animation to complete
-          }
+          // No need to dispatch contentReady for root page since it doesn't show footer
         }, delay);
       });
     }
@@ -43,23 +42,9 @@ export default function Root() {
         >
       
       <div className="max-w-3xl text-center flex flex-col gap-8 items-center p-8">
-        <div 
-          className={`relative w-48 h-48 mb-4 transition-opacity duration-1000 ease-in-out ${
-            visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <Image
-            src="/logoColor.png"
-            alt="Kraken's Den Studios Logo"
-            width={192}
-            height={192}
-            className="object-contain"
-          />
-        </div>
-
         <div className="flex flex-col gap-4">
           <p 
-            className={`text-xl md:text-2xl text-turquoise-300 transition-opacity duration-1000 ease-in-out ${
+            className={`text-lg sm:text-xl md:text-2xl text-turquoise-300 transition-opacity duration-1000 ease-in-out ${
               visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -67,7 +52,7 @@ export default function Root() {
           </p>
 
           <p 
-            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
+            className={`text-base sm:text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
               visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -75,7 +60,7 @@ export default function Root() {
           </p>
           
           <p 
-            className={`text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
+            className={`text-base sm:text-lg md:text-xl text-white mt-4 transition-opacity duration-1000 ease-in-out ${
               visibleParagraphs.includes(2) ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -92,10 +77,15 @@ export default function Root() {
             onClick={() => {
               window.dispatchEvent(new CustomEvent('openTreasure'));
             }}
-            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-8 py-4 shadow-lg transition-all flex items-center gap-2 group font-lora font-bold text-black text-xl"
+            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-6 sm:px-8 py-3 sm:py-4 shadow-lg transition-all flex items-center gap-2 group font-lora font-bold text-black text-base sm:text-lg md:text-xl relative"
             title="Open Treasure"
           >
             Open Treasure
+            {unclaimedMissionsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
+                {unclaimedMissionsCount}
+              </span>
+            )}
           </button>
           {unlockedPages.home && (
             <Link href={Route.HOME}>

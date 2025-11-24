@@ -23,9 +23,6 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
     setGameState('playing');
     setGameProgress(0);
     
-    // Play minigame sound
-    playMinigameSound('courage');
-    
     // Randomize game parameters for variety
     const randomDuration = Math.floor(Math.random() * 1500) + 2500; // 2.5-4 seconds
     const randomButtonSize = Math.floor(Math.random() * 48) + 160; // 160-208px
@@ -57,6 +54,7 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
         setGameProgress(100);
         // Wait a bit for the visual to catch up, then show success
         setTimeout(() => {
+          playMinigameSound('courage');
           setGameState('success');
           // Show success message for longer before completing
           setTimeout(() => {
@@ -89,7 +87,7 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
-      <div className="relative bg-turquoise-800 rounded-2xl p-8 md:p-12 max-w-2xl mx-4 border-2 border-turquoise-400">
+      <div className="relative bg-turquoise-800 rounded-2xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-2xl mx-2 sm:mx-4 border-2 border-turquoise-400 w-full h-[90vh] max-h-[90vh] flex flex-col overflow-hidden" style={{ minHeight: '500px', maxHeight: '90vh' }}>
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white text-3xl font-bold opacity-60 hover:opacity-100 transition-opacity w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10"
@@ -97,49 +95,55 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
           ×
         </button>
 
-        <div className="text-center mb-8">
-          <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-4">
-            Courage: Hold the Pressure
+        <div className="text-center mb-3 sm:mb-4 md:mb-6 flex-shrink-0">
+          <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4">
+            Courage
           </h2>
-          <p className="text-white opacity-80">
-            Hold the button until it fills
-          </p>
         </div>
 
         {gameState === 'success' ? (
-          <div className="text-center">
-            <p className="text-green-400 text-2xl font-bold mb-4">Completed!</p>
-            <p className="text-white opacity-80">You have shown courage</p>
+          <div className="text-center flex-1 flex items-center justify-center min-h-0">
+            <div>
+              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4">Completed!</p>
+              <p className="text-white opacity-80 text-sm sm:text-base">You have shown courage</p>
+            </div>
           </div>
         ) : (
-          <>
-            <div className="mb-8">
-              <div className="w-full bg-gray-700 rounded-full h-8">
+          <div className="flex-1 flex flex-col justify-center min-h-0">
+            <div className="mb-4 sm:mb-6 md:mb-8 flex-shrink-0">
+              <div className="w-full bg-gray-700 rounded-full h-4 sm:h-6 md:h-8">
                 <div
-                  className="bg-turquoise-400 h-8 rounded-full transition-all duration-100"
+                  className="bg-turquoise-400 h-4 sm:h-6 md:h-8 rounded-full transition-all duration-100"
                   style={{ width: `${gameProgress}%` }}
                 >
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center flex-1 min-h-0">
               <button
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onTouchStart={handleMouseDown}
                 onTouchEnd={handleMouseUp}
-                className={`rounded-full text-2xl font-bold transition-all ${
+                className={`rounded-full text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold transition-all flex items-center justify-center ${
                   gameProgress > 0
                     ? 'bg-turquoise-400 text-black scale-110'
                     : 'bg-gray-600 text-white hover:bg-gray-500'
                 }`}
-                style={{ width: `${buttonSize}px`, height: `${buttonSize}px` }}
+                style={{ 
+                  width: `min(${buttonSize}px, 50vw, 60vh)`, 
+                  height: `min(${buttonSize}px, 50vw, 60vh)`,
+                  minWidth: '120px',
+                  minHeight: '120px',
+                  maxWidth: '100%',
+                  maxHeight: '100%'
+                }}
               >
                 {gameProgress === 0 ? 'Hold' : 'Hold...'}
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

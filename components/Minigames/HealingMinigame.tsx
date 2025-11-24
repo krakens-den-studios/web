@@ -38,9 +38,6 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
     setClicks(0);
     clicksRef.current = 0;
     setGameProgress(0);
-    
-    // Play minigame sound
-    playMinigameSound('healing');
     setCanClick(true); // First click is always valid
     const now = Date.now();
     lastClickRef.current = now;
@@ -76,9 +73,9 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
         const cycleProgress = (safeElapsed % currentTargetRhythm) / currentTargetRhythm;
         const phase = cycleProgress * Math.PI * 2;
         
-        // Pulse between 1.0 and 1.3, peaking at the target rhythm
+        // Pulse between 1.0 and 1.15, peaking at the target rhythm (reduced growth)
         // Start from scale 1.0 (minimum) when cycle starts
-        const scale = 1 + Math.sin(phase) * 0.3;
+        const scale = 1 + Math.sin(phase) * 0.15;
         setPulseScale(scale);
         
         // Determine if we're in the "click window" (when pulse is near peak)
@@ -116,7 +113,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
             lastClickTimeRef.current = resetTime;
             lastSuccessfulClickTimeRef.current = resetTime;
             setError(true);
-            setTimeout(() => setError(false), 500);
+            setTimeout(() => setError(false), 1500); // Increased error display time
           }
         }
         
@@ -140,14 +137,13 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
     if (gameState !== 'playing') return;
 
     const now = Date.now();
-    const timeSinceLastClick = now - lastClickRef.current;
     
     // Mark that user clicked during the current window
     clickedInWindowRef.current = true;
     lastClickTimeRef.current = now;
     
-    // First click is always valid
-    if (clicks === 0) {
+    // If canClick is true, the click is valid (user clicked during the pulse window)
+    if (canClick) {
       const newClicks = clicks + 1;
       setClicks(newClicks);
       clicksRef.current = newClicks;
@@ -157,26 +153,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
       setError(false);
       
       if (newClicks >= targetClicks) {
-        setGameState('success');
-        gameStateRef.current = 'success';
-        setTimeout(() => {
-          onComplete();
-        }, 1000);
-      }
-      return;
-    }
-    
-    // Must click within the rhythm window
-    if (timeSinceLastClick >= rhythmWindow.min && timeSinceLastClick <= rhythmWindow.max) {
-      const newClicks = clicks + 1;
-      setClicks(newClicks);
-      clicksRef.current = newClicks;
-      setGameProgress((newClicks / targetClicks) * 100);
-      lastClickRef.current = now;
-      lastSuccessfulClickTimeRef.current = now; // Update successful click time
-      setError(false);
-      
-      if (newClicks >= targetClicks) {
+        playMinigameSound('healing');
         setGameState('success');
         gameStateRef.current = 'success';
         setTimeout(() => {
@@ -184,7 +161,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
         }, 1000);
       }
     } else {
-      // Incorrect rhythm: restart
+      // Clicked outside the valid window: restart
       setClicks(0);
       clicksRef.current = 0;
       setGameProgress(0);
@@ -192,13 +169,13 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
       lastClickTimeRef.current = now;
       lastSuccessfulClickTimeRef.current = now;
       setError(true);
-      setTimeout(() => setError(false), 500);
+      setTimeout(() => setError(false), 1500); // Increased error display time
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
-      <div className="relative bg-turquoise-800 rounded-2xl p-10 md:p-16 max-w-3xl mx-4 border-2 border-turquoise-400 w-full min-h-[700px] h-[700px] flex flex-col">
+      <div className="relative bg-turquoise-800 rounded-2xl p-4 sm:p-6 md:p-10 lg:p-16 max-w-3xl mx-4 border-2 border-turquoise-400 w-full h-[90vh] max-h-[90vh] flex flex-col overflow-hidden" style={{ minHeight: '600px', maxHeight: '90vh' }}>
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white text-3xl font-bold opacity-60 hover:opacity-100 transition-opacity w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-10"
@@ -206,45 +183,53 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
           ×
         </button>
 
-        <div className="text-center mb-10 flex-shrink-0">
-          <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-4">
-            Healing: Breathing Rhythm
+        <div className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10 flex-shrink-0">
+          <h2 className="font-lora text-2xl sm:text-3xl md:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4">
+            Healing
           </h2>
-          <p className="text-white opacity-80">
-            Click following the rhythmic pulse
-          </p>
         </div>
 
         {gameState === 'success' ? (
-          <div className="text-center flex-1 flex items-center justify-center">
+          <div className="text-center flex-1 flex items-center justify-center min-h-0">
             <div>
-              <p className="text-green-400 text-2xl font-bold mb-4">Completed!</p>
-              <p className="text-white opacity-80">You have found your healing rhythm</p>
+              <p className="text-green-400 text-xl sm:text-2xl font-bold mb-4">Completed!</p>
+              <p className="text-white opacity-80 text-sm sm:text-base">You have found your healing rhythm</p>
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col justify-center">
-            <div className="mb-8 flex-shrink-0">
+          <div className="flex-1 flex flex-col justify-center min-h-0" style={{ overflow: 'hidden' }}>
+            <div className="mb-4 sm:mb-6 md:mb-8 flex-shrink-0">
               <div className="w-full bg-gray-700 rounded-full h-4">
                 <div
                   className="bg-turquoise-400 h-4 rounded-full transition-all duration-300"
                   style={{ width: `${gameProgress}%` }}
                 />
               </div>
-              <p className="text-white text-sm mt-2 text-center">
+              <p className="text-white text-xs sm:text-sm mt-2 text-center">
                 Correct clicks: {clicks} / {targetClicks}
               </p>
             </div>
 
-            <div className="flex flex-col items-center gap-8 flex-1 justify-center min-h-[400px]">
+            <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 flex-1 justify-center min-h-0" style={{ overflow: 'hidden' }}>
               {/* Visual pulse indicator */}
-              <div className="relative flex items-center justify-center" style={{ minHeight: '400px', minWidth: '400px' }}>
+              <div className="relative flex items-center justify-center" style={{ 
+                width: 'min(400px, 80vw, 60vh)', 
+                height: 'min(400px, 80vw, 60vh)', 
+                overflow: 'hidden',
+                flexShrink: 0,
+                position: 'relative',
+                minWidth: '250px',
+                minHeight: '250px'
+              }}>
                 {/* Outer pulse ring */}
                 <div
-                  className="absolute rounded-full border-4 border-turquoise-400 opacity-30"
+                  className="absolute rounded-full border-2 sm:border-4 border-turquoise-400 opacity-30"
                   style={{
                     width: `${circleSize * pulseScale * 1.5}px`,
                     height: `${circleSize * pulseScale * 1.5}px`,
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
                     transition: 'all 0.1s ease-out'
                   }}
                 />
@@ -254,39 +239,54 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
                   style={{
                     width: `${circleSize * pulseScale * 1.2}px`,
                     height: `${circleSize * pulseScale * 1.2}px`,
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
                     transition: 'all 0.1s ease-out'
                   }}
                 />
-                {/* Main button */}
-                <button
-                  onClick={handleClick}
-                  className={`rounded-full text-xl font-bold transition-all relative z-10 ${
-                    error
-                      ? 'bg-red-500 text-white'
-                      : canClick
-                      ? 'bg-turquoise-400 text-black hover:bg-turquoise-300 shadow-lg shadow-turquoise-400/50'
-                      : 'bg-turquoise-600 text-black opacity-70'
-                  }`}
-                  style={{ 
-                    width: `${circleSize * pulseScale}px`, 
-                    height: `${circleSize * pulseScale}px`,
-                    transition: 'all 0.1s ease-out'
-                  }}
-                >
-                  {error ? 'Try again' : canClick ? 'Click now' : 'Wait...'}
-                </button>
+                {/* Main button - centered using flexbox */}
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <button
+                    onClick={handleClick}
+                    className={`rounded-full text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all ${
+                      error
+                        ? 'bg-red-500 text-white'
+                        : canClick
+                        ? 'bg-turquoise-400 text-black hover:bg-turquoise-300 shadow-lg shadow-turquoise-400/50'
+                        : 'bg-turquoise-800 text-white opacity-70'
+                    }`}
+                    style={{ 
+                      width: `${circleSize * pulseScale}px`, 
+                      height: `${circleSize * pulseScale}px`,
+                      transition: 'all 0.1s ease-out',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <span className="text-center">
+                      {error ? 'Try again' : canClick ? 'Click now' : 'Wait...'}
+                    </span>
+                  </button>
+                </div>
               </div>
               
-              {/* Text indicator */}
-              <div className="text-center flex-shrink-0">
+              {/* Text indicator - fixed height to prevent layout shift */}
+              <div className="text-center flex-shrink-0" style={{ minHeight: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {canClick && !error && (
-                  <p className="text-turquoise-400 text-lg font-bold animate-pulse">
+                  <p className="text-turquoise-400 text-base sm:text-lg font-bold animate-pulse">
                     Now!
                   </p>
                 )}
                 {!canClick && !error && clicks > 0 && (
-                  <p className="text-white opacity-60 text-sm">
+                  <p className="text-white opacity-60 text-xs sm:text-sm">
                     Follow the rhythm...
+                  </p>
+                )}
+                {!canClick && !error && clicks === 0 && (
+                  <p className="text-transparent text-xs sm:text-sm">
+                    &nbsp;
                   </p>
                 )}
               </div>

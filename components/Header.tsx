@@ -8,13 +8,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiOutlineX } from 'react-icons/hi';
-import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiEmotionLine } from 'react-icons/ri';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiEmotionLine, RiShoppingBagLine } from 'react-icons/ri';
 import Dialog from './Dialog';
 import KrakenTreasure from './KrakenTreasure';
 import OctopusCollector from './OctopusCollector';
 import { useOctopuses } from '@/hooks/useOctopuses';
 import { formatNumber } from '@/utils/formatNumber';
 import { useAudio } from '@/hooks/useAudio';
+import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
+import { useMissionChecker } from '@/hooks/useMissionChecker';
 
 const Header = () => {
   const pathname = usePathname();
@@ -23,6 +25,8 @@ const Header = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
   const { playButtonClick } = useAudio();
+  const unclaimedMissionsCount = useUnclaimedMissions();
+  useMissionChecker(); // Check missions even when shop is closed
 
   useEffect(() => {
     setIsDialogOpen(false);
@@ -104,10 +108,32 @@ const Header = () => {
           />
         </Link>
 
-        {/* krakenlings counter on mobile */}
-        <div className="flex items-center gap-2 text-white lg:hidden whitespace-nowrap">
-          <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
-          <span className="font-bold">{formatNumber(octopusCount)}</span>
+        {/* Mobile: Krakenlings counter and Treasure icon */}
+        <div className="flex items-center gap-4 lg:hidden">
+          <div className="flex items-center gap-2 text-white whitespace-nowrap">
+            <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
+            <span className="font-bold">{formatNumber(octopusCount)}</span>
+          </div>
+          
+          {/* Treasure icon button for mobile */}
+          <button
+            onClick={() => {
+              playButtonClick();
+              setShowTreasure(true);
+              // Dispatch event when shop opens
+              window.dispatchEvent(new CustomEvent('shopOpened'));
+            }}
+            className="p-2 text-white hover:text-turquoise-400 transition-colors relative"
+            title="Open Treasure"
+            aria-label="Open Treasure"
+          >
+            <RiShoppingBagLine className="h-8 w-8" />
+            {unclaimedMissionsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-turquoise-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {unclaimedMissionsCount}
+              </span>
+            )}
+          </button>
         </div>
 
         <HiMenu
@@ -183,10 +209,10 @@ const Header = () => {
             </div>
           )}
 
-          {isPageUnlocked('newsletter') ? (
-            <Link href={Route.HOME}>
+          {isPageUnlocked(Route.CONTACT) ? (
+            <Link href={Route.CONTACT}>
               <p
-                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
                   }`}
               >
                 Contact
@@ -198,7 +224,7 @@ const Header = () => {
                 Contact <RiLockLine className="w-4 h-4" />
               </span>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                Locked. Get "Contact" in The Kraken's Treasure (2000 Krakenlings) to unlock this part of the den.
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
               </div>
             </div>
@@ -216,10 +242,15 @@ const Header = () => {
               // Dispatch event when shop opens
               window.dispatchEvent(new CustomEvent('shopOpened'));
             }}
-            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap font-lora font-bold text-black text-xl"
+            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap font-lora font-bold text-black text-xl relative"
             title="Open Treasure"
           >
             Open Treasure
+            {unclaimedMissionsCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
+                {unclaimedMissionsCount}
+              </span>
+            )}
           </button>
 
           {socialLinks}
@@ -239,7 +270,7 @@ const Header = () => {
               <div className="relative flex w-full flex-col items-center p-6 gap-4">
                 <Link href={Route.HOME} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
+                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
                       }`}
                   >
                     HOME
@@ -248,7 +279,7 @@ const Header = () => {
 
                 <Link href={Route.TEAM} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
+                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
                       }`}
                   >
                     ABOUT US
@@ -257,21 +288,29 @@ const Header = () => {
 
                 <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
                   <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
+                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
                       }`}
                   >
                     GAMES
                   </p>
                 </Link>
 
-                <Link href={Route.HOME} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === 'TODO' ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    CONTACT
-                  </p>
-                </Link>
+                {isPageUnlocked(Route.CONTACT) ? (
+                  <Link href={Route.CONTACT} className="outline-none w-full p-4">
+                    <p
+                      className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
+                        }`}
+                    >
+                      CONTACT
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="w-full p-4">
+                    <p className="font-lora text-gray-300 text-lg sm:text-xl md:text-2xl font-medium select-none text-center">
+                      CONTACT
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="w-full h-fit px-2">{socialLinks}</div>

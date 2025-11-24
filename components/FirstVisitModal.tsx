@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { RiEmotionLine } from 'react-icons/ri';
+import { cookieStorage } from '@/utils/cookieStorage';
 
 interface FirstVisitModalProps {
   onComplete: () => void;
@@ -15,7 +16,7 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
     if (typeof window === 'undefined') return;
     
     // Check if user has already seen the first visit modal
-    const hasSeenFirstVisit = localStorage.getItem('has-seen-first-visit');
+    const hasSeenFirstVisit = cookieStorage.getItem('has-seen-first-visit');
     if (!hasSeenFirstVisit) {
       setIsVisible(true);
     } else {
@@ -32,11 +33,11 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
     if (typeof window === 'undefined') return;
     
     // Mark as seen
-    localStorage.setItem('has-seen-first-visit', 'true');
+    cookieStorage.setItem('has-seen-first-visit', 'true');
     
     // Give the user their first krakenling
-    const currentCount = parseFloat(localStorage.getItem('octopus-count') || '0');
-    localStorage.setItem('octopus-count', (currentCount + 1).toString());
+    const currentCount = parseFloat(cookieStorage.getItem('octopus-count') || '0');
+    cookieStorage.setItem('octopus-count', (currentCount + 1).toString());
     
     // Dispatch event to update counter
     window.dispatchEvent(new CustomEvent('octopusCollected', { detail: { count: currentCount + 1 } }));
@@ -61,7 +62,7 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
       }`}
       style={{ zIndex: 9999 }}
     >
-      <div className={`relative bg-turquoise-800 rounded-2xl p-12 md:p-16 max-w-md mx-4 border-2 border-turquoise-400 text-center transition-all duration-1000 ease-in-out ${
+      <div className={`relative bg-turquoise-800 rounded-2xl p-6 sm:p-8 md:p-12 lg:p-16 max-w-md mx-4 border-2 border-turquoise-400 text-center transition-all duration-1000 ease-in-out max-h-[90vh] overflow-y-auto ${
         isVisible && !isCollecting ? 'opacity-100 scale-100' : isCollecting ? 'opacity-0 scale-95' : 'opacity-0 scale-95'
       }`}>
         <div className="flex flex-col items-center gap-6">

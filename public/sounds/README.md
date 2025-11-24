@@ -7,12 +7,12 @@ Place the following audio files in this directory:
 - `click.mp3` - Sound effect for button clicks (short, satisfying click sound)
 - `collect.wav` - Sound effect for collecting Krakenlings (gentle collection sound)
 
-## Minigame Sounds
+## Minigame Sound Effects
 
-- `hope.mp3` - Ambient sound for Hope therapy minigame (calming, light)
-- `courage.mp3` - Ambient sound for Courage therapy minigame (steady, determined)
-- `connection.mp3` - Ambient sound for Connection therapy minigame (warm, connecting)
-- `healing.mp3` - Ambient sound for Healing therapy minigame (breathing, peaceful)
+- `hope.wav` - Short sparkle/resolution cue for Hope (use when the path is completed)
+- `courage.wav` - Firm but gentle hit for Courage (fires the moment the hold finishes)
+- `connection.wav` - Warm chime for Connection (plays when the correct word is formed)
+- `healing.wav` - Soft breath/pulse for Healing (triggers after keeping rhythm)
 
 ## Music
 
@@ -22,7 +22,7 @@ Place the following audio files in this directory:
 
 - All audio files should be in MP3 format
 - Sound effects should be short (0.5-2 seconds)
-- Minigame sounds can be longer ambient loops
+- Minigame sounds are effects, not loops (no background beds needed)
 - Background music should loop seamlessly
 - Keep file sizes reasonable for web performance
 

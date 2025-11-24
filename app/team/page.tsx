@@ -1,11 +1,9 @@
 'use client';
 
-import LockedPage from '@/components/LockedPage';
 import { Route } from '@/shared/Route';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import Image from 'next/image';
 
 interface TeamMember {
   name: string;

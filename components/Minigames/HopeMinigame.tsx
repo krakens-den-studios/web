@@ -35,9 +35,6 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
     setCurrentPointIndex(0);
     setIsHolding(false);
     
-    // Play minigame sound
-    playMinigameSound('hope');
-    
     // Randomize game parameters for variety
     const randomNumPoints = Math.floor(Math.random() * 4) + 4; // 4-7 points
     const randomPointSize = Math.floor(Math.random() * 16) + 40; // 40-56px
@@ -142,6 +139,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
           setGameProgress((newIndex / points.length) * 100);
           
           if (newIndex === points.length) {
+            playMinigameSound('hope');
             setGameState('success');
             setTimeout(() => {
               onComplete();
@@ -275,7 +273,8 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center select-none">
       <div 
-        className="relative bg-turquoise-800 rounded-2xl p-8 md:p-12 max-w-2xl mx-4 border-2 border-turquoise-400 w-full h-[600px] flex flex-col select-none"
+        className="relative bg-turquoise-800 rounded-2xl p-3 sm:p-4 md:p-6 lg:p-8 max-w-2xl mx-2 sm:mx-4 border-2 border-turquoise-400 w-full h-[90vh] max-h-[90vh] flex flex-col select-none overflow-hidden"
+        style={{ minHeight: '500px', maxHeight: '90vh' }}
       >
         <button
           onClick={onClose}
@@ -286,15 +285,12 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
 
         <div className="text-center mb-6 flex-shrink-0 select-none">
           <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-4 select-none">
-            Hope: Follow the Light
+            Hope
           </h2>
-          <p className="text-white opacity-80 select-none">
-            Hold your mouse button and follow the points in order
-          </p>
         </div>
 
         {gameState === 'success' ? (
-          <div className="text-center flex-1 flex items-center justify-center select-none">
+          <div className="text-center flex-1 flex items-center justify-center select-none min-h-0">
             <div>
               <p className="text-green-400 text-2xl font-bold mb-4 select-none">Completed!</p>
               <p className="text-white opacity-80 select-none">You have followed the light of hope</p>
@@ -316,8 +312,8 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
 
             <div 
               ref={gameAreaRef}
-              className={`relative w-full flex-1 border-2 border-turquoise-400 border-dashed rounded-lg overflow-hidden select-none ${isHolding ? 'cursor-crosshair' : 'cursor-default'}`}
-              style={{ minHeight: '300px' }}
+              className={`relative w-full flex-1 border-2 border-turquoise-400 border-dashed rounded-lg overflow-hidden select-none min-h-0 ${isHolding ? 'cursor-crosshair' : 'cursor-default'}`}
+              style={{ minHeight: 'min(300px, 40vh)', maxHeight: '100%' }}
             >
               {points.map((point, idx) => {
                 const isCurrent = idx === currentPointIndex;
@@ -338,7 +334,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
                     }}
                   >
                     <div
-                      className={`rounded-full flex items-center justify-center text-xl font-bold transition-all select-none ${
+                      className={`rounded-full flex items-center justify-center text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all select-none ${
                         isCompleted
                           ? 'bg-green-400 text-black scale-150'
                           : isCurrent && isHolding && isNear
@@ -347,7 +343,12 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
                           ? 'bg-turquoise-400 text-black scale-110 animate-pulse'
                           : 'bg-gray-600 text-white opacity-50'
                       }`}
-                      style={{ width: `${pointSize}px`, height: `${pointSize}px` }}
+                      style={{ 
+                        width: `min(${pointSize}px, 12vw)`, 
+                        height: `min(${pointSize}px, 12vw)`,
+                        minWidth: '32px',
+                        minHeight: '32px'
+                      }}
                     >
                       {idx + 1}
                     </div>
