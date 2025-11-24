@@ -467,9 +467,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Builds the worlds and spaces where our stories unfold, guiding the player through immersive experiences.'
         },
         {
-          name: 'Meritxell Tesifón',
+          name: 'Meritxell',
           role: 'Narrative Designer',
-          description: 'Weaves the stories and dialogues that give emotional depth to our games, connecting with the player\'s heart.'
+          description: 'A very cute and even clumsier girl who is lucky enough to have the best partner in the world and the universe. She likes turquoise and cats.'
         },
         {
           name: 'José Manuel Correa',
@@ -482,9 +482,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Gives shape and life to worlds and characters in three dimensions, creating models and textures that immerse the player in immersive visual experiences.'
         },
         {
-          name: 'Enric Mir',
-          role: 'Programmer',
-          description: 'Responsible for bringing game mechanics and systems to life, transforming ideas into functional code.'
+          name: 'Enric',
+          role: 'All',
+          description: 'I have to do everything, from tech art to resolving conflicts to programming, since the idea of making a team to make games was mine. Happy that it\'s this way, otherwise it would be boring. Happy to have the best partner in the galaxy.'
         }
       ],
       finalText: 'United by the passion to create experiences that heal and transform, we work together to bring stories to life that resonate in the heart.'
@@ -867,9 +867,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Construye los mundos y espacios donde se desarrollan nuestras historias, guiando al jugador a través de experiencias inmersivas.'
         },
         {
-          name: 'Meritxell Tesifón',
+          name: 'Meritxell',
           role: 'Diseñadora Narrativa',
-          description: 'Teje las historias y diálogos que dan profundidad emocional a nuestros juegos, conectando con el corazón del jugador.'
+          description: 'Una chica muy guapa y aún más torpe que tiene la suerte de tener la mejor pareja del mundo mundial y del universo. Le gusta el color turquesa y los gatos.'
         },
         {
           name: 'José Manuel Correa',
@@ -882,9 +882,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Da forma y vida a mundos y personajes en tres dimensiones, creando modelos y texturas que sumergen al jugador en experiencias visuales inmersivas.'
         },
         {
-          name: 'Enric Mir',
-          role: 'Programador',
-          description: 'Responsable de dar vida a las mecánicas y sistemas del juego, transformando ideas en código funcional.'
+          name: 'Enric',
+          role: 'Todos',
+          description: 'Me toca hacer de todo, desde tech art a solventar conflictos a programar, ya que la idea de hacer un equipo para hacer juegos fue mía. Contento de que sea así, que si no sería aburrido. Feliz de tener la mejor pareja de la galaxia.'
         }
       ],
       finalText: 'Unidos por la pasión de crear experiencias que sanan y transforman, trabajamos juntos para dar vida a historias que resuenan en el corazón.'
@@ -1267,9 +1267,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Construeix els mons i espais on es desenvolupen les nostres històries, guiant el jugador a través d\'experiències immersives.'
         },
         {
-          name: 'Meritxell Tesifón',
+          name: 'Meritxell',
           role: 'Dissenyadora Narrativa',
-          description: 'Teix les històries i diàlegs que donen profunditat emocional als nostres jocs, connectant amb el cor del jugador.'
+          description: 'Una noia molt maca i encara més torpe que té la sort de tenir la millor parella del món mundial i de l\'univers. Li agrada el color turquesa i els gats.'
         },
         {
           name: 'José Manuel Correa',
@@ -1282,9 +1282,9 @@ export const translations: Record<Language, Translations> = {
           description: 'Dóna forma i vida a mons i personatges en tres dimensions, creant models i textures que submergeixen el jugador en experiències visuals immersives.'
         },
         {
-          name: 'Enric Mir',
-          role: 'Programador',
-          description: 'Responsable de donar vida a les mecàniques i sistemes del joc, transformant idees en codi funcional.'
+          name: 'Enric',
+          role: 'Tots',
+          description: 'Em toca fer de tot, des de tech art a solventar conflictes a programar, ja que la idea de fer un equip per fer jocs va ser meva. Content de que sigui així, que sinó seria avorrit. Feliç de tenir la millor parella de la galàxia.'
         }
       ],
       finalText: 'Units per la passió de crear experiències que sanen i transformen, treballem junts per donar vida a històries que ressonen al cor.'
