@@ -183,6 +183,12 @@ export interface Translations {
   team: {
     title: string;
     subtitle: string;
+    members: Array<{
+      name: string;
+      role: string;
+      description: string;
+    }>;
+    finalText: string;
   };
   
   // HeartWeaver
@@ -448,7 +454,40 @@ export const translations: Record<Language, Translations> = {
     },
     team: {
       title: 'Our Team',
-      subtitle: 'Meet the people behind the Kraken\'s Den'
+      subtitle: 'Meet the people behind the Kraken\'s Den',
+      members: [
+        {
+          name: 'Carlos Martínez',
+          role: 'Game Designer',
+          description: 'Creates the mechanics, systems and experiences that make our games unique and memorable.'
+        },
+        {
+          name: 'David Tàrrega',
+          role: 'Level Designer',
+          description: 'Builds the worlds and spaces where our stories unfold, guiding the player through immersive experiences.'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: 'Narrative Designer',
+          description: 'Weaves the stories and dialogues that give emotional depth to our games, connecting with the player\'s heart.'
+        },
+        {
+          name: 'José Manuel Correa',
+          role: 'Animator',
+          description: 'Gives movement and expression to our characters, creating fluid animations that connect with emotions.'
+        },
+        {
+          name: 'Ergoni',
+          role: '3D Artist',
+          description: 'Gives shape and life to worlds and characters in three dimensions, creating models and textures that immerse the player in immersive visual experiences.'
+        },
+        {
+          name: 'Enric Mir',
+          role: 'Programmer',
+          description: 'Responsible for bringing game mechanics and systems to life, transforming ideas into functional code.'
+        }
+      ],
+      finalText: 'United by the passion to create experiences that heal and transform, we work together to bring stories to life that resonate in the heart.'
     },
     heartWeaver: {
       coverAlt: 'Heart Weaver cover',
@@ -815,7 +854,40 @@ export const translations: Record<Language, Translations> = {
     },
     team: {
       title: 'Nuestro Equipo',
-      subtitle: 'Conoce a las personas detrás de la Guarida del Kraken'
+      subtitle: 'Conoce a las personas detrás de la Guarida del Kraken',
+      members: [
+        {
+          name: 'Carlos Martínez',
+          role: 'Diseñador de Juegos',
+          description: 'Crea las mecánicas, sistemas y experiencias que hacen que nuestros juegos sean únicos e inolvidables.'
+        },
+        {
+          name: 'David Tàrrega',
+          role: 'Diseñador de Niveles',
+          description: 'Construye los mundos y espacios donde se desarrollan nuestras historias, guiando al jugador a través de experiencias inmersivas.'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: 'Diseñadora Narrativa',
+          description: 'Teje las historias y diálogos que dan profundidad emocional a nuestros juegos, conectando con el corazón del jugador.'
+        },
+        {
+          name: 'José Manuel Correa',
+          role: 'Animador',
+          description: 'Da movimiento y expresión a nuestros personajes, creando animaciones fluidas que conectan con las emociones.'
+        },
+        {
+          name: 'Ergoni',
+          role: 'Artista 3D',
+          description: 'Da forma y vida a mundos y personajes en tres dimensiones, creando modelos y texturas que sumergen al jugador en experiencias visuales inmersivas.'
+        },
+        {
+          name: 'Enric Mir',
+          role: 'Programador',
+          description: 'Responsable de dar vida a las mecánicas y sistemas del juego, transformando ideas en código funcional.'
+        }
+      ],
+      finalText: 'Unidos por la pasión de crear experiencias que sanan y transforman, trabajamos juntos para dar vida a historias que resuenan en el corazón.'
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',
@@ -1182,7 +1254,40 @@ export const translations: Record<Language, Translations> = {
     },
     team: {
       title: 'El Nostre Equip',
-      subtitle: 'Coneix les persones darrere de la Guarida del Kraken'
+      subtitle: 'Coneix les persones darrere de la Guarida del Kraken',
+      members: [
+        {
+          name: 'Carlos Martínez',
+          role: 'Dissenyador de Jocs',
+          description: 'Crea les mecàniques, sistemes i experiències que fan que els nostres jocs siguin únics i inoblidables.'
+        },
+        {
+          name: 'David Tàrrega',
+          role: 'Dissenyador de Nivells',
+          description: 'Construeix els mons i espais on es desenvolupen les nostres històries, guiant el jugador a través d\'experiències immersives.'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: 'Dissenyadora Narrativa',
+          description: 'Teix les històries i diàlegs que donen profunditat emocional als nostres jocs, connectant amb el cor del jugador.'
+        },
+        {
+          name: 'José Manuel Correa',
+          role: 'Animador',
+          description: 'Dóna moviment i expressió als nostres personatges, creant animacions fluides que connecten amb les emocions.'
+        },
+        {
+          name: 'Ergoni',
+          role: 'Artista 3D',
+          description: 'Dóna forma i vida a mons i personatges en tres dimensions, creant models i textures que submergeixen el jugador en experiències visuals immersives.'
+        },
+        {
+          name: 'Enric Mir',
+          role: 'Programador',
+          description: 'Responsable de donar vida a les mecàniques i sistemes del joc, transformant idees en codi funcional.'
+        }
+      ],
+      finalText: 'Units per la passió de crear experiències que sanen i transformen, treballem junts per donar vida a històries que ressonen al cor.'
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',
