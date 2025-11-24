@@ -3,47 +3,16 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
 import { useAudio } from '@/hooks/useAudio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ConnectionMinigameProps {
   onComplete: () => void;
   onClose: () => void;
 }
 
-// List of words for the connection game - easy to add more in future updates
-const WORDS = [
-  'HOPE',
-  'LOVE',
-  'CALM',
-  'KIND',
-  'WARM',
-  'SAFE',
-  'HEAL',
-  'JOY',
-  'PEACE',
-  'TRUST',
-  'GROW',
-  'OPEN',
-  'CARE',
-  'SOFT',
-  'GENTLE',
-  'BRAVE',
-  'STRONG',
-  'TRUE',
-  'REAL',
-  'FREE',
-  'LIGHT',
-  'DEEP',
-  'QUIET',
-  'STILL',
-  'EASE',
-  'REST',
-  'GLOW',
-  'FLOW',
-  'RISE',
-  'BEAM'
-];
-
 export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMinigameProps) {
+  const { t } = useLanguage();
+  const WORDS = t.gameData.connectionWords;
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'success'>('idle');
   const [gameProgress, setGameProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
@@ -136,16 +105,16 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
 
         <div className="text-center mb-3 sm:mb-4 md:mb-6 flex-shrink-0 select-none">
           <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4 select-none">
-            Connection
+            {t.minigames.connection}
           </h2>
         </div>
 
         {gameState === 'success' ? (
           <div className="text-center flex-1 flex items-center justify-center min-h-0 select-none">
             <div>
-              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4 select-none">Completed!</p>
-              <p className="text-white opacity-80 text-sm sm:text-base select-none">You formed: <span className="text-turquoise-400 font-bold">{selectedWord}</span></p>
-              <p className="text-white opacity-80 mt-2 text-xs sm:text-sm select-none">You have established the connection</p>
+              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4 select-none">{t.minigames.completed}</p>
+              <p className="text-white opacity-80 text-sm sm:text-base select-none">{t.treasure.formed} <span className="text-turquoise-400 font-bold">{selectedWord}</span></p>
+              <p className="text-white opacity-80 mt-2 text-xs sm:text-sm select-none">{t.treasure.established}</p>
             </div>
           </div>
         ) : (
@@ -158,11 +127,11 @@ export default function ConnectionMinigame({ onComplete, onClose }: ConnectionMi
                 />
               </div>
               <p className="text-white text-xs sm:text-sm mt-2 text-center select-none">
-                Progress: {currentStep} / {selectedWord.length}
+                {t.treasure.progress} {currentStep} / {selectedWord.length}
               </p>
               {error && (
                 <p className="text-red-400 text-xs sm:text-sm mt-2 text-center animate-pulse select-none">
-                  Incorrect order. Try again.
+                  {t.treasure.incorrectOrder}
                 </p>
               )}
             </div>

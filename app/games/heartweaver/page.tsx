@@ -10,8 +10,10 @@ import { scroller } from 'react-scroll';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Route } from '@/shared/Route';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function HeartWeaver() {
+  const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
   const { isPageUnlocked, isLoading } = useUnlockedPages();
   const router = useRouter();
@@ -47,22 +49,21 @@ export default function HeartWeaver() {
           <Image
             src="/heartweaverCover.png"
             className="object-cover lg:object-contain object-top select-none"
-            alt="Heart Weaver cover"
+            alt={t.heartWeaver.coverAlt}
             fill
           />
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 h-2/3 md:h-1/2 flex flex-col items-center justify-center gap-8 md:gap-4">
           <div className="relative w-2/3 h-2/5">
-            <Image src="/heartweaver.svg" className="max-w-sm m-auto select-none" fill alt="Heart Weaver title" />
+            <Image src="/heartweaver.svg" className="max-w-sm m-auto select-none" fill alt={t.heartWeaver.titleAlt} />
           </div>
 
           <p className="text-2xl w-4/5 max-w-3xl text-center opacity-80 balanced">
-            When the self shatters into a thousand pieces, when you can no longer be yourself, embark on an adventure,
-            feel again...
+            {t.heartWeaver.introText}
           </p>
 
-          <p className="text-4xl w-4/5 max-w-3xl font-bold text-center balanced">Let the HeartWeaver mend your heart</p>
+          <p className="text-4xl w-4/5 max-w-3xl font-bold text-center balanced">{t.heartWeaver.mainTitle}</p>
 
           <TiArrowSortedDown
             onClick={scrollToGame}
@@ -76,19 +77,19 @@ export default function HeartWeaver() {
       <section className="relative w-full h-fit bg-purple flex items-center justify-center" id="game">
         <div className="relative w-full max-w-[100rem] h-fit gap-4 grid md:grid-areas-left md:grid-cols-left items-center justify-items-center pt-8 md:pt-0">
           <div className="relative flex flex-col gap-6 items-center md:items-start md:grid-in-story w-fit">
-            <Title title="A Story Begins..." />
+            <Title title={t.heartWeaver.storyBegins} />
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left text-white">
-              HeartWeaver is an emotional story-driven, action adventure with a dynamic ability system.
+              {t.heartWeaver.storyDescription1}
             </p>
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left text-white">
-              Loss and guilt have made Ace wish they could never feel anything again...
+              {t.heartWeaver.storyDescription2}
             </p>
           </div>
 
           <div className="relative h-[40vh] lg:h-[50vh] xl:h-[60vh] w-full md:grid-in-image">
-            <Image src="/heartweaverAce.png" className="object-contain object-bottom" fill alt="HeartWeaver Ace" />
+            <Image src="/heartweaverAce.png" className="object-contain object-bottom" fill alt={t.heartWeaver.aceAlt} />
           </div>
         </div>
       </section>
@@ -96,20 +97,19 @@ export default function HeartWeaver() {
       <section className="relative w-full h-fit flex items-center justify-center">
         <div className="relative w-full h-fit gap-4 grid md:grid-areas-right md:grid-cols-right items-center justify-items-center pt-8 md:pt-0">
           <div className="relative flex flex-col gap-6 items-center md:items-start md:grid-in-story w-fit md:pl-16">
-            <Title title="Friends & Foes" />
+            <Title title={t.heartWeaver.friendsAndFoes} />
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
-              Embark on a captivating journey through this twisted realm ensnared by the imbalance of Ace&apos;s
-              emotions.
+              {t.heartWeaver.friendsDescription1}
             </p>
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
-              Help Ace embrace their emotions again and team up with Mark and their loved ones.
+              {t.heartWeaver.friendsDescription2}
             </p>
           </div>
 
           <div className="relative h-[40vh] lg:h-[50vh] xl:h-[60vh] w-full md:grid-in-image">
-            <Image src="/heartweaverMark.png" className="object-contain object-bottom" fill alt="HeartWeaver Mark" />
+            <Image src="/heartweaverMark.png" className="object-contain object-bottom" fill alt={t.heartWeaver.markAlt} />
           </div>
         </div>
       </section>
@@ -117,14 +117,14 @@ export default function HeartWeaver() {
       <section className="relative w-full h-fit bg-purple flex items-center justify-center" id="game">
         <div className="relative w-full max-w-[100rem] h-fit gap-4 grid md:grid-areas-left md:grid-cols-left items-center justify-items-center pt-8 md:pt-0">
           <div className="relative flex flex-col gap-6 items-center md:items-start md:grid-in-story w-fit">
-            <Title title="Decide Ace's Fate" />
+            <Title title={t.heartWeaver.decideFate} />
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
-              Hold the power to either restore Ace&apos;s emotions to their rightful harmony or let them fade forever...
+              {t.heartWeaver.fateDescription1}
             </p>
 
             <p className="text-xl md:text-2xl w-11/12 max-w-3xl text-center md:text-left opacity-80">
-              ... Ace&apos;s future rests in your hands.
+              {t.heartWeaver.fateDescription2}
             </p>
           </div>
           <div className="relative h-[40vh] lg:h-[50vh] xl:h-[60vh] w-full md:grid-in-image">
@@ -132,7 +132,7 @@ export default function HeartWeaver() {
               src="/heartweaverMark2.png"
               className="object-contain object-center p-8 xl:p-16 2xl:p-24"
               fill
-              alt="HeartWeaver book"
+              alt={t.heartWeaver.bookAlt}
             />
           </div>
         </div>

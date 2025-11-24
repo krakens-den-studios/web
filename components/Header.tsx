@@ -17,6 +17,8 @@ import { formatNumber } from '@/utils/formatNumber';
 import { useAudio } from '@/hooks/useAudio';
 import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
 import { useMissionChecker } from '@/hooks/useMissionChecker';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSelector from './LanguageSelector';
 
 const Header = () => {
   const pathname = usePathname();
@@ -26,6 +28,7 @@ const Header = () => {
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
   const { playButtonClick } = useAudio();
   const unclaimedMissionsCount = useUnclaimedMissions();
+  const { t } = useLanguage();
   useMissionChecker(); // Check missions even when shop is closed
 
   useEffect(() => {
@@ -151,16 +154,16 @@ const Header = () => {
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
                   }`}
               >
-                Home
+                {t.header.home}
               </p>
             </Link>
           ) : (
             <div className="relative group">
               <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
-                Home <RiLockLine className="w-4 h-4" />
+                {t.header.home} <RiLockLine className="w-4 h-4" />
               </span>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Locked. Get "Home Page" in The Kraken's Treasure (200 Krakenlings) to unlock this part of the den.
+                {t.header.lockedHome}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
               </div>
             </div>
@@ -173,16 +176,16 @@ const Header = () => {
                   pathname === Route.TEAM ? 'text-turquoise-400' : ''
                 }`}
               >
-                About Us
+                {t.header.team}
               </p>
             </Link>
           ) : (
             <div className="relative group">
               <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
-                About Us <RiLockLine className="w-4 h-4" />
+                {t.header.team} <RiLockLine className="w-4 h-4" />
               </span>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Locked. Get "About Us" in The Kraken's Treasure (1000 Krakenlings) to meet the team.
+                {t.header.lockedTeam}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
               </div>
             </div>
@@ -194,16 +197,16 @@ const Header = () => {
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
                   }`}
               >
-                Games
+                {t.header.games}
               </p>
             </Link>
           ) : (
             <div className="relative group">
               <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
-                Games <RiLockLine className="w-4 h-4" />
+                {t.header.games} <RiLockLine className="w-4 h-4" />
               </span>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Locked. Get "Games Page" in The Kraken's Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                {t.header.lockedGames}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
               </div>
             </div>
@@ -215,16 +218,16 @@ const Header = () => {
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
                   }`}
               >
-                Contact
+                {t.header.contact}
               </p>
             </Link>
           ) : (
             <div className="relative group">
               <span className="text-gray-300 text-xl font-medium flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
-                Contact <RiLockLine className="w-4 h-4" />
+                {t.header.contact} <RiLockLine className="w-4 h-4" />
               </span>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Locked. Get "Contact" in The Kraken's Treasure (2000 Krakenlings) to unlock this part of the den.
+                {t.header.lockedContact}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
               </div>
             </div>
@@ -245,7 +248,7 @@ const Header = () => {
             className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap font-lora font-bold text-black text-xl relative"
             title="Open Treasure"
           >
-            Open Treasure
+            {t.header.openTreasure}
             {unclaimedMissionsCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
                 {unclaimedMissionsCount}
@@ -253,6 +256,7 @@ const Header = () => {
             )}
           </button>
 
+          <LanguageSelector />
           {socialLinks}
         </div>
 
@@ -273,7 +277,7 @@ const Header = () => {
                     className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
                       }`}
                   >
-                    HOME
+                    {t.header.home.toUpperCase()}
                   </p>
                 </Link>
 
@@ -282,7 +286,7 @@ const Header = () => {
                     className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
                       }`}
                   >
-                    ABOUT US
+                    {t.header.aboutUs.toUpperCase()}
                   </p>
                 </Link>
 
@@ -291,7 +295,7 @@ const Header = () => {
                     className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
                       }`}
                   >
-                    GAMES
+                    {t.header.games.toUpperCase()}
                   </p>
                 </Link>
 
@@ -301,13 +305,13 @@ const Header = () => {
                       className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
                         }`}
                     >
-                      CONTACT
+                      {t.header.contact.toUpperCase()}
                     </p>
                   </Link>
                 ) : (
                   <div className="w-full p-4">
                     <p className="font-lora text-gray-300 text-lg sm:text-xl md:text-2xl font-medium select-none text-center">
-                      CONTACT
+                      {t.header.contact.toUpperCase()}
                     </p>
                   </div>
                 )}

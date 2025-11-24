@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
 import { useAudio } from '@/hooks/useAudio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HealingMinigameProps {
   onComplete: () => void;
@@ -10,6 +11,7 @@ interface HealingMinigameProps {
 }
 
 export default function HealingMinigame({ onComplete, onClose }: HealingMinigameProps) {
+  const { t } = useLanguage();
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'success'>('idle');
   const [gameProgress, setGameProgress] = useState(0);
   const [clicks, setClicks] = useState(0);
@@ -104,7 +106,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
           // If user didn't click during the window and has already made at least one click, they lose
           // But only if enough time has passed since the last successful click (to avoid false positives)
           if (!clickedInWindowRef.current && clicksRef.current > 0 && gameStateRef.current === 'playing' && timeSinceLastSuccessfulClick > minTimeBetweenClicks) {
-            // User missed the click window - restart
+            // User missed the click window - restart completely
             setClicks(0);
             clicksRef.current = 0;
             setGameProgress(0);
@@ -112,6 +114,9 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
             lastClickRef.current = resetTime;
             lastClickTimeRef.current = resetTime;
             lastSuccessfulClickTimeRef.current = resetTime;
+            pulseStartTimeRef.current = resetTime; // Reset pulse start time to resync
+            clickedInWindowRef.current = false; // Reset click window flag
+            previousCanClickRef.current = false; // Reset previous state
             setError(true);
             setTimeout(() => setError(false), 1500); // Increased error display time
           }
@@ -161,13 +166,17 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
         }, 1000);
       }
     } else {
-      // Clicked outside the valid window: restart
+      // Clicked outside the valid window: restart completely
       setClicks(0);
       clicksRef.current = 0;
       setGameProgress(0);
-      lastClickRef.current = now;
-      lastClickTimeRef.current = now;
-      lastSuccessfulClickTimeRef.current = now;
+      const resetTime = Date.now();
+      lastClickRef.current = resetTime;
+      lastClickTimeRef.current = resetTime;
+      lastSuccessfulClickTimeRef.current = resetTime;
+      pulseStartTimeRef.current = resetTime; // Reset pulse start time to resync
+      clickedInWindowRef.current = false; // Reset click window flag
+      previousCanClickRef.current = false; // Reset previous state
       setError(true);
       setTimeout(() => setError(false), 1500); // Increased error display time
     }
@@ -185,15 +194,15 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
 
         <div className="text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10 flex-shrink-0">
           <h2 className="font-lora text-2xl sm:text-3xl md:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4">
-            Healing
+            {t.minigames.healing}
           </h2>
         </div>
 
         {gameState === 'success' ? (
           <div className="text-center flex-1 flex items-center justify-center min-h-0">
             <div>
-              <p className="text-green-400 text-xl sm:text-2xl font-bold mb-4">Completed!</p>
-              <p className="text-white opacity-80 text-sm sm:text-base">You have found your healing rhythm</p>
+              <p className="text-green-400 text-xl sm:text-2xl font-bold mb-4">{t.minigames.completed}</p>
+              <p className="text-white opacity-80 text-sm sm:text-base">{t.minigames.foundRhythm}</p>
             </div>
           </div>
         ) : (
@@ -206,7 +215,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
                 />
               </div>
               <p className="text-white text-xs sm:text-sm mt-2 text-center">
-                Correct clicks: {clicks} / {targetClicks}
+                {t.treasure.correctClicks} {clicks} / {targetClicks}
               </p>
             </div>
 
@@ -266,7 +275,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
                     }}
                   >
                     <span className="text-center">
-                      {error ? 'Try again' : canClick ? 'Click now' : 'Wait...'}
+                      {error ? t.treasure.tryAgain : canClick ? t.treasure.clickNow : t.treasure.wait}
                     </span>
                   </button>
                 </div>
@@ -276,12 +285,12 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
               <div className="text-center flex-shrink-0" style={{ minHeight: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {canClick && !error && (
                   <p className="text-turquoise-400 text-base sm:text-lg font-bold animate-pulse">
-                    Now!
+                    {t.treasure.now}
                   </p>
                 )}
                 {!canClick && !error && clicks > 0 && (
                   <p className="text-white opacity-60 text-xs sm:text-sm">
-                    Follow the rhythm...
+                    {t.treasure.followRhythm}
                   </p>
                 )}
                 {!canClick && !error && clicks === 0 && (

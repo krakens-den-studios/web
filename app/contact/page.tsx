@@ -5,9 +5,11 @@ import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { RiMailFill } from 'react-icons/ri';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Contact() {
   const { isPageUnlocked, isLoading } = useUnlockedPages();
+  const { t } = useLanguage();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,10 +70,10 @@ export default function Contact() {
         <div className="w-full max-w-7xl mx-auto px-8 md:px-12">
           <div className="text-center mb-16">
             <h1 className="font-lora text-5xl md:text-6xl font-bold text-turquoise-400 mb-6">
-              Contact Us
+              {t.contact.title}
             </h1>
             <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
-              Reach out to us or stay connected through our newsletter
+              {t.contact.subtitle}
             </p>
           </div>
         </div>
@@ -86,7 +88,7 @@ export default function Contact() {
               <div className="flex items-center gap-4 mb-6">
                 <RiMailFill className="text-turquoise-400 text-4xl" />
                 <h2 className="font-lora text-3xl font-bold text-white">
-                  Email
+                  {t.contact.email}
                 </h2>
               </div>
               <a 
@@ -100,7 +102,7 @@ export default function Contact() {
             {/* Newsletter */}
             <div className="bg-black bg-opacity-40 rounded-2xl p-8 md:p-10 border-2 border-turquoise-400">
               <h2 className="font-lora text-3xl font-bold text-white mb-6">
-                Newsletter
+                {t.contact.newsletter}
               </h2>
               {newsletterUnlocked ? (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -108,7 +110,7 @@ export default function Contact() {
                     type="email"
                     value={email}
                     onChange={handleEmailChange}
-                    placeholder="Enter your email"
+                    placeholder={t.contact.enterEmail}
                     className="rounded-xl px-4 py-3 bg-gray-800 text-white border-2 border-gray-600 focus:border-turquoise-400 focus:outline-none transition-colors"
                     required
                   />
@@ -123,21 +125,21 @@ export default function Contact() {
                         : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    {submitted ? 'Subscribed!' : isSubmitting ? 'Subscribing...' : 'Subscribe'}
+                    {submitted ? t.contact.subscribed : isSubmitting ? t.contact.subscribing : t.contact.subscribe}
                   </button>
                   {submitted && (
                     <p className="text-green-400 text-sm text-center">
-                      Thank you for subscribing!
+                      {t.contact.thankYou}
                     </p>
                   )}
                 </form>
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-300 text-lg mb-4">
-                    Newsletter is locked
+                    {t.contact.locked}
                   </p>
                   <p className="text-gray-400 text-sm">
-                    Unlock the Newsletter in The Kraken&apos;s Treasure to subscribe.
+                    {t.contact.lockedDesc}
                   </p>
                 </div>
               )}

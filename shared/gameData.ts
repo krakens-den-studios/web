@@ -656,6 +656,15 @@ export const UNLOCKABLE_TEMPLATES: UnlockableTemplate[] = [
     upgradeType: 'collection-multiplier',
     manualCollectionPercentOfKps: 0.02,
     missionRequirement: 'collect-1000'
+  },
+  {
+    id: 'collect-all',
+    name: 'Collect All',
+    description: 'When collecting a Krakenling, collect all Krakenlings on the page.',
+    cost: 3000000,
+    type: 'upgrade',
+    upgradeType: 'collection-multiplier',
+    missionRequirement: 'reach-2000000'
   }
 ];
 export const MINIGAME_TEMPLATES: MinigameTemplate[] = [

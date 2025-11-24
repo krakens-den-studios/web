@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
 import { useAudio } from '@/hooks/useAudio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HopeMinigameProps {
   onComplete: () => void;
@@ -17,6 +18,7 @@ interface Point {
 }
 
 export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps) {
+  const { t } = useLanguage();
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'success'>('idle');
   const [gameProgress, setGameProgress] = useState(0);
   const [currentPointIndex, setCurrentPointIndex] = useState(0);
@@ -285,15 +287,15 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
 
         <div className="text-center mb-6 flex-shrink-0 select-none">
           <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-4 select-none">
-            Hope
+            {t.minigames.hope}
           </h2>
         </div>
 
         {gameState === 'success' ? (
           <div className="text-center flex-1 flex items-center justify-center select-none min-h-0">
             <div>
-              <p className="text-green-400 text-2xl font-bold mb-4 select-none">Completed!</p>
-              <p className="text-white opacity-80 select-none">You have followed the light of hope</p>
+              <p className="text-green-400 text-2xl font-bold mb-4 select-none">{t.minigames.completed}</p>
+              <p className="text-white opacity-80 select-none">{t.minigames.followLight}</p>
             </div>
           </div>
         ) : (
@@ -306,7 +308,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
                 />
               </div>
               <p className="text-white text-sm mt-2 text-center select-none">
-                Progress: {currentPointIndex} / {points.length}
+                {t.treasure.progress} {currentPointIndex} / {points.length}
               </p>
             </div>
 
@@ -371,7 +373,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
 
             <div className="text-center mt-4 flex-shrink-0 select-none">
               <p className="text-white text-sm select-none">
-                {isHolding ? 'Hold and move to the points' : 'Hold your mouse button to start'}
+                {isHolding ? t.minigamesExtra.holdAndMove : t.minigamesExtra.holdMouse}
               </p>
             </div>
           </>

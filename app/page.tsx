@@ -10,12 +10,14 @@ import Image from 'next/image';
 import FirstVisitModal from '@/components/FirstVisitModal';
 import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
 import { useMissionChecker } from '@/hooks/useMissionChecker';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Root() {
   const { unlockedPages } = useUnlockedPages();
   const [showContent, setShowContent] = useState(false);
   const [visibleParagraphs, setVisibleParagraphs] = useState<number[]>([]);
   const unclaimedMissionsCount = useUnclaimedMissions();
+  const { t } = useLanguage();
   useMissionChecker(); // Check missions even when shop is closed
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function Root() {
               visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            Dive Into the Kraken's Den
+            {t.home.title}
           </p>
 
           <p 
@@ -56,7 +58,7 @@ export default function Root() {
               visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
             }`}
           >
-          Where play helps navigate big feelings.
+          {t.home.subtitle}
           </p>
           
           <p 
@@ -64,7 +66,7 @@ export default function Root() {
               visibleParagraphs.includes(2) ? 'opacity-100' : 'opacity-0'
             }`}
           >
-          Collect <strong>Krakenlings</strong>, unlock <strong>therapies</strong>, and discover <strong>treasures</strong>.
+          {t.home.description}
           </p>
         </div>
 
@@ -80,7 +82,7 @@ export default function Root() {
             className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-6 sm:px-8 py-3 sm:py-4 shadow-lg transition-all flex items-center gap-2 group font-lora font-bold text-black text-base sm:text-lg md:text-xl relative"
             title="Open Treasure"
           >
-            Open Treasure
+            {t.home.openTreasure}
             {unclaimedMissionsCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
                 {unclaimedMissionsCount}
@@ -89,7 +91,7 @@ export default function Root() {
           </button>
           {unlockedPages.home && (
             <Link href={Route.HOME}>
-              <Button label="ENTER THE DEN" />
+              <Button label={t.home.enterDen} />
             </Link>
           )}
         </div>

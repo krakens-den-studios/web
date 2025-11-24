@@ -13,8 +13,10 @@ import { useState, useEffect } from 'react';
 import { TiArrowSortedDown } from 'react-icons/ti';
 import { scroller } from 'react-scroll';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
+  const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
   const [currentGame, setCurrentGame] = useState(0);
   const { unlockedPages, isPageUnlocked, isLoading } = useUnlockedPages();
@@ -77,7 +79,7 @@ export default function Home() {
           <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
             {unlockedPages.games ? (
               <Link href={Route.HEART_WEAVER}>
-                <Button label="EXPLORE"/>
+                <Button label={t.home.explore}/>
               </Link>
             ) : (
               <div className="relative group">
@@ -85,26 +87,26 @@ export default function Home() {
                   disabled
                   className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
                 >
-                  <p className="whitespace-nowrap text-xl font-lora font-bold text-white">EXPLORE 🔒</p>
+                  <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{t.home.exploreLocked}</p>
                 </button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                  Locked. Get &quot;Games Page&quot; in The Kraken&apos;s Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                  {t.header.lockedGames}
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                 </div>
               </div>
             )}
             {unlockedPages.newsletter ? (
-              <Button label="SUBSCRIBE" onClick={scrollToNewsletter} />
+              <Button label={t.home.subscribe} onClick={scrollToNewsletter} />
             ) : (
               <div className="relative group">
                 <button
                   disabled
                   className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
                 >
-                  <p className="whitespace-nowrap text-xl font-lora font-bold text-white">SUBSCRIBE 🔒</p>
+                  <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{t.home.subscribeLocked}</p>
                 </button>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                  Locked. Get &quot;Newsletter&quot; in The Kraken&apos;s Treasure (2000 Krakenlings) to receive soft, story-driven updates.
+                  {t.footer.lockedNewsletterDesc}
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                 </div>
               </div>
@@ -131,15 +133,15 @@ export default function Home() {
           />
         </Points>
 
-        <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">Welcome to the Heart of the Den</h2>
+        <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">{t.home.welcomeHeart}</h2>
 
         <p className="text-2xl w-4/5 max-w-3xl text-center text-white balanced">
-        Collect Krakenlings, unlock therapies, and discover treasures. Play at your own pace.
+        {t.home.descriptionFull}
         </p>
 
         {unlockedPages.team ? (
           <Link href={Route.TEAM}>
-            <Button label="MEET US!" />
+            <Button label={t.home.meetUs} />
           </Link>
         ) : (
           <div className="relative group">
@@ -147,10 +149,10 @@ export default function Home() {
               disabled
               className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
             >
-              <p className="whitespace-nowrap text-xl font-lora font-bold text-white">MEET US! 🔒</p>
+              <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{t.home.meetUsLocked}</p>
             </button>
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              Locked. Get &quot;About Us&quot; in The Kraken&apos;s Treasure (1000 Krakenlings) to meet the team.
+              {t.header.lockedTeam}
               <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
             </div>
           </div>
@@ -159,7 +161,7 @@ export default function Home() {
 
       <section id="games-section" className="relative w-full flex flex-col items-center h-fit gap-8 bg-turquoise-800 py-20">
         <Points>
-          <h2 className="font-lora text-4xl balanced">{"Kraken's Games"}</h2>
+          <h2 className="font-lora text-4xl balanced">{t.home.krakensGames}</h2>
         </Points>
 
         <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center overflow-hidden">
@@ -205,7 +207,7 @@ export default function Home() {
                       <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{name} 🔒</p>
                     </button>
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                      Locked. Get &quot;Games Page&quot; in The Kraken&apos;s Treasure (500 Krakenlings) to access all therapies and experiences in one place.
+                      {t.header.lockedGames}
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
                     </div>
                   </div>

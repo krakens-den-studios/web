@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Button from '../Button';
 import { useAudio } from '@/hooks/useAudio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CourageMinigameProps {
   onComplete: () => void;
@@ -10,6 +11,7 @@ interface CourageMinigameProps {
 }
 
 export default function CourageMinigame({ onComplete, onClose }: CourageMinigameProps) {
+  const { t } = useLanguage();
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'success'>('idle');
   const [gameProgress, setGameProgress] = useState(0);
   const holdButtonRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,15 +99,15 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
 
         <div className="text-center mb-3 sm:mb-4 md:mb-6 flex-shrink-0">
           <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-turquoise-400 mb-2 sm:mb-4">
-            Courage
+            {t.minigames.courage}
           </h2>
         </div>
 
         {gameState === 'success' ? (
           <div className="text-center flex-1 flex items-center justify-center min-h-0">
             <div>
-              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4">Completed!</p>
-              <p className="text-white opacity-80 text-sm sm:text-base">You have shown courage</p>
+              <p className="text-green-400 text-lg sm:text-xl md:text-2xl font-bold mb-4">{t.minigames.completed}</p>
+              <p className="text-white opacity-80 text-sm sm:text-base">{t.minigames.shownCourage}</p>
             </div>
           </div>
         ) : (
@@ -140,7 +142,7 @@ export default function CourageMinigame({ onComplete, onClose }: CourageMinigame
                   maxHeight: '100%'
                 }}
               >
-                {gameProgress === 0 ? 'Hold' : 'Hold...'}
+                {gameProgress === 0 ? t.treasure.hold : t.treasure.holdButton}
               </button>
             </div>
           </div>

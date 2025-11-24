@@ -233,6 +233,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
   const handleOctopusClick = (octopus: Octopus) => {
     if (!octopus.collected && !collectedOctopuses.includes(octopus.id) && !octopus.fading) {
       let collectionValue = 1;
+      let hasCollectAll = false;
       try {
         if (typeof window !== 'undefined') {
           const { state: unlockables } = deserializeUnlockables(cookieStorage.getItem('unlockables-progress'));
@@ -244,40 +245,90 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
             const totalKps = calculateTotalKps(agents, unlockables);
             collectionValue = Math.max(1, Math.floor(totalKps * tier.percent));
           }
+          
+          // Check if collect-all upgrade is unlocked
+          const collectAllUpgrade = unlockables.find(u => u.id === 'collect-all');
+          hasCollectAll = collectAllUpgrade?.unlocked || false;
         }
       } catch (e) {
         // Ignore errors
       }
       
-      onCollect(octopus.id);
-      
-      // Play collect sound
-      playCollect();
-      
-      // Show floating text with value
-      setFloatingTexts(prev => [...prev, {
-        id: `floating-${octopus.id}-${Date.now()}`,
-        value: collectionValue,
-        x: octopus.x,
-        y: octopus.y
-      }]);
-      
-      // Generar partículas para el efecto
-      const particles = Array.from({ length: 8 }, (_, i) => ({
-        angle: (i * 360) / 8, // Distribuir en círculo
-        distance: 0
-      }));
-      
-      // Mark as collected and start satisfying animation
-      setOctopuses(prev => prev.map(o => 
-        o.id === octopus.id ? { 
-          ...o, 
-          collected: true, 
-          collectedAt: Date.now(),
-          fading: true,
-          particles: particles
-        } : o
-      ));
+      // If collect-all is active, collect all krakenlings on the page
+      if (hasCollectAll) {
+        setOctopuses(prev => {
+          const uncollected = prev.filter(o => !o.collected && !collectedOctopuses.includes(o.id) && !o.fading);
+          const particles = Array.from({ length: 8 }, (_, i) => ({
+            angle: (i * 360) / 8,
+            distance: 0
+          }));
+          
+          // Collect all uncollected krakenlings (call onCollect for each)
+          uncollected.forEach(o => {
+            onCollect(o.id);
+          });
+          
+          // Play collect sound once
+          playCollect();
+          
+          // Show floating text for all collected krakenlings
+          const now = Date.now();
+          setFloatingTexts(prevTexts => [
+            ...prevTexts,
+            ...uncollected.map((o, index) => ({
+              id: `floating-${o.id}-${now}-${index}`,
+              value: collectionValue,
+              x: o.x,
+              y: o.y
+            }))
+          ]);
+          
+          // Mark all as collected
+          return prev.map(o => {
+            if (!o.collected && !collectedOctopuses.includes(o.id) && !o.fading) {
+              return {
+                ...o,
+                collected: true,
+                collectedAt: Date.now(),
+                fading: true,
+                particles: particles
+              };
+            }
+            return o;
+          });
+        });
+      } else {
+        // Normal collection - just this one
+        onCollect(octopus.id);
+        
+        // Play collect sound
+        playCollect();
+        
+        // Show floating text with value
+        setFloatingTexts(prev => [...prev, {
+          id: `floating-${octopus.id}-${Date.now()}`,
+          value: collectionValue,
+          x: octopus.x,
+          y: octopus.y
+        }]);
+        
+        // Generar partículas para el efecto
+        const particles = Array.from({ length: 8 }, (_, i) => ({
+          angle: (i * 360) / 8, // Distribuir en círculo
+          distance: 0
+        }));
+        
+        // Mark as collected and start satisfying animation
+        setOctopuses(prev => prev.map(o => 
+          o.id === octopus.id ? { 
+            ...o, 
+            collected: true, 
+            collectedAt: Date.now(),
+            fading: true,
+            particles: particles
+          } : o
+        ));
+      }
     }
   };
 

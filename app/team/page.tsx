@@ -4,6 +4,7 @@ import { Route } from '@/shared/Route';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TeamMember {
   name: string;
@@ -54,6 +55,7 @@ const teamMembers: TeamMember[] = [
 
 export default function Team() {
   const { isPageUnlocked, isLoading } = useUnlockedPages();
+  const { t } = useLanguage();
   const router = useRouter();
 
   useEffect(() => {
@@ -75,9 +77,10 @@ export default function Team() {
         <div className="w-full max-w-7xl mx-auto px-8 md:px-12">
           <div className="text-center mb-16">
             <h1 className="font-lora text-5xl md:text-6xl font-bold text-turquoise-400 mb-6">
-              Our Team
+              {t.team.title}
             </h1>
             <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto">
+              {t.team.subtitle}
               Meet the people behind Kraken&apos;s Den Studios
             </p>
           </div>

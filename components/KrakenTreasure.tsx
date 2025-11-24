@@ -15,6 +15,7 @@ import { useAudio } from '@/hooks/useAudio';
 import { usePathname } from 'next/navigation';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { cookieStorage } from '@/utils/cookieStorage';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AgentState as Agent,
   MinigameState as Minigame,
@@ -156,6 +157,7 @@ const getAgentEfficiency = (agent: Agent): number => {
 };
 
 export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, onClose }: KrakenTreasureProps) {
+  const { t } = useLanguage();
   const { playButtonClick } = useAudio();
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'helpers' | 'treasures' | 'upgrades' | 'therapies' | 'missions'>('therapies');
@@ -467,7 +469,34 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     if (!missionId) return '';
     if (!missionsLoaded) return '';
     const mission = missions.find(m => m.id === missionId);
+    if (mission && t.gameData.missions[missionId]) {
+      return t.gameData.missions[missionId].name;
+    }
     return mission?.name || '';
+  };
+
+  const getAgentName = (agentId: string): string => {
+    return t.gameData.agents[agentId]?.name || '';
+  };
+
+  const getAgentDescription = (agentId: string): string => {
+    return t.gameData.agents[agentId]?.description || '';
+  };
+
+  const getUnlockableName = (unlockableId: string): string => {
+    return t.gameData.unlockables[unlockableId]?.name || '';
+  };
+
+  const getUnlockableDescription = (unlockableId: string): string => {
+    return t.gameData.unlockables[unlockableId]?.description || '';
+  };
+
+  const getMinigameName = (minigameId: string): string => {
+    return t.gameData.minigames[minigameId]?.name || '';
+  };
+
+  const getMinigameDescription = (minigameId: string): string => {
+    return t.gameData.minigames[minigameId]?.description || '';
   };
 
   const getUnclaimedCompletedMissionsCount = (): number => {
@@ -619,7 +648,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     
     // Si es el tesoro final, mostrar mensaje especial
     if (unlockableId === 'true-heart') {
-      alert(`You've reached the deepest part of the den.\n\nYou've collected Krakenlings, unlocked pages, and completed therapies – but none of that matters more than this:\n\nYou showed up. You played. You felt.\n\nThe Kraken's Den was never about finding something outside of you.\nIt was about noticing the courage, tenderness, and resilience you already carry.\n\nThank you for giving your emotions a place to breathe.`);
+      alert(t.treasure.finalTreasureMessage);
     }
     
     // If it's a page, update unlock status
@@ -735,25 +764,25 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
 
           <div className="text-center mb-4 sm:mb-6 flex-shrink-0">
             <h2 className="font-lora text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-turquoise-400 mb-2 sm:mb-4">
-              The Kraken's Treasure
+              {t.treasure.title}
             </h2>
             <p className="text-gray-300 text-xs sm:text-sm md:text-base text-center mb-2 sm:mb-4 px-2">
-              Trade Krakenlings for helpers, treasures, and therapies.
+              {t.treasure.description}
             </p>
             <div className="flex flex-col items-center gap-2 min-w-0 w-full">
               <div className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl lg:text-2xl min-w-0 w-full justify-center px-2">
                 <RiEmotionLine className="text-turquoise-400 flex-shrink-0 text-sm sm:text-base md:text-lg" />
                 <span className="text-white font-bold truncate min-w-0">{formatNumber(Math.floor(displayOctopusCount))}</span>
-                <span className="text-gray-200 flex-shrink-0 text-xs sm:text-sm md:text-base">krakenlings</span>
+                <span className="text-gray-200 flex-shrink-0 text-xs sm:text-sm md:text-base">{t.treasure.krakenlings}</span>
                 {pickedCount > 0 && (
                   <span className="text-gray-400 flex-shrink-0 text-xs sm:text-sm md:text-base">
-                    ({formatNumber(Math.floor(pickedCount))} saved)
+                    ({formatNumber(Math.floor(pickedCount))} {t.treasure.saved})
                   </span>
                 )}
               </div>
               {totalPulpitosPerSecond > 0 && (
                 <div className="text-turquoise-300 text-xs sm:text-sm whitespace-nowrap">
-                  +{formatKrakenValue(totalPulpitosPerSecond)} krakenlings/second
+                  +{formatKrakenValue(totalPulpitosPerSecond)} {t.treasure.perSecond}
                 </div>
               )}
             </div>
@@ -773,7 +802,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
               } ${getUnclaimedCompletedMissionsCount() > 0 ? 'pr-6 sm:pr-8' : ''}`}
               style={{ borderBottom: '2px solid', borderBottomColor: activeTab === 'missions' ? 'rgb(94 234 212)' : 'transparent' }}
             >
-              Missions
+              {t.treasure.missions}
               {getUnclaimedCompletedMissionsCount() > 0 && (
                 <span className="absolute top-0 right-0 bg-turquoise-400 text-black text-[10px] sm:text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center z-50 transform translate-x-1/2 -translate-y-1/2">
                   {getUnclaimedCompletedMissionsCount()}
@@ -793,7 +822,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
               style={{ borderBottom: activeTab === 'therapies' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'therapies' ? 'rgb(94 234 212)' : 'transparent' }}
             >
               <RiGamepadLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
-              Therapies
+              {t.treasure.therapies}
             </button>
             <button
               onClick={() => {
@@ -808,7 +837,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
               style={{ borderBottom: activeTab === 'treasures' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'treasures' ? 'rgb(94 234 212)' : 'transparent' }}
             >
               <RiShoppingBagLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
-              Treasures
+              {t.treasure.treasures}
             </button>
             <button
               onClick={() => {
@@ -823,7 +852,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
               style={{ borderBottom: activeTab === 'upgrades' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'upgrades' ? 'rgb(94 234 212)' : 'transparent' }}
             >
               <RiLockLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
-              Upgrades
+              {t.treasure.upgrades}
             </button>
             <button
               onClick={() => {
@@ -838,7 +867,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
               style={{ borderBottom: '2px solid', borderBottomColor: activeTab === 'helpers' ? 'rgb(94 234 212)' : 'transparent' }}
             >
               <RiEmotionLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
-              Helpers
+              {t.treasure.helpers}
             </button>
           </div>
 
@@ -849,19 +878,19 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
             <div className="pb-2" style={{ minHeight: '100%' }}>
               <div className="flex items-center justify-between mb-4 px-2">
                 <p className="text-gray-300 text-sm">
-                  Complete missions to unlock new helpers, treasures, and upgrades.
+                  {t.treasure.missionsDescription || 'Complete missions to unlock new helpers, treasures, and upgrades.'}
                 </p>
                 {getUnclaimedCompletedMissionsCount() > 0 && (
                   <div className="bg-turquoise-400 bg-opacity-20 border border-turquoise-400 rounded-lg px-3 py-1.5 flex items-center gap-2">
                     <span className="text-turquoise-300 text-xs sm:text-sm font-semibold">
-                      {getUnclaimedCompletedMissionsCount()} ready to claim
+                      {getUnclaimedCompletedMissionsCount()} {t.treasure.readyToClaim}
                     </span>
                   </div>
                 )}
               </div>
               {!missionsLoaded ? (
                 <div className="text-center text-gray-300 text-sm py-8">
-                  Loading missions...
+                  {t.common.loading}
                 </div>
               ) : (
               <div className="space-y-2">
@@ -883,18 +912,18 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                   >
                     <div className="flex-1 min-w-0 overflow-hidden">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-lora text-base sm:text-lg font-bold text-white">{mission.name}</h3>
+                        <h3 className="font-lora text-base sm:text-lg font-bold text-white">{t.gameData.missions[mission.id]?.name || mission.name}</h3>
                         {mission.claimed && (
-                          <span className="text-green-400 text-sm">✓ Claimed</span>
+                          <span className="text-green-400 text-sm">✓ {t.treasure.claim}ed</span>
                         )}
                         {mission.completed && !mission.claimed && (
-                          <span className="text-turquoise-400 text-sm">Ready to claim!</span>
+                          <span className="text-turquoise-400 text-sm">{t.treasure.readyToClaim}!</span>
                         )}
                       </div>
-                      <p className="text-white opacity-70 text-xs">{mission.description}</p>
+                      <p className="text-white opacity-70 text-xs">{t.gameData.missions[mission.id]?.description || mission.description}</p>
                       {mission.reward && (
                         <p className="text-turquoise-300 text-[11px] sm:text-xs mt-1">
-                          Reward: +{formatKrakenValue(mission.reward)} Krakenlings
+                          {t.treasure.reward} +{formatKrakenValue(mission.reward)} {t.treasure.krakenlings}
                         </p>
                       )}
                     </div>
@@ -907,7 +936,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         }}
                         className="ml-4 bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 sm:px-6 py-2 sm:py-3 font-lora font-bold text-black text-sm sm:text-base transition-all"
                       >
-                        CLAIM
+                        {t.treasure.claim.toUpperCase()}
                       </button>
                     )}
                   </div>
@@ -931,7 +960,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                   const dashIndex = name.indexOf(' – ');
                   return dashIndex !== -1 ? name.substring(0, dashIndex) : name;
                 };
-                const emotionName = getEmotionName(minigame.name);
+                const minigameTranslatedName = getMinigameName(minigame.id) || minigame.name;
+                const emotionName = getEmotionName(minigameTranslatedName);
 
                 return (
                   <div
@@ -1078,7 +1108,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
           {activeTab === 'helpers' && (
             <div className="pb-2" style={{ minHeight: '100%' }}>
               <p className="text-gray-300 text-sm mb-4 px-2">
-                Hire helpers that automatically collect Krakenlings for you. The more you have, the more they gather.
+                {t.treasure.helpersDescription || 'Hire helpers that automatically collect Krakenlings for you. The more you have, the more they gather.'}
               </p>
               <div className="space-y-2">
                 {agents.map((agent) => {
@@ -1102,8 +1132,10 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                     return dashIndex !== -1 ? fullName.substring(0, dashIndex) : fullName;
                   };
                   
-                  const agentMainName = getMainName(agent.name);
-                  const previousAgentMainName = previousAgent ? getMainName(previousAgent.name) : null;
+                  const agentTranslatedName = getAgentName(agent.id) || agent.name;
+                  const agentMainName = getMainName(agentTranslatedName);
+                  const previousAgentTranslatedName = previousAgent ? (getAgentName(previousAgent.id) || previousAgent.name) : null;
+                  const previousAgentMainName = previousAgentTranslatedName ? getMainName(previousAgentTranslatedName) : null;
 
                   return (
                     <div
@@ -1141,11 +1173,11 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         {/* Show requirements only if not all conditions are met */}
                         {(!previousAgentOwned || !missionCompleted) && (
                           <div className="text-right">
-                            <p className="text-gray-400 text-xs mb-1">Requires:</p>
+                            <p className="text-gray-400 text-xs mb-1">{t.treasure.requires}</p>
                             <div className="flex flex-col gap-1">
                               {agentIndex > 0 && previousAgent && previousAgentMainName && !previousAgentOwned && (
                                 <p className="text-xs font-bold text-yellow-400 whitespace-nowrap">
-                                  Buy {previousAgentMainName}
+                                  {t.treasure.buy || 'Buy'} {previousAgentMainName}
                                 </p>
                               )}
                               {missionName && !missionCompleted && (
@@ -1174,7 +1206,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                                   : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
                               }`}
                             >
-                              <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                              <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">{t.treasure.get}</p>
                             </button>
                           </div>
                         )}
@@ -1226,8 +1258,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         <div className="flex items-center gap-1 sm:gap-2">
                           <span className="text-green-400 text-sm sm:text-base md:text-lg flex-shrink-0">✓</span>
                           <div className="min-w-0">
-                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
-                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{getUnlockableName(unlockable.id) || unlockable.name}</h3>
+                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{getUnlockableDescription(unlockable.id) || unlockable.description}</p>
                           </div>
                         </div>
                       ) : (
@@ -1239,8 +1271,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                             </>
                           ) : (
                             <>
-                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
-                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{getUnlockableName(unlockable.id) || unlockable.name}</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{getUnlockableDescription(unlockable.id) || unlockable.description}</p>
                             </>
                           )}
                         </div>
@@ -1250,7 +1282,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
                       {missionName && !missionCompleted && (
                         <div className="text-right">
-                          <p className="text-gray-400 text-xs">Requires:</p>
+                          <p className="text-gray-400 text-xs">{t.treasure.requires}</p>
                           <p className={`text-xs font-bold text-yellow-400 whitespace-nowrap`}>
                             {missionName}
                           </p>
@@ -1259,10 +1291,10 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       {unlockable.unlocked ? (
                         unlockable.route ? (
                           <Link href={unlockable.route} onClick={() => onClose()}>
-                            <Button label="GO" />
+                            <Button label={t.treasure.go || 'GO'} />
                           </Link>
                         ) : (
-                          <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">UNLOCKED</span>
+                          <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">{t.treasure.unlocked}</span>
                         )
                       ) : (
                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -1288,7 +1320,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                                     : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
                                 }`}
                               >
-                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">{t.treasure.get}</p>
                               </button>
                             );
                           })()}
@@ -1307,14 +1339,33 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
             <div className="pb-2" style={{ minHeight: '100%' }}>
               <div className="space-y-2">
                 {unlockables.filter(u => u.type === 'upgrade').sort((a, b) => {
-                  // Sort: unlocked items first, then by cost
-                  if (a.unlocked !== b.unlocked) {
-                    return a.unlocked ? 1 : -1;
-                  }
+                  const aMissionCompleted = isMissionCompleted(a.missionRequirement);
+                  const aCanAfford = displayOctopusCount >= a.cost;
+                  const aCanPurchase = !a.unlocked && aCanAfford && aMissionCompleted;
+                  const aIsLocked = !a.unlocked && !aCanPurchase;
+                  
+                  const bMissionCompleted = isMissionCompleted(b.missionRequirement);
+                  const bCanAfford = displayOctopusCount >= b.cost;
+                  const bCanPurchase = !b.unlocked && bCanAfford && bMissionCompleted;
+                  const bIsLocked = !b.unlocked && !bCanPurchase;
+                  
+                  // Priority order: 1. Available to purchase, 2. Locked, 3. Unlocked
+                  if (aCanPurchase && !bCanPurchase) return -1;
+                  if (!aCanPurchase && bCanPurchase) return 1;
+                  
+                  if (aIsLocked && !bIsLocked && !b.unlocked) return -1;
+                  if (!aIsLocked && !a.unlocked && bIsLocked) return 1;
+                  
+                  if (a.unlocked && !b.unlocked) return 1;
+                  if (!a.unlocked && b.unlocked) return -1;
+                  
+                  // Within same group, sort by cost
                   return a.cost - b.cost;
                 }).map((unlockable) => {
                   const missionName = getMissionName(unlockable.missionRequirement);
                   const missionCompleted = isMissionCompleted(unlockable.missionRequirement);
+                  const canAfford = displayOctopusCount >= unlockable.cost;
+                  const canPurchase = canAfford && missionCompleted;
                   
                   return (
                   <div
@@ -1322,7 +1373,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                     className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
                       unlockable.unlocked
                         ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
-                        : displayOctopusCount >= unlockable.cost
+                        : canPurchase
                         ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
                         : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
@@ -1332,8 +1383,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         <div className="flex items-center gap-1 sm:gap-2">
                           <span className="text-green-400 text-sm sm:text-base md:text-lg flex-shrink-0">✓</span>
                           <div className="min-w-0">
-                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
-                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                            <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{getUnlockableName(unlockable.id) || unlockable.name}</h3>
+                            <p className="text-gray-200 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{getUnlockableDescription(unlockable.id) || unlockable.description}</p>
                           </div>
                         </div>
                       ) : (
@@ -1345,8 +1396,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                             </>
                           ) : (
                             <>
-                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{unlockable.name}</h3>
-                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{unlockable.description}</p>
+                              <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">{getUnlockableName(unlockable.id) || unlockable.name}</h3>
+                              <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">{getUnlockableDescription(unlockable.id) || unlockable.description}</p>
                             </>
                           )}
                         </div>
@@ -1356,14 +1407,14 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
                       {missionName && !missionCompleted && (
                         <div className="text-right">
-                          <p className="text-gray-400 text-xs">Requires:</p>
+                          <p className="text-gray-400 text-xs">{t.treasure.requires}</p>
                           <p className={`text-xs font-bold text-yellow-400 whitespace-nowrap`}>
                             {missionName}
                           </p>
                         </div>
                       )}
                       {unlockable.unlocked ? (
-                        <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">UNLOCKED</span>
+                        <span className="text-green-400 text-xs sm:text-sm font-bold whitespace-nowrap">{t.treasure.unlocked}</span>
                       ) : (
                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                           <div className="flex items-center gap-1 sm:gap-2">
@@ -1388,7 +1439,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                                     : 'bg-gray-600 opacity-40 pointer-events-none cursor-not-allowed'
                                 }`}
                               >
-                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">GET</p>
+                                <p className="whitespace-nowrap text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-lora font-bold text-black">{t.treasure.get}</p>
                               </button>
                             );
                           })()}
