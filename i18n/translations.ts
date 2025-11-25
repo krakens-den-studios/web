@@ -459,32 +459,32 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Game Designer',
-          description: 'Creates the mechanics, systems and experiences that make our games unique and memorable.'
+          description: 'The face of the team, present wherever being sociable and friendly is needed. He is also responsible for making sure the game is not just a walking simulator.'
         },
         {
           name: 'David Tàrrega',
           role: 'Level Designer',
-          description: 'Builds the worlds and spaces where our stories unfold, guiding the player through immersive experiences.'
+          description: 'He started as a student and someday he will become a master. He could totally show up in that volleyball anime series.'
         },
         {
           name: 'Meritxell',
           role: 'Narrative Designer',
-          description: 'A very cute and even clumsier girl who is lucky enough to have the best partner in the world and the universe. She likes turquoise and cats.'
+          description: 'In charge of the stories and texts that—ideally—make everyone laugh, cry, and feel moved. She likes turquoise and cats.'
         },
         {
           name: 'José Manuel Correa',
           role: 'Animator',
-          description: 'Gives movement and expression to our characters, creating fluid animations that connect with emotions.'
+          description: 'Responsible for bringing characters to life. He also helps with modeling and with whatever else is needed.'
         },
         {
           name: 'Ergoni',
           role: '3D Artist',
-          description: 'Gives shape and life to worlds and characters in three dimensions, creating models and textures that immerse the player in immersive visual experiences.'
+          description: 'The one to blame for our 3D models being so beautiful.'
         },
         {
           name: 'Enric',
-          role: 'All',
-          description: 'I have to do everything, from tech art to resolving conflicts to programming, since the idea of making a team to make games was mine. Happy that it\'s this way, otherwise it would be boring. Happy to have the best partner in the galaxy.'
+          role: 'Some',
+          description: 'Team management, code, production, programming... He has a secret past as a League of Legends player.'
         }
       ],
       finalText: 'United by the passion to create experiences that heal and transform, we work together to bring stories to life that resonate in the heart.'
@@ -859,32 +859,32 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Diseñador de Juegos',
-          description: 'Crea las mecánicas, sistemas y experiencias que hacen que nuestros juegos sean únicos e inolvidables.'
+          description: 'La cara del equipo, está presente donde haga falta ser sociable y amable. También es el responsable de que el juego no sea un simulador de caminar.'
         },
         {
           name: 'David Tàrrega',
           role: 'Diseñador de Niveles',
-          description: 'Construye los mundos y espacios donde se desarrollan nuestras historias, guiando al jugador a través de experiencias inmersivas.'
+          description: 'Empezó como estudiante y algún día se convertirá en maestro. Podría aparecer en la serie de anime de voleibol.'
         },
         {
           name: 'Meritxell',
           role: 'Diseñadora Narrativa',
-          description: 'Una chica muy guapa y aún más torpe que tiene la suerte de tener la mejor pareja del mundo mundial y del universo. Le gusta el color turquesa y los gatos.'
+          description: 'Encargada de las historias y de los textos con los que, idealmente, todo el mundo reirá, llorará y se emocionará. Le gusta el color turquesa y los gatos.'
         },
         {
           name: 'José Manuel Correa',
           role: 'Animador',
-          description: 'Da movimiento y expresión a nuestros personajes, creando animaciones fluidas que conectan con las emociones.'
+          description: 'Encargado de dar vida a los personajes. También ayuda a modelar y en lo que sea necesario.'
         },
         {
           name: 'Ergoni',
           role: 'Artista 3D',
-          description: 'Da forma y vida a mundos y personajes en tres dimensiones, creando modelos y texturas que sumergen al jugador en experiencias visuales inmersivas.'
+          description: 'El culpable de que tengamos modelos 3D tan bonitos.'
         },
         {
           name: 'Enric',
-          role: 'Todos',
-          description: 'Me toca hacer de todo, desde tech art a solventar conflictos a programar, ya que la idea de hacer un equipo para hacer juegos fue mía. Contento de que sea así, que si no sería aburrido. Feliz de tener la mejor pareja de la galaxia.'
+          role: 'Algunos',
+          description: 'Gestión de equipo, de código, de producción, de programación... Tiene un pasado oculto como jugador de League of Legends.'
         }
       ],
       finalText: 'Unidos por la pasión de crear experiencias que sanan y transforman, trabajamos juntos para dar vida a historias que resuenan en el corazón.'
@@ -1259,32 +1259,32 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Dissenyador de Jocs',
-          description: 'Crea les mecàniques, sistemes i experiències que fan que els nostres jocs siguin únics i inoblidables.'
+          description: 'La cara de l\'equip, està present allà on faci falta ser sociable i amable. També és el responsable de fer que el joc no sigui un simulador de caminar.'
         },
         {
           name: 'David Tàrrega',
           role: 'Dissenyador de Nivells',
-          description: 'Construeix els mons i espais on es desenvolupen les nostres històries, guiant el jugador a través d\'experiències immersives.'
+          description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime,'
         },
         {
           name: 'Meritxell',
           role: 'Dissenyadora Narrativa',
-          description: 'Una noia molt maca i encara més torpe que té la sort de tenir la millor parella del món mundial i de l\'univers. Li agrada el color turquesa i els gats.'
+          description: 'Encarregada de les històries i dels textos amb les que - idealment - tothom riurà, plorarà i se sentirà emocionat. Li agrada el color turquesa i els gats.'
         },
         {
           name: 'José Manuel Correa',
           role: 'Animador',
-          description: 'Dóna moviment i expressió als nostres personatges, creant animacions fluides que connecten amb les emocions.'
+          description: 'Encarregat de donar vida als personatges. També ajuda a modelar i en allò que sigui necessari.'
         },
         {
           name: 'Ergoni',
           role: 'Artista 3D',
-          description: 'Dóna forma i vida a mons i personatges en tres dimensions, creant models i textures que submergeixen el jugador en experiències visuals immersives.'
+          description: 'El culpable de tenir uns models 3d tan bonics.'
         },
         {
           name: 'Enric',
-          role: 'Tots',
-          description: 'Em toca fer de tot, des de tech art a solventar conflictes a programar, ja que la idea de fer un equip per fer jocs va ser meva. Content de que sigui així, que sinó seria avorrit. Feliç de tenir la millor parella de la galàxia.'
+          role: 'Alguns',
+          description: 'Gestió d\'equip, de codi, de producció, de programació... Té un passat ocult com a jugador de League of Legends.'
         }
       ],
       finalText: 'Units per la passió de crear experiències que sanen i transformen, treballem junts per donar vida a històries que ressonen al cor.'
