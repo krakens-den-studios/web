@@ -60,7 +60,7 @@ const Header = () => {
         <RiInstagramFill className="h-8 w-8" />
       </a>
 
-      <a href="mailto:krakensdenstudios@gmail.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      <a href="mailto:help@krakensdenstudios.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiMailFill className="h-8 w-8" />
       </a>
 
@@ -107,7 +107,8 @@ const Header = () => {
             alt="Kraken's Den Logo"
             width={96}
             height={96}
-            className="object-contain select-none cursor-pointer"
+            className="object-contain select-none cursor-pointer w-auto h-auto"
+            style={{ height: 'auto', width: 'auto' }}
           />
         </Link>
 

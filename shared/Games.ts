@@ -9,7 +9,7 @@ interface Game {
 export const games: Game[] = [
   {
     name: 'HeartWeaver',
-    imageSrc: '/heartweaverImage.png',
+    imageSrc: '/heartweaverThumbnail.png',
     link: Route.HEART_WEAVER
   }
 ];

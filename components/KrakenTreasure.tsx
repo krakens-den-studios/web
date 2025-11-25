@@ -156,6 +156,19 @@ const getAgentEfficiency = (agent: Agent): number => {
   return agent.collectionRate / currentCost;
 };
 
+const calculateAgentMultiplierFromUnlockables = (agentId: string, unlockablesList: Unlockable[]): number => {
+  return unlockablesList
+    .filter(
+      u =>
+        u.type === 'upgrade' &&
+        u.upgradeType === 'agent-multiplier' &&
+        u.targetAgentId === agentId &&
+        u.unlocked &&
+        u.multiplierValue !== undefined
+    )
+    .reduce((multiplier, upgrade) => multiplier * (upgrade.multiplierValue || 1), 1);
+};
+
 export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, onClose }: KrakenTreasureProps) {
   const { t } = useLanguage();
   const { playButtonClick } = useAudio();
@@ -583,27 +596,31 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     
     // Handle upgrade purchases
     if (unlockable.type === 'upgrade') {
-      if (unlockable.upgradeType === 'agent-multiplier' && unlockable.targetAgentId && unlockable.multiplierValue !== undefined) {
-        // Apply multiplier to the target agent
-        // Start from base multiplier (1.0) and apply all unlocked upgrades for this agent
-        const baseMultiplier = 1.0;
-        const allUnlockedUpgrades = unlockables.filter(
-          u => u.type === 'upgrade' && 
-               u.upgradeType === 'agent-multiplier' && 
-               u.targetAgentId === unlockable.targetAgentId && 
-               u.unlocked && 
-               u.multiplierValue !== undefined
+      if (unlockable.upgradeType === 'agent-multiplier' && unlockable.targetAgentId) {
+        const finalMultiplier = calculateAgentMultiplierFromUnlockables(
+          unlockable.targetAgentId,
+          updatedUnlockables
         );
-        const finalMultiplier = allUnlockedUpgrades.reduce((mult, upgrade) => {
-          return mult * (upgrade.multiplierValue || 1.0);
-        }, baseMultiplier);
-        
-        const updatedAgents = agents.map(a => 
-          a.id === unlockable.targetAgentId ? { ...a, multiplier: finalMultiplier } : a
-        );
-        setAgents(updatedAgents);
-        if (typeof window !== 'undefined') {
-          persistAgentProgress(updatedAgents);
+
+        let agentsChanged = false;
+        const updatedAgents = agents.map(agent => {
+          if (agent.id !== unlockable.targetAgentId) {
+            return agent;
+          }
+
+          if (agent.multiplier === finalMultiplier) {
+            return agent;
+          }
+
+          agentsChanged = true;
+          return { ...agent, multiplier: finalMultiplier };
+        });
+
+        if (agentsChanged) {
+          setAgents(updatedAgents);
+          if (typeof window !== 'undefined') {
+            persistAgentProgress(updatedAgents);
+          }
         }
       } else if (unlockable.upgradeType === 'minigame-cooldown' && unlockable.targetMinigameId && unlockable.multiplierValue !== undefined) {
         // Apply cooldown reduction to the target minigame
@@ -1136,6 +1153,12 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                   const agentMainName = getMainName(agentTranslatedName);
                   const previousAgentTranslatedName = previousAgent ? (getAgentName(previousAgent.id) || previousAgent.name) : null;
                   const previousAgentMainName = previousAgentTranslatedName ? getMainName(previousAgentTranslatedName) : null;
+                  const perHelperRate = agent.collectionRate * (agent.multiplier || 1);
+                  const totalHelperRate = perHelperRate * agent.owned;
+                  const helperMultiplier = agent.multiplier || 1;
+                  const hasMultiplierBonus = helperMultiplier > 1;
+                  const helperMultiplierLabel =
+                    helperMultiplier % 1 === 0 ? helperMultiplier.toFixed(0) : helperMultiplier.toFixed(2);
 
                   return (
                     <div
@@ -1157,9 +1180,29 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                                 )}
                               </h3>
                             </div>
-                            <div className="flex items-center gap-2 mt-2">
-                              <RiEmotionLine className="text-turquoise-400 text-sm sm:text-base" />
-                              <span className="text-white text-xs sm:text-sm">+{formatKrakenValue(agent.collectionRate * (agent.multiplier || 1.0))}/s</span>
+                            <div className="flex flex-col gap-1 mt-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <RiEmotionLine className="text-turquoise-400 text-sm sm:text-base" />
+                                <span className="text-white text-xs sm:text-sm font-semibold">
+                                  +{formatKrakenValue(perHelperRate)}/s
+                                </span>
+                                <span className="text-gray-400 text-[11px] sm:text-xs uppercase tracking-wide">
+                                  {t.treasure.helperPerHelper || 'per helper'}
+                                </span>
+                                {hasMultiplierBonus && (
+                                  <span className="text-turquoise-300 text-[11px] sm:text-xs font-semibold">
+                                    ×{helperMultiplierLabel} {t.treasure.helperUpgradeBonus || 'upgraded'}
+                                  </span>
+                                )}
+                              </div>
+                              {agent.owned > 0 && (
+                                <p className="text-gray-300 text-[11px] sm:text-xs">
+                                  {t.treasure.helperTotalProduction || 'Total'}:{' '}
+                                  <span className="text-white font-semibold">
+                                    +{formatKrakenValue(totalHelperRate)}/s
+                                  </span>
+                                </p>
+                              )}
                             </div>
                           </>
                         ) : (

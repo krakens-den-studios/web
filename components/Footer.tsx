@@ -14,6 +14,10 @@ const randomizeQuote = (copies: string[]) => {
   return copies[Math.floor(Math.random() * copies.length)]
 }
 
+const MAILERLITE_API_URL = 'https://connect.mailerlite.com/api/subscribers';
+const MAILERLITE_API_KEY = process.env.NEXT_PUBLIC_MAILERLITE_API_KEY;
+const MAILERLITE_GROUP_ID = '172026650194609552';
+
 const Footer = () => {
   const pathname = usePathname();
   const { isPageUnlocked } = useUnlockedPages();
@@ -33,21 +37,28 @@ const Footer = () => {
   };
 
   const addContact = async () => {
+    if (!email) return;
+
+    if (!MAILERLITE_API_KEY) {
+      toast.error(t.footer.subscribeError);
+      return;
+    }
+
+    const payload: Record<string, any> = {
+      email: email.trim()
+    };
+
+    payload.groups = [MAILERLITE_GROUP_ID];
+
     const options = {
       method: 'POST',
-      url: 'https://api.brevo.com/v3/contacts',
+      url: MAILERLITE_API_URL,
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'api-key': process.env.NEXT_PUBLIC_BREVO_API_KEY
+        Authorization: `Bearer ${MAILERLITE_API_KEY}`
       },
-      data: {
-        email: email,
-        emailBlacklisted: false,
-        smsBlacklisted: false,
-        listIds: [3],
-        updateEnabled: false,
-      }
+      data: payload
     };
 
     try {
@@ -55,6 +66,11 @@ const Footer = () => {
       toast.success(t.footer.subscribeSuccess);
       setEmail('');
     } catch (error: any) {
+      if (error?.response?.status === 409) {
+        toast.success(t.footer.subscribeSuccess);
+        setEmail('');
+        return;
+      }
       toast.error(error.response?.data?.message || t.footer.subscribeError);
     }
   }
@@ -65,7 +81,7 @@ const Footer = () => {
         <RiInstagramFill className="h-8 w-8" />
       </a>
 
-      <a href="mailto:krakensdenstudios@gmail.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
+      <a href="mailto:help@krakensdenstudios.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiMailFill className="h-8 w-8" />
       </a>
 

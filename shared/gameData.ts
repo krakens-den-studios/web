@@ -639,22 +639,22 @@ export const UNLOCKABLE_TEMPLATES: UnlockableTemplate[] = [
   },
   {
     id: 'collect-percent-1',
-    name: 'Collect Flow: 1% KPS',
-    description: 'Manual collect gives 1% of your total KPS.',
+    name: 'Collect Flow I',
+    description: 'Manual collect gives 5 times your total KPS.',
     cost: 600000,
     type: 'upgrade',
     upgradeType: 'collection-multiplier',
-    manualCollectionPercentOfKps: 0.01,
+    manualCollectionPercentOfKps: 5,
     missionRequirement: 'collect-500'
   },
   {
     id: 'collect-percent-2',
-    name: 'Collect Flow: 2% KPS',
-    description: 'Manual collect gives 2% of your total KPS.',
+    name: 'Collect Flow II',
+    description: 'Manual collect gives 10 times of your total KPS.',
     cost: 1200000,
     type: 'upgrade',
     upgradeType: 'collection-multiplier',
-    manualCollectionPercentOfKps: 0.02,
+    manualCollectionPercentOfKps: 10,
     missionRequirement: 'collect-1000'
   },
   {

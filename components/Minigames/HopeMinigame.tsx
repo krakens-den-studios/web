@@ -270,7 +270,7 @@ export default function HopeMinigame({ onComplete, onClose }: HopeMinigameProps)
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [gameState, isHolding, currentPointIndex, points, onComplete, activationDistance]);
+  }, [gameState, isHolding, currentPointIndex, points, onComplete, activationDistance, playMinigameSound]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center select-none">

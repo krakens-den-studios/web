@@ -68,6 +68,7 @@ export default function Home() {
             className="object-cover lg:object-[24vw] 3xl:object-contain 3xl:object-[38vw] select-none"
             alt="Heart Weaver cover"
             fill
+            priority
           />
         </div>
 
@@ -186,10 +187,11 @@ export default function Home() {
               <div className="w-full justify-center flex relative h-full pointer-events-none">
                 <Image
                   src={imageSrc}
-                  className="select-none object-contain max-h-[24rem]"
+                  className="select-none object-contain max-h-[24rem] rounded-2xl"
                   alt={`${name} cover`}
                   height={252}
                   width={451}
+                  style={{ height: 'auto', width: 'auto' }}
                 />
               </div>
 

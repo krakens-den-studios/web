@@ -7,6 +7,10 @@ import { useEffect, useState } from 'react';
 import { RiMailFill } from 'react-icons/ri';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+const MAILERLITE_API_URL = 'https://connect.mailerlite.com/api/subscribers';
+const MAILERLITE_API_KEY = process.env.NEXT_PUBLIC_MAILERLITE_API_KEY || '';
+const MAILERLITE_CONTACT_GROUP_ID = '172026650194609552';
+
 export default function Contact() {
   const { isPageUnlocked, isLoading } = useUnlockedPages();
   const { t } = useLanguage();
@@ -38,23 +42,35 @@ export default function Contact() {
 
     setIsSubmitting(true);
     
+    if (!MAILERLITE_API_KEY) {
+      console.error('Missing MailerLite API key');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const payload: Record<string, any> = {
+      email: email.trim()
+    };
+
+    payload.groups = [MAILERLITE_CONTACT_GROUP_ID];
+
     try {
-      const response = await fetch('https://api.brevo.com/v3/contacts', {
+      const response = await fetch(MAILERLITE_API_URL, {
         method: 'POST',
         headers: {
-          'accept': 'application/json',
-          'api-key': process.env.NEXT_PUBLIC_BREVO_API_KEY || '',
+          accept: 'application/json',
+          Authorization: `Bearer ${MAILERLITE_API_KEY}`,
           'content-type': 'application/json'
         },
-        body: JSON.stringify({
-          email: email,
-          listIds: [2]
-        })
+        body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
+      if (response.ok || response.status === 409) {
         setSubmitted(true);
         setEmail('');
+      } else {
+        const errorBody = await response.json().catch(() => null);
+        console.error('Error subscribing to newsletter:', errorBody || response.statusText);
       }
     } catch (error) {
       console.error('Error subscribing to newsletter:', error);
@@ -92,10 +108,10 @@ export default function Contact() {
                 </h2>
               </div>
               <a 
-                href="mailto:krakensdenstudios@gmail.com"
+                href="mailto:help@krakensdenstudios.com"
                 className="text-turquoise-300 text-lg md:text-xl hover:text-turquoise-200 transition-colors break-all"
               >
-                krakensdenstudios@gmail.com
+                help@krakensdenstudios.com
               </a>
             </div>
 

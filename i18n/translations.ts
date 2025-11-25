@@ -85,6 +85,9 @@ export interface Translations {
     buy: string;
     missionsDescription: string;
     helpersDescription: string;
+    helperPerHelper: string;
+    helperTotalProduction: string;
+    helperUpgradeBonus: string;
       clickNow: string;
       wait: string;
       tryAgain: string;
@@ -209,6 +212,17 @@ export interface Translations {
     fateDescription1: string;
     fateDescription2: string;
     bookAlt: string;
+    mendHeartTitle: string;
+    mendHeartAlt: string;
+    cleanseThoughtsTitle: string;
+    cleanseThoughtsAlt: string;
+    charismaticCompanionTitle: string;
+    charismaticCompanionAlt: string;
+    immersiveWorldTitle: string;
+    immersiveWorldAlt: string;
+    powerEmotionsTitle: string;
+    powerEmotionsGifAlts: string[];
+    powerEmotionsCenterAlt: string;
   };
   
   // Minigames additional
@@ -365,6 +379,9 @@ export const translations: Record<Language, Translations> = {
       buy: 'Buy',
       missionsDescription: 'Complete missions to unlock new helpers, treasures, and upgrades.',
       helpersDescription: 'Hire helpers that automatically collect Krakenlings for you. The more you have, the more they gather.',
+      helperPerHelper: 'per helper',
+      helperTotalProduction: 'total production',
+      helperUpgradeBonus: 'from upgrades',
       clickNow: 'Click now',
       wait: 'Wait...',
       tryAgain: 'Try again',
@@ -505,7 +522,22 @@ export const translations: Record<Language, Translations> = {
       decideFate: 'Decide Ace\'s Fate',
       fateDescription1: 'Hold the power to either restore Ace\'s emotions to their rightful harmony or let them fade forever...',
       fateDescription2: '... Ace\'s future rests in your hands.',
-      bookAlt: 'HeartWeaver book'
+      bookAlt: 'HeartWeaver book',
+      mendHeartTitle: 'Let the Heart Weaver mend your heart',
+      mendHeartAlt: 'Heart Weaver weaving light around a heart',
+      cleanseThoughtsTitle: 'Use Ace\'s emotions to cleanse her intrusive thoughts',
+      cleanseThoughtsAlt: 'Ace channeling emotions to clear intrusive thoughts',
+      charismaticCompanionTitle: 'Charismatic and unique companion',
+      charismaticCompanionAlt: 'Charismatic companion smiling with confidence',
+      immersiveWorldTitle: 'Dive deep into a fantasy immersive world',
+      immersiveWorldAlt: 'Heart Weaver fantasy world map',
+      powerEmotionsTitle: 'Use the power of emotions',
+      powerEmotionsGifAlts: [
+        'Hope ability preview',
+        'Courage ability preview',
+        'Connection ability preview'
+      ],
+      powerEmotionsCenterAlt: 'Transparent Heart Weaver emblem'
     },
     minigamesExtra: {
       holdMouse: 'Hold your mouse button to start',
@@ -765,6 +797,9 @@ export const translations: Record<Language, Translations> = {
       buy: 'Comprar',
       missionsDescription: 'Completa misiones para desbloquear nuevos ayudantes, tesoros y mejoras.',
       helpersDescription: 'Contrata ayudantes que automáticamente recolectan Krakensitos por ti. Cuantos más tengas, más recolectan.',
+      helperPerHelper: 'por ayudante',
+      helperTotalProduction: 'producción total',
+      helperUpgradeBonus: 'por mejoras',
       clickNow: 'Haz clic ahora',
       wait: 'Espera...',
       tryAgain: 'Intenta de nuevo',
@@ -905,7 +940,22 @@ export const translations: Record<Language, Translations> = {
       decideFate: 'Decide el Destino de Ace',
       fateDescription1: 'Tienes el poder de restaurar las emociones de Ace a su armonía legítima o dejarlas desvanecerse para siempre...',
       fateDescription2: '... El futuro de Ace descansa en tus manos.',
-      bookAlt: 'Libro de HeartWeaver'
+      bookAlt: 'Libro de HeartWeaver',
+      mendHeartTitle: 'Deja que la Heart Weaver sane tu corazón',
+      mendHeartAlt: 'Heart Weaver envolviendo un corazón con luz sanadora',
+      cleanseThoughtsTitle: 'Usa las emociones de Ace para limpiar sus pensamientos intrusivos',
+      cleanseThoughtsAlt: 'Ace canalizando emociones para purificar sus pensamientos',
+      charismaticCompanionTitle: 'Compañera carismática y única',
+      charismaticCompanionAlt: 'Compañera carismática sonriendo con confianza',
+      immersiveWorldTitle: 'Sumérgete en un mundo de fantasía inmersivo',
+      immersiveWorldAlt: 'Mapa fantástico del mundo de Heart Weaver',
+      powerEmotionsTitle: 'Utiliza el poder de las emociones',
+      powerEmotionsGifAlts: [
+        'Vista previa de la habilidad de esperanza',
+        'Vista previa de la habilidad de valor',
+        'Vista previa de la habilidad de conexión'
+      ],
+      powerEmotionsCenterAlt: 'Emblema transparente de Heart Weaver'
     },
     minigamesExtra: {
       holdMouse: 'Presiona el botón del ratón para empezar',
@@ -1165,6 +1215,9 @@ export const translations: Record<Language, Translations> = {
       buy: 'Comprar',
       missionsDescription: 'Completa missions per desbloquejar nous ajudants, tresors i millores.',
       helpersDescription: 'Contracta ajudants que automàticament recullen Krakenets per tu. Com més en tinguis, més recullen.',
+      helperPerHelper: 'per ajudant',
+      helperTotalProduction: 'producció total',
+      helperUpgradeBonus: 'per millores',
       clickNow: 'Fes clic ara',
       wait: 'Espera...',
       tryAgain: 'Torna a intentar',
@@ -1305,7 +1358,22 @@ export const translations: Record<Language, Translations> = {
       decideFate: 'Decideix el Destí d\'Ace',
       fateDescription1: 'Tens el poder de restaurar les emocions d\'Ace a la seva harmonia legítima o deixar-les desaparèixer per sempre...',
       fateDescription2: '... El futur d\'Ace descansa a les teves mans.',
-      bookAlt: 'Llibre de HeartWeaver'
+      bookAlt: 'Llibre de HeartWeaver',
+      mendHeartTitle: 'Deixa que la Heart Weaver sani el teu cor',
+      mendHeartAlt: 'La Heart Weaver teixint llum al voltant d\'un cor',
+      cleanseThoughtsTitle: 'Utilitza les emocions de l\'Ace per netejar els seus pensaments intrusius',
+      cleanseThoughtsAlt: 'Ace canalitzant emocions per purificar els pensaments',
+      charismaticCompanionTitle: 'Companya carismàtica i única',
+      charismaticCompanionAlt: 'Companya carismàtica somrient amb confiança',
+      immersiveWorldTitle: 'Endinsa\'t en un món de fantasia immersiu',
+      immersiveWorldAlt: 'Mapa fantàstic del món de Heart Weaver',
+      powerEmotionsTitle: 'Utilitza el poder de les emocions',
+      powerEmotionsGifAlts: [
+        'Vista prèvia de l\'habilitat d\'esperança',
+        'Vista prèvia de l\'habilitat de coratge',
+        'Vista prèvia de l\'habilitat de connexió'
+      ],
+      powerEmotionsCenterAlt: 'Emblema transparent de Heart Weaver'
     },
     minigamesExtra: {
       holdMouse: 'Manté pressionat el botó del ratolí per començar',

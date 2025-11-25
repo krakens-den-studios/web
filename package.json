@@ -10,23 +10,28 @@
   },
   "dependencies": {
     "@savvywombat/tailwindcss-grid-areas": "^3.1.0",
-    "@types/node": "20.4.2",
-    "@types/react": "18.2.15",
-    "@types/react-dom": "18.2.7",
+    "@types/node": "20.14.10",
+    "@types/react": "18.2.79",
+    "@types/react-dom": "18.2.25",
     "@types/react-scroll": "^1.8.7",
     "@vercel/speed-insights": "^1.2.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
-    "eslint": "8.45.0",
-    "eslint-config-next": "13.4.10",
-    "next": "13.4.10",
-    "postcss": "8.4.26",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.33",
+    "next": "14.2.33",
+    "postcss": "8.4.49",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.10.1",
     "react-scroll": "^1.8.9",
     "tailwindcss": "3.3.3",
-    "typescript": "5.1.6"
+    "typescript": "5.4.5"
+  },
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "glob": "10.5.0"
+    }
   }
 }

@@ -12,6 +12,15 @@ import { useRouter } from 'next/navigation';
 import { Route } from '@/shared/Route';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+import AngerGif from '@/public/anger.gif';
+import FearGif from '@/public/fear.gif';
+import SadnessGif from '@/public/sadness.gif';
+import IntroGif from '@/public/intro.gif';
+import Dialogue2dGif from '@/public/dialogue2d.gif';
+import MapImg from '@/public/map.png';
+import PulseGif from '@/public/pulse.gif';
+import MarkGif from '@/public/mark.gif';
+
 export default function HeartWeaver() {
   const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
@@ -51,6 +60,7 @@ export default function HeartWeaver() {
             className="object-cover lg:object-contain object-top select-none"
             alt={t.heartWeaver.coverAlt}
             fill
+            priority
           />
         </div>
 
