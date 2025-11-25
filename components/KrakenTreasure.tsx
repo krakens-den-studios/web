@@ -257,6 +257,32 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     }
   }, []);
 
+  useEffect(() => {
+    if (unlockables.length === 0) return;
+
+    setAgents(prevAgents => {
+      let changed = false;
+      const updatedAgents = prevAgents.map(agent => {
+        const finalMultiplier = calculateAgentMultiplierFromUnlockables(agent.id, unlockables);
+        const normalizedMultiplier = finalMultiplier || 1;
+        if (agent.multiplier === normalizedMultiplier) {
+          return agent;
+        }
+        changed = true;
+        return { ...agent, multiplier: normalizedMultiplier };
+      });
+
+      if (changed) {
+        if (typeof window !== 'undefined') {
+          persistAgentProgress(updatedAgents);
+        }
+        return updatedAgents;
+      }
+
+      return prevAgents;
+    });
+  }, [unlockables]);
+
   // Check and update mission completion status
   useEffect(() => {
     if (typeof window === 'undefined' || !missionsLoaded) return;

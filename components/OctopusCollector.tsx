@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { RiEmotionLine } from 'react-icons/ri';
 import FloatingText from './FloatingText';
 import { useAudio } from '@/hooks/useAudio';
@@ -36,9 +36,14 @@ interface OctopusCollectorProps {
 export default function OctopusCollector({ onCollect, collectedOctopuses }: OctopusCollectorProps) {
   const [octopuses, setOctopuses] = useState<Octopus[]>([]);
   const [floatingTexts, setFloatingTexts] = useState<FloatingTextData[]>([]);
+  const floatingIdRef = useRef(0);
   const { playCollect } = useAudio();
   const pathname = usePathname();
   const { unlockedPages } = useUnlockedPages();
+  const generateFloatingId = useCallback((baseId: string, timestamp: number = Date.now()) => {
+    floatingIdRef.current += 1;
+    return `floating-${baseId}-${timestamp}-${floatingIdRef.current}`;
+  }, []);
   
   // Check if shop was just closed using a timestamp stored in cookies
   const wasShopJustClosed = useCallback(() => {
@@ -256,47 +261,47 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
       
       // If collect-all is active, collect all krakenlings on the page
       if (hasCollectAll) {
-        setOctopuses(prev => {
-          const uncollected = prev.filter(o => !o.collected && !collectedOctopuses.includes(o.id) && !o.fading);
-          const particles = Array.from({ length: 8 }, (_, i) => ({
-            angle: (i * 360) / 8,
-            distance: 0
-          }));
-          
-          // Collect all uncollected krakenlings (call onCollect for each)
-          uncollected.forEach(o => {
-            onCollect(o.id);
-          });
-          
-          // Play collect sound once
-          playCollect();
-          
-          // Show floating text for all collected krakenlings
-          const now = Date.now();
-          setFloatingTexts(prevTexts => [
-            ...prevTexts,
-            ...uncollected.map((o, index) => ({
-              id: `floating-${o.id}-${now}-${index}`,
-              value: collectionValue,
-              x: o.x,
-              y: o.y
-            }))
-          ]);
-          
-          // Mark all as collected
-          return prev.map(o => {
-            if (!o.collected && !collectedOctopuses.includes(o.id) && !o.fading) {
-              return {
-                ...o,
-                collected: true,
-                collectedAt: Date.now(),
-                fading: true,
-                particles: particles
-              };
-            }
-            return o;
-          });
+        const now = Date.now();
+        const batchToCollect = octopuses.filter(o => !o.collected && !collectedOctopuses.includes(o.id) && !o.fading);
+        if (batchToCollect.length === 0) {
+          return;
+        }
+        
+        const particles = Array.from({ length: 8 }, (_, i) => ({
+          angle: (i * 360) / 8,
+          distance: 0
+        }));
+        
+        setOctopuses(prev => prev.map(o => {
+          if (!o.collected && !collectedOctopuses.includes(o.id) && !o.fading) {
+            return {
+              ...o,
+              collected: true,
+              collectedAt: now,
+              fading: true,
+              particles
+            };
+          }
+          return o;
+        }));
+        
+        batchToCollect.forEach(o => {
+          onCollect(o.id);
         });
+        
+        playCollect();
+        
+        setFloatingTexts(prevTexts => [
+          ...prevTexts,
+          ...batchToCollect.map(o => ({
+            id: generateFloatingId(o.id, now),
+            value: collectionValue,
+            x: o.x,
+            y: o.y
+          }))
+        ]);
+        
+        return;
       } else {
         // Normal collection - just this one
         onCollect(octopus.id);
@@ -306,7 +311,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
         
         // Show floating text with value
         setFloatingTexts(prev => [...prev, {
-          id: `floating-${octopus.id}-${Date.now()}`,
+          id: generateFloatingId(octopus.id),
           value: collectionValue,
           x: octopus.x,
           y: octopus.y

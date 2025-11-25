@@ -259,7 +259,7 @@ export const translations: Record<Language, Translations> = {
       aboutUs: 'About Us',
       lockedHome: 'Locked. Get "Home Page" in The Kraken\'s Treasure to unlock this part of the den.',
       lockedTeam: 'Locked. Get "About Us" in The Kraken\'s Treasure to meet the team.',
-      lockedGames: 'Locked. Get "Games Page" in The Kraken\'s Treasure to access all therapies and experiences in one place.',
+      lockedGames: 'Locked. Get "Games Page" in The Kraken\'s Treasure to check our games.',
       lockedContact: 'Locked. Get "Contact" in The Kraken\'s Treasure to unlock this part of the den.'
     },
     footer: {
@@ -360,7 +360,7 @@ export const translations: Record<Language, Translations> = {
       title: "The Kraken's Treasure",
       description: 'Trade Krakenlings for helpers, treasures, and therapies.',
       krakenlings: 'krakenlings',
-      saved: 'saved',
+      saved: 'personally saved',
       perSecond: 'krakenlings/second',
       missions: 'Missions',
       therapies: 'Therapies',
@@ -500,11 +500,11 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Enric',
-          role: 'Some',
-          description: 'Team management, code, production, programming... He has a secret past as a League of Legends player.'
+          role: 'Many',
+          description: 'Team management, code, production, programming... Whatever it takes. I am required to write that no one told me to write that I have not been forced to work extra hours in order to buy my dog and 2 cats more toys and food.'
         }
       ],
-      finalText: 'United by the passion to create experiences that heal and transform, we work together to bring stories to life that resonate in the heart.'
+      finalText: 'Just some people trying to make a positive impact in some other people\'s lives while living out of it.'
     },
     heartWeaver: {
       coverAlt: 'Heart Weaver cover',
@@ -677,7 +677,7 @@ export const translations: Record<Language, Translations> = {
       aboutUs: 'Sobre Nosotros',
       lockedHome: 'Bloqueado. Obtén "Página de Inicio" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
       lockedTeam: 'Bloqueado. Obtén "Sobre Nosotros" en El Tesoro del Kraken para conocer al equipo.',
-      lockedGames: 'Bloqueado. Obtén "Página de Juegos" en El Tesoro del Kraken para acceder a todas las terapias y experiencias en un solo lugar.',
+      lockedGames: 'Bloqueado. Obtén "Página de Juegos" en El Tesoro del Kraken para ver nuestros juegos.',
       lockedContact: 'Bloqueado. Obtén "Contacto" en El Tesoro del Kraken para desbloquear esta parte de la guarida.'
     },
     footer: {
@@ -763,7 +763,7 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'Un lugar donde las emociones encuentran su hogar',
       description: 'Recolecta Krakensitos, desbloquea terapias y encuentra tesoros.',
       openTreasure: 'Abrir Tesoro',
-      enterDen: 'ENTRAR A LA GUARIDA',
+      enterDen: 'Acceder a la Guarida',
       welcomeHeart: 'Bienvenido al Corazón de la Guarida',
       descriptionFull: 'Recolecta Krakensitos, desbloquea terapias y encuentra tesoros. Juega a tu propio ritmo.',
       explore: 'EXPLORAR',
@@ -772,13 +772,13 @@ export const translations: Record<Language, Translations> = {
       subscribeLocked: 'SUSCRIBIRSE 🔒',
       meetUs: '¡CONÓCENOS!',
       meetUsLocked: '¡CONÓCENOS! 🔒',
-      krakensGames: 'Juegos de Kraken\'s Den Studios'
+      krakensGames: 'Nuestros Juegos'
     },
     treasure: {
       title: 'El Tesoro del Kraken',
       description: 'Intercambia Krakensitos por ayudantes, tesoros y terapias.',
       krakenlings: 'krakensitos',
-      saved: 'guardados',
+      saved: 'salvados personalmente',
       perSecond: 'krakensitos/segundo',
       missions: 'Misiones',
       therapies: 'Terapias',
@@ -918,8 +918,8 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Enric',
-          role: 'Algunos',
-          description: 'Gestión de equipo, de código, de producción, de programación... Tiene un pasado oculto como jugador de League of Legends.'
+          role: 'Muchos',
+          description: 'Gestión del equipo, del código, de la producción, de la programación... Lo que haga falta. Me obligan a escribir que nadie me ha dicho que no me están obligando a hacer horas extra para comprarle más juguetes y comida a mi perro y a mis dos gatos.'
         }
       ],
       finalText: 'Unidos por la pasión de crear experiencias que sanan y transforman, trabajamos juntos para dar vida a historias que resuenan en el corazón.'
@@ -1017,8 +1017,8 @@ export const translations: Record<Language, Translations> = {
         'collect-multiplier-10': { name: 'Oleada de Recolección: 10', description: 'Recolección manual da 10 Krakenlings.' },
         'collect-multiplier-100': { name: 'Oleada de Recolección: 100', description: 'Recolección manual da 100 Krakenlings.' },
         'collect-multiplier-500': { name: 'Oleada de Recolección: 1000', description: 'Recolección manual da 1000 Krakenlings.' },
-        'collect-percent-1': { name: 'Flujo de Recolección: 1% KPS', description: 'Recolección manual da 1% de tu KPS total.' },
-        'collect-percent-2': { name: 'Flujo de Recolección: 2% KPS', description: 'Recolección manual da 2% de tu KPS total.' },
+        'collect-percent-1': { name: 'Tsunami de Recolección I', description: 'Recolección manual da 5 veces tu KPS.' },
+        'collect-percent-2': { name: 'Tsunami de Recolección II', description: 'Recolección manual da 10 veces tu KPS.' },
         'collect-all': { name: 'Recolectar Todo', description: 'Al recolectar un Krakenling, recolecta todos los Krakenlings de la página.' }
       },
       minigames: {
@@ -1095,7 +1095,7 @@ export const translations: Record<Language, Translations> = {
       aboutUs: 'Sobre Nosaltres',
       lockedHome: 'Bloquejat. Obtén "Pàgina d\'Inici" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
       lockedTeam: 'Bloquejat. Obtén "Sobre Nosaltres" al Tresor del Kraken per conèixer l\'equip.',
-      lockedGames: 'Bloquejat. Obtén "Pàgina de Jocs" al Tresor del Kraken per accedir a totes les teràpies i experiències en un sol lloc.',
+      lockedGames: 'Bloquejat. Obtén "Pàgina de Jocs" al Tresor del Kraken per veure els nostres jocs.',
       lockedContact: 'Bloquejat. Obtén "Contacte" al Tresor del Kraken per desbloquejar aquesta part de la guarida.'
     },
     footer: {
@@ -1181,7 +1181,7 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'Un lloc on les emocions troben la seva llar',
       description: 'Recull Krakenets, desbloqueja teràpies i descobreix tresors.',
       openTreasure: 'Obrir Tresor',
-      enterDen: 'ENTRAR A LA GUARIDA',
+      enterDen: 'Entrar a la Guarida',
       welcomeHeart: 'Benvingut al Cor del Kraken',
       descriptionFull: 'Recull Krakenets, desbloqueja teràpies i descobreix tresors. Juga al teu propi ritme.',
       explore: 'EXPLORAR',
@@ -1190,13 +1190,13 @@ export const translations: Record<Language, Translations> = {
       subscribeLocked: 'SUBSCRIURE\'S 🔒',
       meetUs: 'CONÈIX-NOS!',
       meetUsLocked: 'CONÈIX-NOS! 🔒',
-      krakensGames: 'Jocs de Kraken\'s Den Studios'
+      krakensGames: 'Els nostres Jocs'
     },
     treasure: {
       title: 'El Tresor del Kraken',
       description: 'Intercanvia Krakenets per ajudants, tresors i teràpies.',
       krakenlings: 'krakenets',
-      saved: 'guardats',
+      saved: 'salvats personalment',
       perSecond: 'krakenets/segon',
       missions: 'Missions',
       therapies: 'Teràpies',
@@ -1337,7 +1337,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Enric',
           role: 'Alguns',
-          description: 'Gestió d\'equip, de codi, de producció, de programació... Té un passat ocult com a jugador de League of Legends.'
+          description: 'Gestió de l\'equip, del codi, de la producció, de la programació... El que calgui. M\'obliguen a escriure que ningú m\'ha dit que no m\'estan obligant a fer hores extra per comprar-li més joguines i menjar al meu gos i als meus dos gats.'
         }
       ],
       finalText: 'Units per la passió de crear experiències que sanen i transformen, treballem junts per donar vida a històries que ressonen al cor.'
@@ -1432,11 +1432,11 @@ export const translations: Record<Language, Translations> = {
         'sound-minigame-connection': { name: 'Efectes de So: Teràpia Connexió', description: 'Desbloqueja sons de Connexió.' },
         'sound-minigame-healing': { name: 'Efectes de So: Teràpia Sanació', description: 'Desbloqueja sons de Sanació.' },
         'sound-music': { name: 'Música de Fons', description: 'Desbloqueja música de fons.' },
-        'collect-multiplier-10': { name: 'Onada de Recol·lecció: 10', description: 'Recol·lecció manual dóna 10 Krakenlings.' },
-        'collect-multiplier-100': { name: 'Onada de Recol·lecció: 100', description: 'Recol·lecció manual dóna 100 Krakenlings.' },
-        'collect-multiplier-500': { name: 'Onada de Recol·lecció: 1000', description: 'Recol·lecció manual dóna 1000 Krakenlings.' },
-        'collect-percent-1': { name: 'Flux de Recol·lecció: 1% KPS', description: 'Recol·lecció manual dóna 1% del teu KPS total.' },
-        'collect-percent-2': { name: 'Flux de Recol·lecció: 2% KPS', description: 'Recol·lecció manual dóna 2% del teu KPS total.' },
+        'collect-multiplier-10': { name: 'Onada de Recol·lecció I', description: 'Recol·lecció manual dóna 10 Krakenlings.' },
+        'collect-multiplier-100': { name: 'Onada de Recol·lecció II', description: 'Recol·lecció manual dóna 100 Krakenlings.' },
+        'collect-multiplier-500': { name: 'Onada de Recol·lecció III', description: 'Recol·lecció manual dóna 1000 Krakenlings.' },
+        'collect-percent-1': { name: 'Tsunami de Recol·lecció I', description: 'Recol·lecció manual dóna 5 cops el teu KPS total.' },
+        'collect-percent-2': { name: 'Tsunami de Recol·lecció I', description: 'Recol·lecció manual dóna 10 cops el teu KPS total.' },
         'collect-all': { name: 'Recollir Tot', description: 'En recollir un Krakenling, recull tots els Krakenlings de la pàgina.' }
       },
       minigames: {
