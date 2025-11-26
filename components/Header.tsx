@@ -18,7 +18,6 @@ import { useAudio } from '@/hooks/useAudio';
 import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
 import { useMissionChecker } from '@/hooks/useMissionChecker';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageSelector from './LanguageSelector';
 import KrakenlingIcon from './KrakenlingIcon';
 
 const Header = () => {
@@ -141,7 +140,7 @@ const Header = () => {
           } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
       />
 
-      <div className="flex w-full justify-between py-4 px-6 md:px-8 items-center z-20 max-w-7xl">
+      <div className="flex w-full justify-between py-4 px-6 md:px-8 items-center z-20 max-w-7xl gap-6 bg-black/70 backdrop-blur rounded-b-2xl">
         <Link href={Route.ROOT} className="flex items-center">
           <Image
             src="/logoWhite.png"
@@ -293,13 +292,15 @@ const Header = () => {
             title={t.header.openTreasure}
           >
             <div className="flex items-center gap-2 text-white whitespace-nowrap">
-              <KrakenlingIcon size={32} tint="total" background="total" className="flex-shrink-0" />
-              <span
-                className="font-bold text-white tabular-nums tracking-wide"
-                style={{ minWidth: '5ch', textAlign: 'right' }}
-              >
-                {formatNumber(octopusCount)}
-              </span>
+              <div className="flex items-center gap-1">
+                <KrakenlingIcon size={32} tint="total" background="total" className="flex-shrink-0" />
+                <span
+                  className="font-bold text-white tabular-nums tracking-wide"
+                  style={{ minWidth: '5ch', textAlign: 'right' }}
+                >
+                  {formatNumber(octopusCount)}
+                </span>
+              </div>
             </div>
             <span className="text-black text-base lg:text-lg">{t.header.openTreasure}</span>
             {unclaimedMissionsCount > 0 && (
@@ -309,7 +310,6 @@ const Header = () => {
             )}
           </button>
 
-          <LanguageSelector />
           {socialLinks}
         </div>
 

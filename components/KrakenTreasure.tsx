@@ -1104,11 +1104,6 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       </div>
                     </div>
 
-                        {canPlay && (
-                          <div className="text-left w-full max-w-[10rem] sm:max-w-sm">
-                            <Button label={t.treasure.play} compact />
-                          </div>
-                        )}
                         
                         {!canPlay && (
                           <div className="text-left">

@@ -165,7 +165,7 @@ export default function Home() {
           <h2 className="font-lora text-4xl balanced">{t.home.krakensGames}</h2>
         </Points>
 
-        <div className="relative w-full h-[28rem] sm:h-[32rem] flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-[24rem] sm:h-[28rem] flex items-center justify-center overflow-hidden px-2">
           <TiArrowSortedDown
             onClick={prevGame}
             className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
@@ -185,14 +185,14 @@ export default function Home() {
               }`}
             >
               <div className="w-full justify-center flex relative pointer-events-none px-2 sm:px-6">
-                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/20 border border-white/10 aspect-[16/9]">
+                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/20 border border-white/10 min-h-[16rem] sm:min-h-[18rem]">
                   <Image
                     src={imageSrc}
                     className="select-none object-contain"
                     alt={`${name} cover`}
                     fill
                     sizes="(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 50vw"
-                    style={{ padding: '1.25rem' }}
+                    style={{ padding: '1rem' }}
                   />
                 </div>
               </div>
@@ -200,13 +200,13 @@ export default function Home() {
               <div className="w-full h-fit relative flex items-center justify-center">
                 {unlockedPages.games ? (
                   <Link href={link} className="w-fit">
-                    <Button label={name} />
+                    <Button label={name} compact />
                   </Link>
                 ) : (
                   <div className="relative group">
                     <button
                       disabled
-                      className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
+                      className="bg-gray-600 relative w-48 py-3 px-4 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
                     >
                       <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{name} 🔒</p>
                     </button>

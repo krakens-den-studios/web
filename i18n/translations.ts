@@ -99,6 +99,7 @@ export interface Translations {
     helperUpgradeBonus: string;
     missionRequiredLabel: string;
     missionUnlockHint: string;
+    tapToPlay: string;
       clickNow: string;
       wait: string;
       tryAgain: string;
@@ -402,6 +403,7 @@ export const translations: Record<Language, Translations> = {
       helperUpgradeBonus: 'from upgrades',
       missionRequiredLabel: 'Mission required:',
       missionUnlockHint: 'Complete this mission to unlock',
+      tapToPlay: 'Tap anywhere to play',
       clickNow: 'Click now',
       wait: 'Wait...',
       tryAgain: 'Try again',
@@ -829,6 +831,7 @@ export const translations: Record<Language, Translations> = {
       helperUpgradeBonus: 'por mejoras',
       missionRequiredLabel: 'Misión requerida:',
       missionUnlockHint: 'Completa esta misión para desbloquear',
+      tapToPlay: 'Toca en cualquier lugar para jugar',
       clickNow: 'Haz clic ahora',
       wait: 'Espera...',
       tryAgain: 'Intenta de nuevo',
@@ -1256,6 +1259,7 @@ export const translations: Record<Language, Translations> = {
       helperUpgradeBonus: 'per millores',
       missionRequiredLabel: 'Missió requerida:',
       missionUnlockHint: 'Completa aquesta missió per desbloquejar',
+      tapToPlay: 'Toca en qualsevol lloc per jugar',
       clickNow: 'Fes clic ara',
       wait: 'Espera...',
       tryAgain: 'Torna a intentar',
