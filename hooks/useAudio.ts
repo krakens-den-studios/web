@@ -218,7 +218,7 @@ export function useAudio() {
     
     collectSoundRef.current = new Audio('/sounds/collect.wav');
     collectSoundRef.current.preload = 'auto';
-    collectSoundRef.current.volume = 0.15;
+    collectSoundRef.current.volume = 0.08;
     collectSoundRef.current.load();
     
     hopeSoundRef.current = new Audio('/sounds/hope.wav');

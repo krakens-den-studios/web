@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { RiEmotionLine } from 'react-icons/ri';
 import FloatingText from './FloatingText';
 import { useAudio } from '@/hooks/useAudio';
 import { usePathname } from 'next/navigation';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { cookieStorage } from '@/utils/cookieStorage';
 import { calculateTotalKps, deserializeAgents, deserializeUnlockables, resolveManualCollectionTier } from '@/shared/gameData';
+import KrakenlingIcon from './KrakenlingIcon';
 
 interface Octopus {
   id: string;
@@ -438,13 +438,14 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
                   filter: `drop-shadow(0 0 ${10 * glowIntensity}px rgba(17, 180, 187, ${glowIntensity})) brightness(${1 + glowIntensity * 0.5})`
                 }}
               >
-                <RiEmotionLine
-                  className="text-turquoise-400 pointer-events-none"
+                <KrakenlingIcon
+                  size={octopus.size}
+                  tint="turquoise"
+                  className="pointer-events-none select-none"
                   style={{
-                    width: `${octopus.size}px`,
-                    height: `${octopus.size}px`,
                     transform: `rotate(${rotation}deg)`,
-                    transformOrigin: 'center center'
+                    transformOrigin: 'center center',
+                    filter: `drop-shadow(0 0 ${8 * glowIntensity}px rgba(17, 180, 187, ${glowIntensity})) brightness(${1 + glowIntensity * 0.5})`
                   }}
                 />
               </button>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Button from './Button';
 import OctopusCollector from './OctopusCollector';
 import EmotionShop from './EmotionShop';
-import { RiEmotionLine } from 'react-icons/ri';
+import KrakenlingIcon from './KrakenlingIcon';
 import { cookieStorage } from '@/utils/cookieStorage';
 
 interface Emotion {
@@ -471,7 +471,7 @@ export default function EmotionJourney({
       {/* Instrucciones y contador de pulpitos */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20 text-center">
         <div className="flex items-center justify-center gap-4 mb-4">
-          <RiEmotionLine className="text-turquoise-400 text-3xl" />
+          <KrakenlingIcon size={36} tint="turquoise" />
           <span className="text-2xl text-white font-bold">{octopusCount}</span>
           <span className="text-lg text-white opacity-80">pulpitos</span>
         </div>

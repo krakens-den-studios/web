@@ -6,7 +6,6 @@ import { useIsScrolled } from '@/hooks/useIsScrolled';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import Image from 'next/image';
 import { TiArrowSortedDown } from 'react-icons/ti';
-import { scroller } from 'react-scroll';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Route } from '@/shared/Route';
@@ -36,12 +35,10 @@ export default function HeartWeaver() {
   }, [isLoading, isPageUnlocked, router]);
 
   const scrollToGame = () => {
-    if (window) {
-      scroller.scrollTo('game', {
-        duration: 800,
-        delay: 0,
-        smooth: 'easeInOutQuart'
-      });
+    if (typeof window === 'undefined') return;
+    const section = document.getElementById('game');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -124,7 +121,7 @@ export default function HeartWeaver() {
         </div>
       </section>
 
-      <section className="relative w-full h-fit bg-purple flex items-center justify-center" id="game">
+      <section className="relative w-full h-fit bg-purple flex items-center justify-center" id="game-details">
         <div className="relative w-full max-w-[100rem] h-fit gap-4 grid md:grid-areas-left md:grid-cols-left items-center justify-items-center pt-8 md:pt-0">
           <div className="relative flex flex-col gap-6 items-center md:items-start md:grid-in-story w-fit">
             <Title title={t.heartWeaver.decideFate} />

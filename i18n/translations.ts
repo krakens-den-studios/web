@@ -60,6 +60,14 @@ export interface Translations {
     meetUsLocked: string;
     krakensGames: string;
   };
+
+  // First visit modal
+  firstVisit: {
+    title: string;
+    subtitle: string;
+    action: string;
+    instruction: string;
+  };
   
   // Kraken Treasure
   treasure: {
@@ -79,6 +87,7 @@ export interface Translations {
     requires: string;
     reward: string;
     claim: string;
+    claimed: string;
     readyToClaim: string;
     completed: string;
     go: string;
@@ -88,6 +97,8 @@ export interface Translations {
     helperPerHelper: string;
     helperTotalProduction: string;
     helperUpgradeBonus: string;
+    missionRequiredLabel: string;
+    missionUnlockHint: string;
       clickNow: string;
       wait: string;
       tryAgain: string;
@@ -356,6 +367,12 @@ export const translations: Record<Language, Translations> = {
       meetUsLocked: 'MEET US! 🔒',
       krakensGames: "Kraken's Games"
     },
+    firstVisit: {
+      title: 'Welcome to the Den',
+      subtitle: 'A Krakenling has found you.',
+      action: 'Save it',
+      instruction: 'Click on the Krakenling to save it'
+    },
     treasure: {
       title: "The Kraken's Treasure",
       description: 'Trade Krakenlings for helpers, treasures, and therapies.',
@@ -373,6 +390,7 @@ export const translations: Record<Language, Translations> = {
       requires: 'Requires:',
       reward: 'Reward:',
       claim: 'Claim',
+      claimed: 'Claimed',
       readyToClaim: 'ready to claim',
       completed: 'Completed!',
       go: 'GO',
@@ -382,6 +400,8 @@ export const translations: Record<Language, Translations> = {
       helperPerHelper: 'per helper',
       helperTotalProduction: 'total production',
       helperUpgradeBonus: 'from upgrades',
+      missionRequiredLabel: 'Mission required:',
+      missionUnlockHint: 'Complete this mission to unlock',
       clickNow: 'Click now',
       wait: 'Wait...',
       tryAgain: 'Try again',
@@ -774,6 +794,12 @@ export const translations: Record<Language, Translations> = {
       meetUsLocked: '¡CONÓCENOS! 🔒',
       krakensGames: 'Nuestros Juegos'
     },
+    firstVisit: {
+      title: 'Bienvenido a la Guarida',
+      subtitle: 'Un Krakenling te ha encontrado.',
+      action: 'Sálvalo',
+      instruction: 'Haz clic sobre el Krakenling para salvarlo'
+    },
     treasure: {
       title: 'El Tesoro del Kraken',
       description: 'Intercambia Krakensitos por ayudantes, tesoros y terapias.',
@@ -791,6 +817,7 @@ export const translations: Record<Language, Translations> = {
       requires: 'Requiere:',
       reward: 'Recompensa:',
       claim: 'Reclamar',
+      claimed: 'Reclamado',
       readyToClaim: 'listas para reclamar',
       completed: '¡Completado!',
       go: 'IR',
@@ -800,6 +827,8 @@ export const translations: Record<Language, Translations> = {
       helperPerHelper: 'por ayudante',
       helperTotalProduction: 'producción total',
       helperUpgradeBonus: 'por mejoras',
+      missionRequiredLabel: 'Misión requerida:',
+      missionUnlockHint: 'Completa esta misión para desbloquear',
       clickNow: 'Haz clic ahora',
       wait: 'Espera...',
       tryAgain: 'Intenta de nuevo',
@@ -1052,11 +1081,11 @@ export const translations: Record<Language, Translations> = {
         'own-3-helpers': { name: 'Equipo Inicial', description: 'Consigue 3 ayudantes diferentes trabajando al mismo tiempo.' },
         'own-5-helpers': { name: 'Equipo en Crecimiento', description: 'Consigue 5 ayudantes diferentes trabajando al mismo tiempo.' },
         'own-10-helpers': { name: 'Equipo Completo', description: 'Consigue 10 ayudantes diferentes trabajando al mismo tiempo.' },
-        'collect-10': { name: 'Recolector I', description: 'Ahorra 10 Krakenlings.' },
-        'collect-50': { name: 'Recolector II', description: 'Ahorra 50 Krakenlings.' },
-        'collect-100': { name: 'Recolector III', description: 'Ahorra 100 Krakenlings.' },
-        'collect-500': { name: 'Recolector IV', description: 'Ahorra 500 Krakenlings.' },
-        'collect-1000': { name: 'Recolector V', description: 'Ahorra 1000 Krakenlings.' },
+        'collect-10': { name: 'Recolector I', description: 'Salva personalmente a 10 Krakenlings.' },
+        'collect-50': { name: 'Recolector II', description: 'Salva personalmente a 50 Krakenlings.' },
+        'collect-100': { name: 'Recolector III', description: 'Salva personalmente a 100 Krakenlings.' },
+        'collect-500': { name: 'Recolector IV', description: 'Salva personalmente a 500 Krakenlings.' },
+        'collect-1000': { name: 'Recolector V', description: 'Salva personalmente a 1000 Krakenlings.' },
         'reach-5000': { name: 'Abundancia I', description: 'Alcanza 5000 Krakenlings en total.' },
         'reach-20000': { name: 'Abundancia II', description: 'Alcanza 20000 Krakenlings en total.' },
         'reach-50000': { name: 'Abundancia III', description: 'Alcanza 50000 Krakenlings en total.' },
@@ -1192,6 +1221,12 @@ export const translations: Record<Language, Translations> = {
       meetUsLocked: 'CONÈIX-NOS! 🔒',
       krakensGames: 'Els nostres Jocs'
     },
+    firstVisit: {
+      title: 'Benvingut a la Guarida',
+      subtitle: 'Un Krakenling t\'ha trobat.',
+      action: 'Salva\'l',
+      instruction: 'Fes clic al Krakenling per salvar-lo'
+    },
     treasure: {
       title: 'El Tresor del Kraken',
       description: 'Intercanvia Krakenets per ajudants, tresors i teràpies.',
@@ -1209,15 +1244,18 @@ export const translations: Record<Language, Translations> = {
       requires: 'Requereix:',
       reward: 'Recompensa:',
       claim: 'Reclamar',
+      claimed: 'Reclamat',
       readyToClaim: 'llestes per reclamar',
       completed: '¡Completat!',
-      go: 'ANAR',
+      go: 'Visitar',
       buy: 'Comprar',
       missionsDescription: 'Completa missions per desbloquejar nous ajudants, tresors i millores.',
       helpersDescription: 'Contracta ajudants que automàticament recullen Krakenets per tu. Com més en tinguis, més recullen.',
       helperPerHelper: 'per ajudant',
       helperTotalProduction: 'producció total',
       helperUpgradeBonus: 'per millores',
+      missionRequiredLabel: 'Missió requerida:',
+      missionUnlockHint: 'Completa aquesta missió per desbloquejar',
       clickNow: 'Fes clic ara',
       wait: 'Espera...',
       tryAgain: 'Torna a intentar',
@@ -1470,11 +1508,11 @@ export const translations: Record<Language, Translations> = {
         'own-3-helpers': { name: 'Equip Inicial', description: 'Consegueix 3 ajudants diferents treballant al mateix temps.' },
         'own-5-helpers': { name: 'Equip en Creixement', description: 'Consegueix 5 ajudants diferents treballant al mateix temps.' },
         'own-10-helpers': { name: 'Equip Complet', description: 'Consegueix 10 ajudants diferents treballant al mateix temps.' },
-        'collect-10': { name: 'Recol·lector I', description: 'Estalvia 10 Krakenlings.' },
-        'collect-50': { name: 'Recol·lector II', description: 'Estalvia 50 Krakenlings.' },
-        'collect-100': { name: 'Recol·lector III', description: 'Estalvia 100 Krakenlings.' },
-        'collect-500': { name: 'Recol·lector IV', description: 'Estalvia 500 Krakenlings.' },
-        'collect-1000': { name: 'Recol·lector V', description: 'Estalvia 1000 Krakenlings.' },
+        'collect-10': { name: 'Recol·lector I', description: 'Salva personalment a 10 Krakenlings.' },
+        'collect-50': { name: 'Recol·lector II', description: 'Salva personalment a 50 Krakenlings.' },
+        'collect-100': { name: 'Recol·lector III', description: 'Salva personalment a 100 Krakenlings.' },
+        'collect-500': { name: 'Recol·lector IV', description: 'Salva personalment a 500 Krakenlings.' },
+        'collect-1000': { name: 'Recol·lector V', description: 'Salva personalment a 1000 Krakenlings.' },
         'reach-5000': { name: 'Abundància I', description: 'Arriba a 5000 Krakenlings en total.' },
         'reach-20000': { name: 'Abundància II', description: 'Arriba a 20000 Krakenlings en total.' },
         'reach-50000': { name: 'Abundància III', description: 'Arriba a 50000 Krakenlings en total.' },
@@ -1492,7 +1530,7 @@ export const translations: Record<Language, Translations> = {
       },
       connectionWords: [
         'ESPERANÇA', 'AMOR', 'CALMA', 'AMABLE', 'CÀLID', 'SEGUR', 'SANAR', 'ALEGRIA', 'PAU', 'CONFIANÇA',
-        'CRÉIXER', 'OBRIR', 'CUIDAR', 'SUAU', 'GENTIL', 'VALENT', 'FORT', 'VERDADER', 'REAL', 'LLIURE',
+        'AMIC', 'OBRIR', 'CUIDAR', 'SUAU', 'GENTIL', 'VALENT', 'FORT', 'VERDADER', 'REAL', 'LLIURE',
         'LLUM', 'PROFUND', 'SILENCI', 'QUIET', 'FACILITAT', 'DESCANS', 'BRILLANTOR', 'FLUIR', 'CRÈIXER', 'RAIG'
       ]
     }

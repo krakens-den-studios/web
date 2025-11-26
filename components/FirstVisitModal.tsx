@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RiEmotionLine } from 'react-icons/ri';
 import { cookieStorage } from '@/utils/cookieStorage';
+import KrakenlingIcon from './KrakenlingIcon';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FirstVisitModalProps {
   onComplete: () => void;
@@ -11,6 +12,7 @@ interface FirstVisitModalProps {
 export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isCollecting, setIsCollecting] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -67,15 +69,15 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
       }`}>
         <div className="flex flex-col items-center gap-6">
           <h2 className="font-lora text-3xl md:text-4xl font-bold text-turquoise-400 mb-2">
-            Welcome to the Den
+            {t.firstVisit.title}
           </h2>
           
           <p className="text-white text-lg md:text-xl mb-4">
-            A Krakenling has found you.
+            {t.firstVisit.subtitle}
           </p>
           
           <p className="text-turquoise-300 text-xl md:text-2xl font-bold mb-6">
-            Save it
+            {t.firstVisit.action}
           </p>
           
           <button
@@ -92,10 +94,14 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
               outline: 'none'
             }}
           >
-            <RiEmotionLine 
-              className={`text-turquoise-400 transition-all duration-1000 ease-in-out ${
-                isCollecting ? 'scale-150 rotate-180 opacity-0' : 'w-24 h-24'
-              }`}
+            <KrakenlingIcon
+              size={96}
+              className="transition-all duration-1000 ease-in-out"
+              tint="turquoise"
+              style={{
+                transform: isCollecting ? 'scale(1.5) rotate(180deg)' : undefined,
+                opacity: isCollecting ? 0 : 1
+              }}
             />
             
             {isCollecting && (
@@ -107,7 +113,7 @@ export default function FirstVisitModal({ onComplete }: FirstVisitModalProps) {
           
           {!isCollecting && (
             <p className="text-gray-300 text-sm mt-4">
-              Click on the Krakenling to save it
+              {t.firstVisit.instruction}
             </p>
           )}
         </div>

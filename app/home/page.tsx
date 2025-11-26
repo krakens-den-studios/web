@@ -160,12 +160,12 @@ export default function Home() {
         )}
       </section>
 
-      <section id="games-section" className="relative w-full flex flex-col items-center h-fit gap-8 bg-turquoise-800 py-20">
+      <section id="games-section" className="relative w-full flex flex-col items-center h-fit gap-6 sm:gap-8 bg-turquoise-800 py-16 sm:py-20">
         <Points>
           <h2 className="font-lora text-4xl balanced">{t.home.krakensGames}</h2>
         </Points>
 
-        <div className="relative w-full h-screen max-h-[30rem] flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-[28rem] sm:h-[32rem] flex items-center justify-center overflow-hidden">
           <TiArrowSortedDown
             onClick={prevGame}
             className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
@@ -176,7 +176,7 @@ export default function Home() {
           {games.map(({ name, link, imageSrc }, i) => (
             <div
               key={`${name}_${i}`}
-              className={`absolute h-fit w-4/5 max-w-4/5 grid grid-cols-1 grid-rows-[min-content_4rem] gap-8 transition-all duration-300 ${
+              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-300 ${
                 currentGame === i
                   ? 'opacity-100 delay-200 z-10'
                   : currentGame > i
@@ -184,15 +184,17 @@ export default function Home() {
                   : 'translate-x-36 opacity-0 pointer-events-none'
               }`}
             >
-              <div className="w-full justify-center flex relative h-full pointer-events-none">
-                <Image
-                  src={imageSrc}
-                  className="select-none object-contain max-h-[24rem] rounded-2xl"
-                  alt={`${name} cover`}
-                  height={252}
-                  width={451}
-                  style={{ height: 'auto', width: 'auto' }}
-                />
+              <div className="w-full justify-center flex relative pointer-events-none px-2 sm:px-6">
+                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/20 border border-white/10 aspect-[16/9]">
+                  <Image
+                    src={imageSrc}
+                    className="select-none object-contain"
+                    alt={`${name} cover`}
+                    fill
+                    sizes="(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 50vw"
+                    style={{ padding: '1.25rem' }}
+                  />
+                </div>
               </div>
 
               <div className="w-full h-fit relative flex items-center justify-center">

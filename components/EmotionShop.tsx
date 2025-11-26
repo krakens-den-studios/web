@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Button from './Button';
-import { RiLockLine, RiEmotionLine } from 'react-icons/ri';
+import { RiLockLine } from 'react-icons/ri';
+import KrakenlingIcon from './KrakenlingIcon';
 
 interface Emotion {
   id: string;
@@ -39,7 +40,7 @@ export default function EmotionShop({ emotions, collectedOctopuses, onPurchase, 
             El Tesoro del Kraken
           </h2>
           <div className="flex items-center justify-center gap-3 text-2xl">
-            <RiEmotionLine className="text-turquoise-400" />
+            <KrakenlingIcon size={28} tint="total" background="total" />
             <span className="text-white font-bold">{collectedOctopuses}</span>
             <span className="text-white opacity-80">pulpitos recolectados</span>
           </div>
@@ -73,7 +74,7 @@ export default function EmotionShop({ emotions, collectedOctopuses, onPurchase, 
                     {emotion.name} <RiLockLine className="w-5 h-5" />
                   </h3>
                   <div className="flex items-center gap-2">
-                    <RiEmotionLine className="text-turquoise-400" />
+                    <KrakenlingIcon size={24} tint="none" background="gold" />
                     <span className="text-white font-bold">{emotion.cost}</span>
                   </div>
                 </div>

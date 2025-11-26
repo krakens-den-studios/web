@@ -3,7 +3,8 @@
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { Route } from '@/shared/Route';
 import Button from './Button';
-import { RiLockLine, RiEmotionLine } from 'react-icons/ri';
+import { RiLockLine } from 'react-icons/ri';
+import KrakenlingIcon from './KrakenlingIcon';
 
 interface LockedPageProps {
   route: Route;
@@ -49,7 +50,7 @@ export default function LockedPage({ route, emotionName, emotionDescription, onS
           </p>
           
           <p className="text-white text-sm opacity-60 flex items-center gap-2">
-            <RiEmotionLine className="w-5 h-5" />
+            <KrakenlingIcon size={20} tint="turquoise" />
             Get this page in the "Treasures" tab of The Kraken's Treasure
           </p>
         </div>

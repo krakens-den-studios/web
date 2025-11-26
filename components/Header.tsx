@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiOutlineX } from 'react-icons/hi';
-import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiEmotionLine, RiShoppingBagLine } from 'react-icons/ri';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiShoppingBagLine } from 'react-icons/ri';
 import Dialog from './Dialog';
 import KrakenTreasure from './KrakenTreasure';
 import OctopusCollector from './OctopusCollector';
@@ -19,6 +19,7 @@ import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
 import { useMissionChecker } from '@/hooks/useMissionChecker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
+import KrakenlingIcon from './KrakenlingIcon';
 
 const Header = () => {
   const pathname = usePathname();
@@ -30,6 +31,47 @@ const Header = () => {
   const unclaimedMissionsCount = useUnclaimedMissions();
   const { t } = useLanguage();
   useMissionChecker(); // Check missions even when shop is closed
+
+  const getLockedCopy = (route: Route) => {
+    switch (route) {
+      case Route.HOME:
+        return t.header.lockedHome;
+      case Route.TEAM:
+        return t.header.lockedTeam;
+      case Route.HEART_WEAVER:
+        return t.header.lockedGames;
+      case Route.CONTACT:
+        return t.header.lockedContact;
+      default:
+        return '';
+    }
+  };
+
+  const renderMobileNavItem = (route: Route, label: string, unlocked: boolean) => {
+    const commonClasses =
+      'font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center transition-colors';
+
+    if (unlocked) {
+      return (
+        <Link href={route} className="outline-none w-full p-4" onClick={() => setIsDialogOpen(false)}>
+          <p className={`${commonClasses} hover:text-turquoise-400 ${pathname === route ? 'text-turquoise-400' : ''}`}>
+            {label.toUpperCase()}
+          </p>
+        </Link>
+      );
+    }
+
+    const lockedCopy = getLockedCopy(route);
+    return (
+      <div className="w-full p-4 flex flex-col items-center gap-1 opacity-60">
+        <p className={`${commonClasses} text-gray-400 flex items-center justify-center gap-2`}>
+          {label.toUpperCase()}
+          <RiLockLine className="w-4 h-4" />
+        </p>
+        {lockedCopy && <p className="text-xs text-gray-400 text-center">{lockedCopy}</p>}
+      </div>
+    );
+  };
 
   useEffect(() => {
     setIsDialogOpen(false);
@@ -51,11 +93,7 @@ const Header = () => {
   const isScrolled = useIsScrolled();
 
   const socialLinks = (
-    <div className="h-full flex items-center">
-      {/* <a href="https://example.com" className="p-2 text-white hover:text-turquoise-400" target="_blank">
-        <RiDiscordFill className="h-8 w-8" />
-      </a> */}
-
+    <div className="h-full flex items-center justify-center w-full gap-2">
       <a href="https://www.instagram.com/krakensdenstudios/" className="p-2 text-white hover:text-turquoise-400" target="_blank">
         <RiInstagramFill className="h-8 w-8" />
       </a>
@@ -75,7 +113,9 @@ const Header = () => {
   );
 
   return (
-    <header className="w-full fixed z-30 flex justify-center">
+    <>
+      <div className="h-[72px] sm:h-[80px] lg:h-[96px]" />
+      <header className="w-full fixed z-30 flex justify-center top-0 left-0">
       {/* Collectable krakenlings on all pages - only show when treasure is closed */}
       {!showTreasure && (
         <OctopusCollector
@@ -95,6 +135,7 @@ const Header = () => {
           }}
         />
       )}
+      <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur border-b border-white/10 lg:hidden" />
       <div
         className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${isScrolled ? 'opacity-100' : ''
           } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
@@ -112,41 +153,48 @@ const Header = () => {
           />
         </Link>
 
-        {/* Mobile: Krakenlings counter and Treasure icon */}
-        <div className="flex items-center gap-4 lg:hidden">
-          <div className="flex items-center gap-2 text-white whitespace-nowrap">
-            <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
-            <span className="font-bold">{formatNumber(octopusCount)}</span>
-          </div>
-          
-          {/* Treasure icon button for mobile */}
+        {/* Mobile: Krakenlings counter & menu button */}
+        <div className="flex items-center gap-3 lg:hidden">
           <button
+            className="flex items-center gap-2 text-white whitespace-nowrap px-2 py-1 rounded-full hover:bg-white/10 transition-colors relative"
             onClick={() => {
               playButtonClick();
               setShowTreasure(true);
-              // Dispatch event when shop opens
               window.dispatchEvent(new CustomEvent('shopOpened'));
             }}
-            className="p-2 text-white hover:text-turquoise-400 transition-colors relative"
-            title="Open Treasure"
-            aria-label="Open Treasure"
           >
-            <RiShoppingBagLine className="h-8 w-8" />
+            <KrakenlingIcon size={28} tint="total" background="total" className="flex-shrink-0" />
+            <span className="font-bold">{formatNumber(octopusCount)}</span>
             {unclaimedMissionsCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-turquoise-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {unclaimedMissionsCount}
               </span>
             )}
           </button>
-        </div>
 
-        <HiMenu
-          className="text-white h-14 w-14 lg:hidden cursor-pointer hover:text-turquoise-400"
-          onClick={() => {
-            playButtonClick();
-            setIsDialogOpen(true);
-          }}
-        />
+          <div
+            className="p-2 text-white hover:text-turquoise-400 transition-colors"
+            title="Open navigation"
+            aria-label="Open navigation"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              playButtonClick();
+              setIsDialogOpen(true);
+            }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                playButtonClick();
+                setIsDialogOpen(true);
+              }
+            }}
+          >
+            <HiMenu className="h-9 w-9" />
+          </div>
+        </div>
 
         <div className="h-14 gap-8 items-center hidden lg:flex">
           {isPageUnlocked(Route.HOME) ? (
@@ -235,21 +283,20 @@ const Header = () => {
           )}
 
           {/* krakenlings counter on desktop */}
-          <div className="flex items-center gap-2 text-white whitespace-nowrap">
-            <RiEmotionLine className="text-turquoise-400 text-xl flex-shrink-0" />
-            <span className="font-bold">{formatNumber(octopusCount)}</span>
-          </div>
           <button
             onClick={() => {
               playButtonClick();
               setShowTreasure(true);
-              // Dispatch event when shop opens
               window.dispatchEvent(new CustomEvent('shopOpened'));
             }}
-            className="bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all flex items-center gap-2 group whitespace-nowrap font-lora font-bold text-black text-xl relative"
-            title="Open Treasure"
+            className="flex items-center gap-3 text-black font-lora font-bold whitespace-nowrap bg-turquoise-400 hover:bg-turquoise-300 rounded-xl px-4 py-2 shadow-lg transition-all relative"
+            title={t.header.openTreasure}
           >
-            {t.header.openTreasure}
+            <div className="flex items-center gap-2 text-white whitespace-nowrap">
+              <KrakenlingIcon size={32} tint="total" background="total" className="flex-shrink-0" />
+              <span className="font-bold text-white">{formatNumber(octopusCount)}</span>
+            </div>
+            <span className="text-black text-base lg:text-lg">{t.header.openTreasure}</span>
             {unclaimedMissionsCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
                 {unclaimedMissionsCount}
@@ -261,7 +308,7 @@ const Header = () => {
           {socialLinks}
         </div>
 
-        <div className="absolute lg:hidden">
+        <div className="lg:hidden">
           <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
             <div className="relative flex w-full flex-col items-end px-3 py-5 gap-4">
               <HiOutlineX
@@ -272,50 +319,11 @@ const Header = () => {
                 }}
               />
 
-              <div className="relative flex w-full flex-col items-center p-6 gap-4">
-                <Link href={Route.HOME} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HOME ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    {t.header.home.toUpperCase()}
-                  </p>
-                </Link>
-
-                <Link href={Route.TEAM} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.TEAM ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    {t.header.aboutUs.toUpperCase()}
-                  </p>
-                </Link>
-
-                <Link href={Route.HEART_WEAVER} className="outline-none w-full p-4">
-                  <p
-                    className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
-                      }`}
-                  >
-                    {t.header.games.toUpperCase()}
-                  </p>
-                </Link>
-
-                {isPageUnlocked(Route.CONTACT) ? (
-                  <Link href={Route.CONTACT} className="outline-none w-full p-4">
-                    <p
-                      className={`font-lora text-white text-lg sm:text-xl md:text-2xl font-medium select-none text-center hover:text-turquoise-400 ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
-                        }`}
-                    >
-                      {t.header.contact.toUpperCase()}
-                    </p>
-                  </Link>
-                ) : (
-                  <div className="w-full p-4">
-                    <p className="font-lora text-gray-300 text-lg sm:text-xl md:text-2xl font-medium select-none text-center">
-                      {t.header.contact.toUpperCase()}
-                    </p>
-                  </div>
-                )}
+              <div className="relative flex w-full flex-col items-center p-6 gap-2">
+                {renderMobileNavItem(Route.HOME, t.header.home, isPageUnlocked(Route.HOME))}
+                {renderMobileNavItem(Route.TEAM, t.header.aboutUs, isPageUnlocked(Route.TEAM))}
+                {renderMobileNavItem(Route.HEART_WEAVER, t.header.games, isPageUnlocked(Route.HEART_WEAVER))}
+                {renderMobileNavItem(Route.CONTACT, t.header.contact, isPageUnlocked(Route.CONTACT))}
               </div>
 
               <div className="w-full h-fit px-2">{socialLinks}</div>
@@ -324,6 +332,7 @@ const Header = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 
