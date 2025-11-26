@@ -134,38 +134,38 @@ const Header = () => {
           }}
         />
       )}
-      <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur border-b border-white/10 lg:hidden" />
+      <div className="pointer-events-none absolute inset-0 bg-black/70 backdrop-blur border-b border-white/10" />
       <div
         className={`duration-300 pointer-events-none user-select-none transition-opacity opacity-0 ${isScrolled ? 'opacity-100' : ''
           } z-10 absolute left-0 right-0 top-0 bottom-[-5rem] bg-gradient-to-b from-black to-transparent`}
       />
 
-      <div className="flex w-full justify-between py-4 px-6 md:px-8 items-center z-20 max-w-7xl gap-6 bg-black/70 backdrop-blur rounded-b-2xl">
+      <div className="flex w-full max-w-7xl justify-between py-4 px-6 md:px-8 items-center z-20">
         <Link href={Route.ROOT} className="flex items-center">
-          <Image
-            src="/logoWhite.png"
-            alt="Kraken's Den Logo"
-            width={96}
-            height={96}
-            className="object-contain select-none cursor-pointer w-auto h-auto"
-            style={{ height: 'auto', width: 'auto' }}
-          />
+          <div className="relative w-28 h-12">
+            <Image
+              src="/logoWhite.png"
+              alt="Kraken's Den Logo"
+              fill
+              className="object-contain select-none cursor-pointer"
+            />
+          </div>
         </Link>
 
         {/* Mobile: Krakenlings counter & menu button */}
         <div className="flex items-center gap-3 lg:hidden">
           <button
-            className="flex items-center gap-2 text-white whitespace-nowrap px-2 py-1 rounded-full hover:bg-white/10 transition-colors relative"
+            className="flex items-center gap-2 text-white whitespace-nowrap px-3 py-1.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors relative"
             onClick={() => {
               playButtonClick();
               setShowTreasure(true);
               window.dispatchEvent(new CustomEvent('shopOpened'));
             }}
           >
-            <KrakenlingIcon size={28} tint="total" background="total" className="flex-shrink-0" />
+            <KrakenlingIcon size={24} background="total" className="flex-shrink-0" />
             <span className="font-bold">{formatNumber(octopusCount)}</span>
             {unclaimedMissionsCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-turquoise-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-turquoise-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {unclaimedMissionsCount}
               </span>
             )}
