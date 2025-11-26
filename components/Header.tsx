@@ -294,7 +294,12 @@ const Header = () => {
           >
             <div className="flex items-center gap-2 text-white whitespace-nowrap">
               <KrakenlingIcon size={32} tint="total" background="total" className="flex-shrink-0" />
-              <span className="font-bold text-white">{formatNumber(octopusCount)}</span>
+              <span
+                className="font-bold text-white tabular-nums tracking-wide"
+                style={{ minWidth: '5ch', textAlign: 'right' }}
+              >
+                {formatNumber(octopusCount)}
+              </span>
             </div>
             <span className="text-black text-base lg:text-lg">{t.header.openTreasure}</span>
             {unclaimedMissionsCount > 0 && (
