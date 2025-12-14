@@ -808,7 +808,7 @@ export const MISSION_TEMPLATES: MissionTemplate[] = [
     target: 'courage',
     targetCount: 5,
     reward: 5000,
-    dependsOn: ['courage-1']
+    dependsOn: ['courage-2']
   },
   {
     id: 'courage-4',

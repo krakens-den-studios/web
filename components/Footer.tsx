@@ -152,7 +152,11 @@ const Footer = () => {
           <div className="lg:h-48 h-24 flex flex-col justify-bottom items-bottom">
             <div className="gap-8 items-end flex justify-bottom pt-3 md:pt-10">
               {isPageUnlocked(Route.HOME) ? (
-                <Link href={Route.HOME}>
+                <Link 
+                  href={Route.HOME}
+                  scroll={false}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
                       pathname === Route.HOME ? 'text-turquoise-400' : ''
@@ -174,7 +178,11 @@ const Footer = () => {
               )}
 
               {isPageUnlocked(Route.TEAM) ? (
-                <Link href={Route.TEAM}>
+                <Link 
+                  href={Route.TEAM}
+                  scroll={false}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
                       pathname === Route.TEAM ? 'text-turquoise-400' : ''
@@ -196,7 +204,11 @@ const Footer = () => {
               )}
 
               {isPageUnlocked(Route.HEART_WEAVER) ? (
-                <Link href={Route.HEART_WEAVER}>
+                <Link 
+                  href={Route.HEART_WEAVER}
+                  scroll={false}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
                       pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''

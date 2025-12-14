@@ -416,7 +416,7 @@ export const translations: Record<Language, Translations> = {
       incorrectOrder: 'Incorrect order. Try again.',
       formed: 'You formed:',
       established: 'You have established the connection',
-      play: 'PLAY',
+      play: 'START',
       therapyNeedsTime: 'The therapy needs time to settle. Return in',
       finalTreasureMessage: 'You\'ve reached the deepest part of the den.\n\nYou\'ve collected Krakenlings, unlocked pages, and completed therapies – but none of that matters more than this:\n\nYou showed up. You played. You felt.\n\nThe Kraken\'s Den was never about finding something outside of you.\nIt was about noticing the courage, tenderness, and resilience you already carry.\n\nThank you for giving your emotions a place to breathe.'
     },
@@ -844,7 +844,7 @@ export const translations: Record<Language, Translations> = {
       incorrectOrder: 'Orden incorrecto. Intenta de nuevo.',
       formed: 'Formaste:',
       established: 'Has establecido la conexión',
-      play: 'JUGAR',
+      play: 'COMENZAR',
       therapyNeedsTime: 'La terapia necesita tiempo para asentarse. Vuelve en',
       finalTreasureMessage: 'Has llegado a la parte más profunda de la guarida.\n\nHas recolectado Krakenlings, desbloqueado páginas y completado terapias – pero nada de eso importa más que esto:\n\nTe presentaste. Jugaste. Sentiste.\n\nLa Guarida del Kraken nunca fue sobre encontrar algo fuera de ti.\nFue sobre notar el coraje, la ternura y la resiliencia que ya llevas contigo.\n\nGracias por darle a tus emociones un lugar para respirar.'
     },
@@ -1272,7 +1272,7 @@ export const translations: Record<Language, Translations> = {
       incorrectOrder: 'Ordre incorrecte. Torna a intentar.',
       formed: 'Has format:',
       established: 'Has establert la connexió',
-      play: 'JUGAR',
+      play: 'COMENÇAR',
       therapyNeedsTime: 'La teràpia necessita temps per establir-se. Torna en',
       finalTreasureMessage: 'Has arribat a la part més profunda de la guarida.\n\nHas recollit Krakenlings, desbloquejat pàgines i completat teràpies – però res d\'això importa més que això:\n\nT\'has presentat. Has jugat. Has sentit.\n\nLa Guarida del Kraken mai va ser sobre trobar alguna cosa fora de tu.\nVa ser sobre notar el coratge, la tendresa i la resilència que ja portes amb tu.\n\nGràcies per donar-li a les teves emocions un lloc per respirar.'
     },

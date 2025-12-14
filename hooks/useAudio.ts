@@ -316,11 +316,40 @@ export function useAudio() {
     playSoundEffect(soundRef);
   };
 
+  const isAudioEnabled = settings.buttonClickEnabled || settings.collectEnabled || settings.musicEnabled || 
+    settings.minigameSoundsEnabled.hope || settings.minigameSoundsEnabled.courage || 
+    settings.minigameSoundsEnabled.connection || settings.minigameSoundsEnabled.healing;
+
+  const toggleAllAudio = () => {
+    // If any audio is enabled, disable all. Otherwise, enable all.
+    const shouldEnable = !isAudioEnabled;
+    const newSettings: AudioSettings = {
+      buttonClickEnabled: shouldEnable,
+      collectEnabled: shouldEnable,
+      musicEnabled: shouldEnable,
+      minigameSoundsEnabled: {
+        hope: shouldEnable,
+        courage: shouldEnable,
+        connection: shouldEnable,
+        healing: shouldEnable
+      }
+    };
+    setSettings(newSettings);
+    persistAudioSettings(newSettings);
+    settingsLoadedRef.current = true;
+    updateGlobalMusic(newSettings.musicEnabled);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('audioSettingsChanged'));
+    }
+  };
+
   return {
     playButtonClick,
     playCollect,
     playMinigameSound,
-    musicEnabled: settings.musicEnabled
+    musicEnabled: settings.musicEnabled,
+    toggleAllAudio,
+    isAudioEnabled
   };
 }
 

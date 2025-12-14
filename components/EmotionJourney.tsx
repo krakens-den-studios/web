@@ -767,17 +767,32 @@ export default function EmotionJourney({
                   Puedes continuar explorando otras emociones o cerrar este diálogo cuando quieras.
                 </p>
                 {selectedEmotion.sectionId === 'welcome' && (
-                  <Link href="/home" className="inline-block">
+                  <Link 
+                    href="/home" 
+                    className="inline-block"
+                    scroll={false}
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
                     <Button label="GO TO HOME" />
                   </Link>
                 )}
                 {selectedEmotion.sectionId === 'team' && (
-                  <Link href="/team" className="inline-block">
+                  <Link 
+                    href="/team" 
+                    className="inline-block"
+                    scroll={false}
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
                     <Button label="GO TO TEAM" />
                   </Link>
                 )}
                 {selectedEmotion.sectionId === 'games-section' && (
-                  <Link href="/games/heartweaver" className="inline-block">
+                  <Link 
+                    href="/games/heartweaver" 
+                    className="inline-block"
+                    scroll={false}
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
                     <Button label="GO TO GAMES" />
                   </Link>
                 )}

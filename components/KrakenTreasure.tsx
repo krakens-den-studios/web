@@ -1104,11 +1104,27 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       </div>
                     </div>
 
+                        {canPlay && (
+                          <div className="mt-4 w-full">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                playButtonClick();
+                                setShowMinigame(minigame.id);
+                              }}
+                              className="w-full bg-turquoise-400 hover:bg-turquoise-300 py-3 px-4 rounded-xl border-none select-none flex items-center justify-center h-fit outline-none transition-all"
+                            >
+                              <p className="whitespace-nowrap font-lora font-bold text-black text-base sm:text-lg">
+                                {t.treasure.play}
+                              </p>
+                            </button>
+                          </div>
+                        )}
                         
                         {!canPlay && (
-                          <div className="text-left">
+                          <div className="text-left mt-4">
                             <p className="text-gray-300 text-xs sm:text-sm mb-2">
-                              The therapy needs time to settle. Return in {cooldownSeconds}s
+                              {t.treasure.therapyNeedsTime} {cooldownSeconds}s
                             </p>
                             <div className="w-full bg-gray-700 rounded-full h-2">
                               <div
@@ -1406,7 +1422,15 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       )}
                       {unlockable.unlocked ? (
                         unlockable.route ? (
-                          <Link href={unlockable.route} onClick={() => onClose()} className="w-full max-w-xs">
+                          <Link 
+                            href={unlockable.route} 
+                            scroll={false}
+                            onClick={() => {
+                              onClose();
+                              window.scrollTo(0, 0);
+                            }} 
+                            className="w-full max-w-xs"
+                          >
                             <Button label={t.treasure.go || 'GO'} compact />
                           </Link>
                         ) : (
@@ -1505,7 +1529,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         </div>
                       ) : (
                         <div className="min-w-0">
-                          {missionName && !missionCompleted ? (
+                          {unlockable.missionRequirement && !missionCompleted ? (
                             <>
                               <h3 className="font-lora text-sm sm:text-base md:text-lg font-bold text-white truncate">???</h3>
                               <p className="text-white opacity-70 text-[10px] sm:text-xs mt-0.5 sm:mt-1 line-clamp-1">???</p>

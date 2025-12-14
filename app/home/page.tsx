@@ -79,7 +79,11 @@ export default function Home() {
 
           <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
             {unlockedPages.games ? (
-              <Link href={Route.HEART_WEAVER}>
+              <Link 
+                href={Route.HEART_WEAVER}
+                scroll={false}
+                onClick={() => window.scrollTo(0, 0)}
+              >
                 <Button label={t.home.explore}/>
               </Link>
             ) : (
@@ -141,7 +145,11 @@ export default function Home() {
         </p>
 
         {unlockedPages.team ? (
-          <Link href={Route.TEAM}>
+          <Link 
+            href={Route.TEAM}
+            scroll={false}
+            onClick={() => window.scrollTo(0, 0)}
+          >
             <Button label={t.home.meetUs} />
           </Link>
         ) : (
@@ -199,7 +207,12 @@ export default function Home() {
 
               <div className="w-full h-fit relative flex items-center justify-center">
                 {unlockedPages.games ? (
-                  <Link href={link} className="w-fit">
+                  <Link 
+                    href={link} 
+                    className="w-fit"
+                    scroll={false}
+                    onClick={() => window.scrollTo(0, 0)}
+                  >
                     <Button label={name} compact />
                   </Link>
                 ) : (

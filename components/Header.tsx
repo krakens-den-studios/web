@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiOutlineX } from 'react-icons/hi';
-import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiShoppingBagLine } from 'react-icons/ri';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiLockLine, RiShoppingBagLine, RiVolumeMuteLine, RiVolumeUpLine } from 'react-icons/ri';
 import Dialog from './Dialog';
 import KrakenTreasure from './KrakenTreasure';
 import OctopusCollector from './OctopusCollector';
@@ -26,7 +26,7 @@ const Header = () => {
   const [showTreasure, setShowTreasure] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
-  const { playButtonClick } = useAudio();
+  const { playButtonClick, toggleAllAudio, isAudioEnabled } = useAudio();
   const unclaimedMissionsCount = useUnclaimedMissions();
   const { t } = useLanguage();
   useMissionChecker(); // Check missions even when shop is closed
@@ -52,7 +52,15 @@ const Header = () => {
 
     if (unlocked) {
       return (
-        <Link href={route} className="outline-none w-full p-4" onClick={() => setIsDialogOpen(false)}>
+        <Link 
+          href={route} 
+          className="outline-none w-full p-4" 
+          scroll={false}
+          onClick={(e) => {
+            setIsDialogOpen(false);
+            window.scrollTo(0, 0);
+          }}
+        >
           <p className={`${commonClasses} hover:text-turquoise-400 ${pathname === route ? 'text-turquoise-400' : ''}`}>
             {label.toUpperCase()}
           </p>
@@ -141,7 +149,12 @@ const Header = () => {
       />
 
       <div className="flex w-full max-w-7xl justify-between py-4 px-6 md:px-8 items-center z-20">
-        <Link href={Route.ROOT} className="flex items-center">
+        <Link 
+          href={Route.ROOT} 
+          className="flex items-center"
+          scroll={false}
+          onClick={() => window.scrollTo(0, 0)}
+        >
           <div className="relative w-28 h-12">
             <Image
               src="/logoWhite.png"
@@ -152,8 +165,23 @@ const Header = () => {
           </div>
         </Link>
 
-        {/* Mobile: Krakenlings counter & menu button */}
+        {/* Mobile: Audio toggle, Krakenlings counter & menu button */}
         <div className="flex items-center gap-3 lg:hidden">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAllAudio();
+            }}
+            className="p-2 text-white hover:text-turquoise-400 transition-colors"
+            title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+            aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+          >
+            {isAudioEnabled ? (
+              <RiVolumeUpLine className="h-6 w-6" />
+            ) : (
+              <RiVolumeMuteLine className="h-6 w-6" />
+            )}
+          </button>
           <button
             className="flex items-center gap-2 text-white whitespace-nowrap px-3 py-1.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors relative"
             onClick={() => {
@@ -197,7 +225,11 @@ const Header = () => {
 
         <div className="h-14 gap-8 items-center hidden lg:flex">
           {isPageUnlocked(Route.HOME) ? (
-            <Link href={Route.HOME}>
+            <Link 
+              href={Route.HOME}
+              scroll={false}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
                   }`}
@@ -218,7 +250,11 @@ const Header = () => {
           )}
 
           {isPageUnlocked(Route.TEAM) ? (
-            <Link href={Route.TEAM}>
+            <Link 
+              href={Route.TEAM}
+              scroll={false}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${
                   pathname === Route.TEAM ? 'text-turquoise-400' : ''
@@ -240,7 +276,11 @@ const Header = () => {
           )}
 
           {isPageUnlocked(Route.HEART_WEAVER) ? (
-            <Link href={Route.HEART_WEAVER}>
+            <Link 
+              href={Route.HEART_WEAVER}
+              scroll={false}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
                   }`}
@@ -261,7 +301,11 @@ const Header = () => {
           )}
 
           {isPageUnlocked(Route.CONTACT) ? (
-            <Link href={Route.CONTACT}>
+            <Link 
+              href={Route.CONTACT}
+              scroll={false}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
                   }`}
@@ -280,6 +324,23 @@ const Header = () => {
               </div>
             </div>
           )}
+
+          {/* Audio toggle button on desktop */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAllAudio();
+            }}
+            className="p-2 text-white hover:text-turquoise-400 transition-colors"
+            title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+            aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+          >
+            {isAudioEnabled ? (
+              <RiVolumeUpLine className="h-6 w-6" />
+            ) : (
+              <RiVolumeMuteLine className="h-6 w-6" />
+            )}
+          </button>
 
           {/* krakenlings counter on desktop */}
           <button

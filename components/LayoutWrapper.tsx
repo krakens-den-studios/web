@@ -63,6 +63,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
   }, [isRootPage]);
 
+  // Scroll to top when pathname changes (for any navigation, including router.push)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]);
+
   return (
     <>
       {showHeader && (

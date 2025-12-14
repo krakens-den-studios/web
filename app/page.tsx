@@ -90,7 +90,11 @@ export default function Root() {
             )}
           </button>
           {unlockedPages.home && (
-            <Link href={Route.HOME}>
+            <Link 
+              href={Route.HOME}
+              scroll={false}
+              onClick={() => window.scrollTo(0, 0)}
+            >
               <Button label={t.home.enterDen} />
             </Link>
           )}
