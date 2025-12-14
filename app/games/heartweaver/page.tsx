@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import AngerGif from '@/public/anger.gif';
 import FearGif from '@/public/fear.gif';
 import SadnessGif from '@/public/sadness.gif';
-import IntroGif from '@/public/intro.gif';
+import IntroGif from '@/public/gif_intro.gif';
 import Dialogue2dGif from '@/public/dialogue2d.gif';
 import MapImg from '@/public/map.png';
 import PulseGif from '@/public/pulse.gif';
