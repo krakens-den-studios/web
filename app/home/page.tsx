@@ -61,8 +61,23 @@ export default function Home() {
     <main className="relative w-full h-fit">
       {showJourney && <EmotionJourney onComplete={() => setShowJourney(false)} />}
       
-      <section id="welcome" className="relative w-full h-screen md:h-[80vh] lg:h-[66vh] flex flex-col items-center">
-        <div className="relative w-full h-1/2 lg:h-full">
+      <section id="welcome" className="relative w-full h-screen md:h-[80vh] lg:h-[66vh] flex flex-col items-center overflow-hidden">
+        {/* Video de fons opcional - descomentar quan hi hagi video */}
+        {/* <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-70 z-0"
+        >
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video> */}
+        
+        {/* Fons de color mentre la imatge carrega */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/50 to-black z-0" />
+        
+        {/* Imatge de fons - carrega darrere del contingut */}
+        <div className="relative w-full h-1/2 lg:h-full z-0">
           <Image
             src="/heartweaverCover.png"
             className="object-cover lg:object-[24vw] 3xl:object-contain 3xl:object-[38vw] select-none"
@@ -70,9 +85,12 @@ export default function Home() {
             fill
             priority
           />
+          {/* Overlay per millorar llegibilitat del text */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60 lg:via-transparent lg:to-black/40" />
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 lg:right-1/3 h-2/3 flex flex-col items-center gap-8">
+        {/* Contingut (logo i botons) - es mostra primer */}
+        <div className="absolute bottom-0 left-0 right-0 lg:right-1/3 h-2/3 flex flex-col items-center gap-8 z-20">
           <div className="relative w-2/3 h-2/5">
             <Image src="/heartweaver.svg" className="max-w-sm m-auto select-none" fill alt="Heart Weaver title" />
           </div>
@@ -81,8 +99,6 @@ export default function Home() {
             {unlockedPages.games ? (
               <Link 
                 href={Route.HEART_WEAVER}
-                scroll={false}
-                onClick={() => window.scrollTo(0, 0)}
               >
                 <Button label={t.home.explore}/>
               </Link>
@@ -147,8 +163,6 @@ export default function Home() {
         {unlockedPages.team ? (
           <Link 
             href={Route.TEAM}
-            scroll={false}
-            onClick={() => window.scrollTo(0, 0)}
           >
             <Button label={t.home.meetUs} />
           </Link>
@@ -173,6 +187,7 @@ export default function Home() {
           <h2 className="font-lora text-4xl balanced">{t.home.krakensGames}</h2>
         </Points>
 
+        {/* Carousel millorat */}
         <div className="relative w-full h-[24rem] sm:h-[28rem] flex items-center justify-center overflow-hidden px-2">
           <TiArrowSortedDown
             onClick={prevGame}
@@ -184,16 +199,14 @@ export default function Home() {
           {games.map(({ name, link, imageSrc }, i) => (
             <div
               key={`${name}_${i}`}
-              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-300 ${
+              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-500 ${
                 currentGame === i
-                  ? 'opacity-100 delay-200 z-10'
-                  : currentGame > i
-                  ? '-translate-x-36 opacity-0 pointer-events-none'
-                  : 'translate-x-36 opacity-0 pointer-events-none'
+                  ? 'opacity-100 scale-100 z-10'
+                  : 'opacity-0 scale-95 pointer-events-none'
               }`}
             >
               <div className="w-full justify-center flex relative pointer-events-none px-2 sm:px-6">
-                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/20 border border-white/10 min-h-[16rem] sm:min-h-[18rem]">
+                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/30 border-2 border-turquoise-400/30 hover:border-turquoise-400/60 transition-all min-h-[16rem] sm:min-h-[18rem] shadow-2xl">
                   <Image
                     src={imageSrc}
                     className="select-none object-contain"
@@ -210,8 +223,6 @@ export default function Home() {
                   <Link 
                     href={link} 
                     className="w-fit"
-                    scroll={false}
-                    onClick={() => window.scrollTo(0, 0)}
                   >
                     <Button label={name} compact />
                   </Link>
@@ -239,6 +250,57 @@ export default function Home() {
               currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
             }`}
           />
+        </div>
+
+        {/* Indicadors del carousel */}
+        {games.length > 1 && (
+          <div className="flex gap-2 justify-center items-center">
+            {games.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentGame(i)}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${
+                  currentGame === i
+                    ? 'bg-turquoise-400 w-8 sm:w-10'
+                    : 'bg-turquoise-400/40 hover:bg-turquoise-400/60'
+                }`}
+                aria-label={`Go to game ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Gallery de Screenshots del Joc */}
+        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
+          <h3 className="text-2xl sm:text-3xl font-lora font-bold text-center text-white mb-6 sm:mb-8">
+            Explora el Món de HeartWeaver
+          </h3>
+          
+          {/* Screenshots - placeholder amb imatges existents */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              '/heartweaverCover.png',
+              '/heartweaverThumbnail.png',
+              '/heartweaverAce.png',
+              '/heartweaverMark.png',
+              '/heartweaverMark2.png',
+              '/heartweaverMainImage.png'
+            ].map((src, index) => (
+              <div
+                key={index}
+                className="relative aspect-video rounded-lg overflow-hidden group cursor-pointer border-2 border-turquoise-400/20 hover:border-turquoise-400 transition-all hover:scale-105 bg-black/40"
+              >
+                <Image
+                  src={src}
+                  alt={`HeartWeaver Screenshot ${index + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </main>

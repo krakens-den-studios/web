@@ -770,8 +770,6 @@ export default function EmotionJourney({
                   <Link 
                     href="/home" 
                     className="inline-block"
-                    scroll={false}
-                    onClick={() => window.scrollTo(0, 0)}
                   >
                     <Button label="GO TO HOME" />
                   </Link>
@@ -780,8 +778,6 @@ export default function EmotionJourney({
                   <Link 
                     href="/team" 
                     className="inline-block"
-                    scroll={false}
-                    onClick={() => window.scrollTo(0, 0)}
                   >
                     <Button label="GO TO TEAM" />
                   </Link>
@@ -790,8 +786,6 @@ export default function EmotionJourney({
                   <Link 
                     href="/games/heartweaver" 
                     className="inline-block"
-                    scroll={false}
-                    onClick={() => window.scrollTo(0, 0)}
                   >
                     <Button label="GO TO GAMES" />
                   </Link>

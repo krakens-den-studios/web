@@ -18,6 +18,7 @@ import { useAudio } from '@/hooks/useAudio';
 import { useUnclaimedMissions } from '@/hooks/useUnclaimedMissions';
 import { useMissionChecker } from '@/hooks/useMissionChecker';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAvailablePurchases } from '@/hooks/useAvailablePurchases';
 import KrakenlingIcon from './KrakenlingIcon';
 
 const Header = () => {
@@ -28,6 +29,7 @@ const Header = () => {
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
   const { playButtonClick, toggleAllAudio, isAudioEnabled } = useAudio();
   const unclaimedMissionsCount = useUnclaimedMissions();
+  const availablePurchasesCount = useAvailablePurchases();
   const { t } = useLanguage();
   useMissionChecker(); // Check missions even when shop is closed
 
@@ -54,12 +56,8 @@ const Header = () => {
       return (
         <Link 
           href={route} 
-          className="outline-none w-full p-4" 
-          scroll={false}
-          onClick={(e) => {
-            setIsDialogOpen(false);
-            window.scrollTo(0, 0);
-          }}
+          className="outline-none w-full p-4"
+          onClick={() => setIsDialogOpen(false)}
         >
           <p className={`${commonClasses} hover:text-turquoise-400 ${pathname === route ? 'text-turquoise-400' : ''}`}>
             {label.toUpperCase()}
@@ -152,8 +150,6 @@ const Header = () => {
         <Link 
           href={Route.ROOT} 
           className="flex items-center"
-          scroll={false}
-          onClick={() => window.scrollTo(0, 0)}
         >
           <div className="relative w-28 h-12">
             <Image
@@ -193,8 +189,13 @@ const Header = () => {
             <KrakenlingIcon size={24} background="total" className="flex-shrink-0" />
             <span className="font-bold">{formatNumber(octopusCount)}</span>
             {unclaimedMissionsCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-turquoise-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-turquoise-400 text-black text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center z-10">
                 {unclaimedMissionsCount}
+              </span>
+            )}
+            {availablePurchasesCount > 0 && (
+              <span className="absolute -top-2 -left-1 bg-amber-500 text-black text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center border border-amber-600 z-10">
+                {availablePurchasesCount}
               </span>
             )}
           </button>
@@ -227,8 +228,6 @@ const Header = () => {
           {isPageUnlocked(Route.HOME) ? (
             <Link 
               href={Route.HOME}
-              scroll={false}
-              onClick={() => window.scrollTo(0, 0)}
             >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HOME ? 'text-turquoise-400' : ''
@@ -252,8 +251,6 @@ const Header = () => {
           {isPageUnlocked(Route.TEAM) ? (
             <Link 
               href={Route.TEAM}
-              scroll={false}
-              onClick={() => window.scrollTo(0, 0)}
             >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${
@@ -278,8 +275,6 @@ const Header = () => {
           {isPageUnlocked(Route.HEART_WEAVER) ? (
             <Link 
               href={Route.HEART_WEAVER}
-              scroll={false}
-              onClick={() => window.scrollTo(0, 0)}
             >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.HEART_WEAVER ? 'text-turquoise-400' : ''
@@ -303,8 +298,6 @@ const Header = () => {
           {isPageUnlocked(Route.CONTACT) ? (
             <Link 
               href={Route.CONTACT}
-              scroll={false}
-              onClick={() => window.scrollTo(0, 0)}
             >
               <p
                 className={`text-white text-xl font-medium hover:text-turquoise-400 whitespace-nowrap ${pathname === Route.CONTACT ? 'text-turquoise-400' : ''
@@ -365,8 +358,13 @@ const Header = () => {
             </div>
             <span className="text-black text-base lg:text-lg">{t.header.openTreasure}</span>
             {unclaimedMissionsCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-turquoise-400">
+              <span className="absolute -top-1 -right-1 bg-black text-turquoise-400 text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center border-2 border-turquoise-400 z-10">
                 {unclaimedMissionsCount}
+              </span>
+            )}
+            {availablePurchasesCount > 0 && (
+              <span className="absolute -top-1 -left-1 bg-amber-500 text-black text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center border-2 border-amber-600 z-10">
+                {availablePurchasesCount}
               </span>
             )}
           </button>

@@ -17,6 +17,7 @@ import { usePathname } from 'next/navigation';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import { cookieStorage } from '@/utils/cookieStorage';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAvailablePurchases } from '@/hooks/useAvailablePurchases';
 import {
   AgentState as Agent,
   MinigameState as Minigame,
@@ -174,6 +175,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
   const { t } = useLanguage();
   const { playButtonClick } = useAudio();
   const pathname = usePathname();
+  const availablePurchasesCount = useAvailablePurchases();
   const [activeTab, setActiveTab] = useState<'helpers' | 'treasures' | 'upgrades' | 'therapies' | 'missions'>('therapies');
   const [displayOctopusCount, setDisplayOctopusCount] = useState(collectedOctopuses);
   const [pickedCount, setPickedCount] = useState(0);
@@ -575,6 +577,21 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
     return missions.filter(m => m.completed && !m.claimed).length;
   };
 
+  const getAvailableTreasuresCount = (): number => {
+    return unlockables.filter(u => {
+      // Only count treasures and pages
+      if (u.type !== 'treasure' && u.type !== 'page') return false;
+      // Skip if already unlocked
+      if (u.unlocked) return false;
+      // Check mission requirement
+      const missionCompleted = isMissionCompleted(u.missionRequirement);
+      if (!missionCompleted) return false;
+      // Check if user can afford
+      if (displayOctopusCount >= u.cost) return true;
+      return false;
+    }).length;
+  };
+
   const handleMinigameComplete = (minigameId: string) => {
     const minigame = minigames.find(m => m.id === minigameId);
     if (!minigame) return;
@@ -929,11 +946,16 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                 activeTab === 'treasures'
                   ? 'text-turquoise-400'
                   : 'text-gray-300 hover:text-white'
-              }`}
+              } ${getAvailableTreasuresCount() > 0 ? 'pr-6 sm:pr-8' : ''}`}
               style={{ borderBottom: activeTab === 'treasures' ? '2px solid rgb(94 234 212)' : '2px solid transparent', borderBottomColor: activeTab === 'treasures' ? 'rgb(94 234 212)' : 'transparent' }}
             >
               <RiTreasureMapLine className="inline mr-1 sm:mr-2 text-base sm:text-lg md:text-xl" />
               {t.treasure.treasures}
+              {getAvailableTreasuresCount() > 0 && (
+                <span className="absolute top-0 right-0 bg-amber-500 text-black text-[10px] sm:text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center z-50 transform translate-x-1/2 -translate-y-1/2">
+                  {getAvailableTreasuresCount()}
+                </span>
+              )}
             </button>
             <button
               ref={el => {
@@ -1424,11 +1446,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         unlockable.route ? (
                           <Link 
                             href={unlockable.route} 
-                            scroll={false}
-                            onClick={() => {
-                              onClose();
-                              window.scrollTo(0, 0);
-                            }} 
+                            onClick={onClose}
                             className="w-full max-w-xs"
                           >
                             <Button label={t.treasure.go || 'GO'} compact />

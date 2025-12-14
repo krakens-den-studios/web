@@ -24,6 +24,7 @@ const Footer = () => {
   const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
 
+
   const [email, setEmail] = useState('');
 
   const [randomNewsletterCopy, setRandomNewsletterCopy] = useState('');
@@ -154,8 +155,6 @@ const Footer = () => {
               {isPageUnlocked(Route.HOME) ? (
                 <Link 
                   href={Route.HOME}
-                  scroll={false}
-                  onClick={() => window.scrollTo(0, 0)}
                 >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
@@ -180,8 +179,6 @@ const Footer = () => {
               {isPageUnlocked(Route.TEAM) ? (
                 <Link 
                   href={Route.TEAM}
-                  scroll={false}
-                  onClick={() => window.scrollTo(0, 0)}
                 >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${
@@ -206,8 +203,6 @@ const Footer = () => {
               {isPageUnlocked(Route.HEART_WEAVER) ? (
                 <Link 
                   href={Route.HEART_WEAVER}
-                  scroll={false}
-                  onClick={() => window.scrollTo(0, 0)}
                 >
                   <p
                     className={`text-white text-md md:text-xl font-light md:font-medium hover:text-turquoise-400 ${

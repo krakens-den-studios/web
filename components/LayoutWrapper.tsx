@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Header from './Header';
 import Footer from './Footer';
+import RootGameComponents from './RootGameComponents';
 import { cookieStorage } from '@/utils/cookieStorage';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -63,20 +64,15 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
   }, [isRootPage]);
 
-  // Scroll to top when pathname changes (for any navigation, including router.push)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname]);
-
   return (
     <>
-      {showHeader && (
+      {showHeader && !isRootPage && (
         <div className="w-full transition-opacity duration-1000 ease-in-out animate-fade-in">
           <Header />
         </div>
       )}
+      {/* Game components (treasure and krakenlings) for root page */}
+      {isRootPage && <RootGameComponents />}
       {children}
       {showFooter && !isRootPage && (
         <div className="w-full transition-opacity duration-1000 ease-in-out animate-fade-in">
