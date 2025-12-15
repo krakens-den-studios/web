@@ -19,6 +19,16 @@ interface AudioSettings {
   musicEnabled: boolean;
 }
 
+interface AudioUnlockState {
+  buttonClickUnlocked: boolean;
+  minigameHopeUnlocked: boolean;
+  minigameCourageUnlocked: boolean;
+  minigameConnectionUnlocked: boolean;
+  minigameHealingUnlocked: boolean;
+  musicUnlocked: boolean;
+  anyAudioUnlocked: boolean;
+}
+
 // Global singleton for music to ensure it only plays once and persists across page navigations
 let globalMusicRef: HTMLAudioElement | null = null;
 let musicInitialized = false;
@@ -82,6 +92,7 @@ export function useAudio() {
     },
     musicEnabled: false
   });
+  const [hasAudioUnlock, setHasAudioUnlock] = useState(false);
   const settingsLoadedRef = useRef(false);
 
   const buttonClickSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -115,6 +126,49 @@ export function useAudio() {
     }
   });
 
+  const getAudioUnlockState = (): AudioUnlockState => {
+    const raw = cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY);
+    if (!raw) {
+      return {
+        buttonClickUnlocked: false,
+        minigameHopeUnlocked: false,
+        minigameCourageUnlocked: false,
+        minigameConnectionUnlocked: false,
+        minigameHealingUnlocked: false,
+        musicUnlocked: false,
+        anyAudioUnlocked: false
+      };
+    }
+
+    const { state: unlockables } = deserializeUnlockables(raw);
+    const isUnlocked = (id: string) => unlockables.some(u => u.id === id && u.unlocked);
+
+    const buttonClickUnlocked = isUnlocked('sound-button-click');
+    const minigameHopeUnlocked = isUnlocked('sound-minigame-hope');
+    const minigameCourageUnlocked = isUnlocked('sound-minigame-courage');
+    const minigameConnectionUnlocked = isUnlocked('sound-minigame-connection');
+    const minigameHealingUnlocked = isUnlocked('sound-minigame-healing');
+    const musicUnlocked = isUnlocked('sound-music');
+
+    const anyAudioUnlocked =
+      buttonClickUnlocked ||
+      minigameHopeUnlocked ||
+      minigameCourageUnlocked ||
+      minigameConnectionUnlocked ||
+      minigameHealingUnlocked ||
+      musicUnlocked;
+
+    return {
+      buttonClickUnlocked,
+      minigameHopeUnlocked,
+      minigameCourageUnlocked,
+      minigameConnectionUnlocked,
+      minigameHealingUnlocked,
+      musicUnlocked,
+      anyAudioUnlocked
+    };
+  };
+
   const loadAudioSettingsFromCookie = (): AudioSettings | null => {
     const saved = cookieStorage.getItem(AUDIO_SETTINGS_KEY);
     if (!saved) return null;
@@ -140,28 +194,30 @@ export function useAudio() {
     cookieStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settingsToSave));
   };
 
-  const deriveSettingsFromUnlockables = (): AudioSettings | null => {
-    const raw = cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY);
-    if (!raw) return null;
+  const clampSettingsToUnlocks = (settingsToClamp: AudioSettings, unlocks: AudioUnlockState): AudioSettings => ({
+    buttonClickEnabled: settingsToClamp.buttonClickEnabled && unlocks.buttonClickUnlocked,
+    collectEnabled: settingsToClamp.collectEnabled && unlocks.buttonClickUnlocked,
+    musicEnabled: settingsToClamp.musicEnabled && unlocks.musicUnlocked,
+    minigameSoundsEnabled: {
+      hope: settingsToClamp.minigameSoundsEnabled.hope && unlocks.minigameHopeUnlocked,
+      courage: settingsToClamp.minigameSoundsEnabled.courage && unlocks.minigameCourageUnlocked,
+      connection: settingsToClamp.minigameSoundsEnabled.connection && unlocks.minigameConnectionUnlocked,
+      healing: settingsToClamp.minigameSoundsEnabled.healing && unlocks.minigameHealingUnlocked
+    }
+  });
 
-    const { state: unlockables } = deserializeUnlockables(raw);
-    const buttonClickEnabled = unlockables.some(u => u.id === 'sound-button-click' && u.unlocked);
-    const hopeEnabled = unlockables.some(u => u.id === 'sound-minigame-hope' && u.unlocked);
-    const courageEnabled = unlockables.some(u => u.id === 'sound-minigame-courage' && u.unlocked);
-    const connectionEnabled = unlockables.some(u => u.id === 'sound-minigame-connection' && u.unlocked);
-    const healingEnabled = unlockables.some(u => u.id === 'sound-minigame-healing' && u.unlocked);
-    const musicEnabled = unlockables.some(u => u.id === 'sound-music' && u.unlocked);
-
+  const deriveSettingsFromUnlockables = (unlocks: AudioUnlockState): AudioSettings | null => {
+    if (!unlocks.anyAudioUnlocked) return null;
     return {
-      buttonClickEnabled,
-      collectEnabled: buttonClickEnabled,
+      buttonClickEnabled: unlocks.buttonClickUnlocked,
+      collectEnabled: unlocks.buttonClickUnlocked,
       minigameSoundsEnabled: {
-        hope: hopeEnabled,
-        courage: courageEnabled,
-        connection: connectionEnabled,
-        healing: healingEnabled
+        hope: unlocks.minigameHopeUnlocked,
+        courage: unlocks.minigameCourageUnlocked,
+        connection: unlocks.minigameConnectionUnlocked,
+        healing: unlocks.minigameHealingUnlocked
       },
-      musicEnabled
+      musicEnabled: unlocks.musicUnlocked
     };
   };
 
@@ -176,13 +232,18 @@ export function useAudio() {
     };
 
     const loadSettings = () => {
+      const unlockState = getAudioUnlockState();
+      setHasAudioUnlock(unlockState.anyAudioUnlocked);
+
       const audioCookieSettings = loadAudioSettingsFromCookie();
       if (audioCookieSettings) {
-        applySettings(audioCookieSettings);
+        const clamped = clampSettingsToUnlocks(audioCookieSettings, unlockState);
+        applySettings(clamped);
+        persistAudioSettings(clamped);
         return;
       }
 
-      const derived = deriveSettingsFromUnlockables();
+      const derived = deriveSettingsFromUnlockables(unlockState);
       if (derived) {
         applySettings(derived);
         persistAudioSettings(derived);
@@ -321,17 +382,20 @@ export function useAudio() {
     settings.minigameSoundsEnabled.connection || settings.minigameSoundsEnabled.healing;
 
   const toggleAllAudio = () => {
+    const unlockState = getAudioUnlockState();
+    if (!unlockState.anyAudioUnlocked) return;
+
     // If any audio is enabled, disable all. Otherwise, enable all.
     const shouldEnable = !isAudioEnabled;
     const newSettings: AudioSettings = {
-      buttonClickEnabled: shouldEnable,
-      collectEnabled: shouldEnable,
-      musicEnabled: shouldEnable,
+      buttonClickEnabled: shouldEnable && unlockState.buttonClickUnlocked,
+      collectEnabled: shouldEnable && unlockState.buttonClickUnlocked,
+      musicEnabled: shouldEnable && unlockState.musicUnlocked,
       minigameSoundsEnabled: {
-        hope: shouldEnable,
-        courage: shouldEnable,
-        connection: shouldEnable,
-        healing: shouldEnable
+        hope: shouldEnable && unlockState.minigameHopeUnlocked,
+        courage: shouldEnable && unlockState.minigameCourageUnlocked,
+        connection: shouldEnable && unlockState.minigameConnectionUnlocked,
+        healing: shouldEnable && unlockState.minigameHealingUnlocked
       }
     };
     setSettings(newSettings);
@@ -349,7 +413,8 @@ export function useAudio() {
     playMinigameSound,
     musicEnabled: settings.musicEnabled,
     toggleAllAudio,
-    isAudioEnabled
+    isAudioEnabled,
+    hasAudioUnlock
   };
 }
 

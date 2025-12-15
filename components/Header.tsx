@@ -27,7 +27,7 @@ const Header = () => {
   const [showTreasure, setShowTreasure] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { octopusCount, collectedOctopuses, updateOctopusCount, collectOctopus } = useOctopuses();
-  const { playButtonClick, toggleAllAudio, isAudioEnabled } = useAudio();
+  const { playButtonClick, toggleAllAudio, isAudioEnabled, hasAudioUnlock } = useAudio();
   const unclaimedMissionsCount = useUnclaimedMissions();
   const availablePurchasesCount = useAvailablePurchases();
   const { t } = useLanguage();
@@ -163,21 +163,23 @@ const Header = () => {
 
         {/* Mobile: Audio toggle, Krakenlings counter & menu button */}
         <div className="flex items-center gap-3 lg:hidden">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleAllAudio();
-            }}
-            className="p-2 text-white hover:text-turquoise-400 transition-colors"
-            title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
-            aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
-          >
-            {isAudioEnabled ? (
-              <RiVolumeUpLine className="h-6 w-6" />
-            ) : (
-              <RiVolumeMuteLine className="h-6 w-6" />
-            )}
-          </button>
+          {hasAudioUnlock && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleAllAudio();
+              }}
+              className="p-2 text-white hover:text-turquoise-400 transition-colors"
+              title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+              aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+            >
+              {isAudioEnabled ? (
+                <RiVolumeUpLine className="h-6 w-6" />
+              ) : (
+                <RiVolumeMuteLine className="h-6 w-6" />
+              )}
+            </button>
+          )}
           <button
             className="flex items-center gap-2 text-white whitespace-nowrap px-3 py-1.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors relative"
             onClick={() => {
@@ -319,21 +321,23 @@ const Header = () => {
           )}
 
           {/* Audio toggle button on desktop */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleAllAudio();
-            }}
-            className="p-2 text-white hover:text-turquoise-400 transition-colors"
-            title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
-            aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
-          >
-            {isAudioEnabled ? (
-              <RiVolumeUpLine className="h-6 w-6" />
-            ) : (
-              <RiVolumeMuteLine className="h-6 w-6" />
-            )}
-          </button>
+          {hasAudioUnlock && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleAllAudio();
+              }}
+              className="p-2 text-white hover:text-turquoise-400 transition-colors"
+              title={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+              aria-label={isAudioEnabled ? 'Desactivar sons' : 'Activar sons'}
+            >
+              {isAudioEnabled ? (
+                <RiVolumeUpLine className="h-6 w-6" />
+              ) : (
+                <RiVolumeMuteLine className="h-6 w-6" />
+              )}
+            </button>
+          )}
 
           {/* krakenlings counter on desktop */}
           <button
