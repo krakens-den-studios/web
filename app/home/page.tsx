@@ -11,8 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { TiArrowSortedDown } from 'react-icons/ti';
-import { scroller } from 'react-scroll';
-import { useRouter } from 'next/navigation';
+import { SiSteam, SiKickstarter } from 'react-icons/si';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
@@ -20,22 +19,12 @@ export default function Home() {
   const [showJourney, setShowJourney] = useState(false);
   const [currentGame, setCurrentGame] = useState(0);
   const { unlockedPages, isLoading } = useUnlockedPages();
-  const router = useRouter();
   const isScrolled = useIsScrolled();
 
   const onScrollClick = () => {
     window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
   };
 
-  const scrollToNewsletter = () => {
-    if (window) {
-      scroller.scrollTo('newsletter', {
-        duration: 800,
-        delay: 0,
-        smooth: 'easeInOutQuart'
-      })
-    }
-  }
 
   const nextGame = () => {
     setCurrentGame(currentGame === games.length - 1 ? 0 : currentGame + 1);
@@ -104,7 +93,9 @@ export default function Home() {
                 </div>
               </div>
             )}
-            <Button label={t.home.subscribe} onClick={scrollToNewsletter} />
+            <Link href={Route.CONTACT}>
+              <Button label={t.home.subscribe} />
+            </Link>
           </div>
 
           <TiArrowSortedDown
@@ -132,83 +123,84 @@ export default function Home() {
           {t.home.descriptionFull}
         </p>
 
-        {unlockedPages.team ? (
-          <Link
-            href={Route.TEAM}
-          >
-            <Button label={t.home.meetUs} />
-          </Link>
-        ) : (
-          <div className="relative group">
-            <button
-              disabled
-              className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
-            >
-              <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{t.home.meetUsLocked}</p>
-            </button>
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              {t.header.lockedTeam}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
-            </div>
-          </div>
-        )}
+        <Link
+          href={Route.TEAM}
+        >
+          <Button label={t.home.meetUs} />
+        </Link>
       </section>
 
       <section id="games-section" className="relative w-full flex flex-col items-center h-fit gap-6 sm:gap-8 bg-turquoise-800 py-16 sm:py-20">
-        <Points>
+        {/* <Points>
           <h2 className="font-lora text-4xl balanced">{t.home.krakensGames}</h2>
-        </Points>
+        </Points> */}
 
         {/* Carousel millorat */}
-        <div className="relative w-full h-[24rem] sm:h-[28rem] flex items-center justify-center overflow-hidden px-2">
+        <div className="relative w-full min-h-[800px] sm:min-h-[900px] flex items-center justify-center overflow-visible px-2 py-8">
           <TiArrowSortedDown
             onClick={prevGame}
-            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 transition-opacity duration-300 ${currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
               }`}
           />
 
-          {games.map(({ name, link, imageSrc }, i) => (
+          {games.map(({ name, link, videoSrc, steamLink, kickstarterLink }, i) => (
             <div
               key={`${name}_${i}`}
-              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-500 ${currentGame === i
-                ? 'opacity-100 scale-100 z-10'
+              className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col items-center gap-6 sm:gap-8 transition-all duration-500 py-8 ${currentGame === i
+                ? 'opacity-100 scale-100 z-10 pointer-events-auto'
                 : 'opacity-0 scale-95 pointer-events-none'
                 }`}
             >
-              <div className="w-full justify-center flex relative pointer-events-none px-2 sm:px-6">
-                <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/30 border-2 border-turquoise-400/30 hover:border-turquoise-400/60 transition-all min-h-[16rem] sm:min-h-[18rem] shadow-2xl">
-                  <Image
-                    src={imageSrc}
-                    className="select-none object-contain"
-                    alt={`${name} cover`}
-                    fill
-                    sizes="(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 50vw"
-                    style={{ padding: '1rem' }}
-                  />
-                </div>
-              </div>
+              {/* Game Name */}
+              <h3 className="text-3xl sm:text-4xl md:text-5xl font-lora font-bold text-white text-center">
+                {name}
+              </h3>
 
-              <div className="w-full h-fit relative flex items-center justify-center">
-                {unlockedPages.games ? (
-                  <Link
-                    href={link}
+              {/* Video */}
+              {videoSrc ? (
+                <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden border-2 border-turquoise-400/30 shadow-2xl bg-black/40">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                    style={{ display: 'block' }}
+                  >
+                    <source src={videoSrc} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : null}
+
+              {/* Buttons */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <Link href={link} className="w-fit">
+                  <Button label={t.home.learnMore} />
+                </Link>
+                {steamLink && (
+                  <a
+                    href={steamLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-fit"
                   >
-                    <Button label={name} compact />
-                  </Link>
-                ) : (
-                  <div className="relative group">
-                    <button
-                      disabled
-                      className="bg-gray-600 relative w-48 py-3 px-4 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
-                    >
-                      <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{name} 🔒</p>
+                    <button className="bg-[#171a21] hover:bg-[#1b2838] w-14 h-14 rounded-2xl border-none select-none flex items-center justify-center outline-none transition-colors duration-200">
+                      <SiSteam className="w-8 h-8 text-white" />
                     </button>
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                      {t.header.lockedGames}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
-                    </div>
-                  </div>
+                  </a>
+                )}
+                {kickstarterLink && (
+                  <a
+                    href={kickstarterLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-fit"
+                  >
+                    <button className="bg-[#2bde73] hover:bg-[#25c865] w-14 h-14 rounded-2xl border-none select-none flex items-center justify-center outline-none transition-colors duration-200">
+                      <SiKickstarter className="w-8 h-8 text-white" />
+                    </button>
+                  </a>
                 )}
               </div>
             </div>
@@ -216,14 +208,14 @@ export default function Home() {
 
           <TiArrowSortedDown
             onClick={nextGame}
-            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 transition-opacity duration-300 ${currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
               }`}
           />
         </div>
 
         {/* Indicadors del carousel */}
         {games.length > 1 && (
-          <div className="flex gap-2 justify-center items-center">
+          <div className="flex gap-2 justify-center items-center mt-8">
             {games.map((_, i) => (
               <button
                 key={i}
@@ -237,39 +229,6 @@ export default function Home() {
             ))}
           </div>
         )}
-
-        {/* Gallery de Screenshots del Joc */}
-        <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
-          <h3 className="text-2xl sm:text-3xl font-lora font-bold text-center text-white mb-6 sm:mb-8">
-            Explora el Món de HeartWeaver
-          </h3>
-
-          {/* Screenshots - placeholder amb imatges existents */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {[
-              '/heartweaverCover.png',
-              '/heartweaverThumbnail.png',
-              '/heartweaverAce.png',
-              '/heartweaverMark.png',
-              '/heartweaverMark2.png',
-              '/heartweaverMainImage.png'
-            ].map((src, index) => (
-              <div
-                key={index}
-                className="relative aspect-video rounded-lg overflow-hidden group cursor-pointer border-2 border-turquoise-400/20 hover:border-turquoise-400 transition-all hover:scale-105 bg-black/40"
-              >
-                <Image
-                  src={src}
-                  alt={`HeartWeaver Screenshot ${index + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
     </main>
   );

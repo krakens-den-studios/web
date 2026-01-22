@@ -61,6 +61,9 @@ export interface Translations {
     meetUs: string;
     meetUsLocked: string;
     krakensGames: string;
+    learnMore: string;
+    steam: string;
+    kickstarter: string;
   };
 
   // First visit modal
@@ -244,6 +247,8 @@ export interface Translations {
     powerEmotionsTitle: string;
     powerEmotionsGifAlts: string[];
     powerEmotionsCenterAlt: string;
+    wishlistNow: string;
+    followUs: string;
   };
 
   // Minigames additional
@@ -377,7 +382,10 @@ export const translations: Record<Language, Translations> = {
       subscribeLocked: 'SUBSCRIBE 🔒',
       meetUs: 'MEET US!',
       meetUsLocked: 'MEET US! 🔒',
-      krakensGames: "Kraken's Games"
+      krakensGames: "Kraken's Games",
+      learnMore: "Learn More",
+      steam: "Steam",
+      kickstarter: "Kickstarter"
     },
     firstVisit: {
       title: 'Welcome to the Den',
@@ -575,7 +583,9 @@ export const translations: Record<Language, Translations> = {
         'Courage ability preview',
         'Connection ability preview'
       ],
-      powerEmotionsCenterAlt: 'Transparent Heart Weaver emblem'
+      powerEmotionsCenterAlt: 'Transparent Heart Weaver emblem',
+      wishlistNow: 'Wishlist now!',
+      followUs: 'Follow us!'
     },
     minigamesExtra: {
       holdMouse: 'Hold your mouse button to start',
@@ -812,7 +822,10 @@ export const translations: Record<Language, Translations> = {
       subscribeLocked: 'SUSCRIBIRSE 🔒',
       meetUs: '¡CONÓCENOS!',
       meetUsLocked: '¡CONÓCENOS! 🔒',
-      krakensGames: 'Nuestros Juegos'
+      krakensGames: 'Nuestros Juegos',
+      learnMore: 'Saber Más',
+      steam: 'Steam',
+      kickstarter: 'Kickstarter'
     },
     firstVisit: {
       title: 'Bienvenido a la Guarida',
@@ -1010,7 +1023,9 @@ export const translations: Record<Language, Translations> = {
         'Vista previa de la habilidad de valor',
         'Vista previa de la habilidad de conexión'
       ],
-      powerEmotionsCenterAlt: 'Emblema transparente de Heart Weaver'
+      powerEmotionsCenterAlt: 'Emblema transparente de Heart Weaver',
+      wishlistNow: '¡Añadir a la lista de deseos!',
+      followUs: '¡Síguenos!'
     },
     minigamesExtra: {
       holdMouse: 'Presiona el botón del ratón para empezar',
@@ -1247,7 +1262,10 @@ export const translations: Record<Language, Translations> = {
       subscribeLocked: 'SUBSCRIURE\'S 🔒',
       meetUs: 'CONÈIX-NOS!',
       meetUsLocked: 'CONÈIX-NOS! 🔒',
-      krakensGames: 'Els nostres Jocs'
+      krakensGames: 'Els nostres Jocs',
+      learnMore: 'Saber-ne Més',
+      steam: 'Steam',
+      kickstarter: 'Kickstarter'
     },
     firstVisit: {
       title: 'Benvingut a la Guarida',
@@ -1445,7 +1463,9 @@ export const translations: Record<Language, Translations> = {
         'Vista prèvia de l\'habilitat de coratge',
         'Vista prèvia de l\'habilitat de connexió'
       ],
-      powerEmotionsCenterAlt: 'Emblema transparent de Heart Weaver'
+      powerEmotionsCenterAlt: 'Emblema transparent de Heart Weaver',
+      wishlistNow: 'Afegeix a la llista de desitjos!',
+      followUs: 'Segueix-nos!'
     },
     minigamesExtra: {
       holdMouse: 'Manté pressionat el botó del ratolí per començar',

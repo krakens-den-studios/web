@@ -1,22 +1,17 @@
 'use client';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Route } from '@/shared/Route';
 import { usePathname } from 'next/navigation';
 import { RiInstagramFill, RiTwitterFill, RiTiktokFill, RiMailFill, RiLockLine } from 'react-icons/ri';
 import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import EmotionJourney from './EmotionJourney';
+import NewsletterForm from './NewsletterForm';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const randomizeQuote = (copies: string[]) => {
   return copies[Math.floor(Math.random() * copies.length)]
 }
-
-const MAILERLITE_API_URL = 'https://connect.mailerlite.com/api/subscribers';
-const MAILERLITE_API_KEY = process.env.NEXT_PUBLIC_MAILERLITE_API_KEY;
-const MAILERLITE_GROUP_ID = '172026650194609552';
 
 const Footer = () => {
   const pathname = usePathname();
@@ -25,56 +20,11 @@ const Footer = () => {
   const [showJourney, setShowJourney] = useState(false);
 
 
-  const [email, setEmail] = useState('');
-
   const [randomNewsletterCopy, setRandomNewsletterCopy] = useState('');
 
   useEffect(() => {
     setRandomNewsletterCopy(randomizeQuote(t.footer.newsletterCopies));
   }, [t.footer.newsletterCopies]);
-
-  const handleChange = (event: any) => {
-    setEmail(event.target.value);
-  };
-
-  const addContact = async () => {
-    if (!email) return;
-
-    if (!MAILERLITE_API_KEY) {
-      toast.error(t.footer.subscribeError);
-      return;
-    }
-
-    const payload: Record<string, any> = {
-      email: email.trim()
-    };
-
-    payload.groups = [MAILERLITE_GROUP_ID];
-
-    const options = {
-      method: 'POST',
-      url: MAILERLITE_API_URL,
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        Authorization: `Bearer ${MAILERLITE_API_KEY}`
-      },
-      data: payload
-    };
-
-    try {
-      await axios.request(options);
-      toast.success(t.footer.subscribeSuccess);
-      setEmail('');
-    } catch (error: any) {
-      if (error?.response?.status === 409) {
-        toast.success(t.footer.subscribeSuccess);
-        setEmail('');
-        return;
-      }
-      toast.error(error.response?.data?.message || t.footer.subscribeError);
-    }
-  }
 
   const socialLinks = (
     <div className="h-full flex items-center w-full justify-evenly">
@@ -111,15 +61,7 @@ const Footer = () => {
           </div>
 
           <div className="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col items-center" id="newsletter">
-            <div className="w-3/4 md:w-1/2">
-              <h2 className="text-white text-4xl text-center">
-                {t.footer.newsletter}
-              </h2>
-              <input type="email" value={email} onChange={handleChange} className="rounded-[0.75rem] text-center mt-3 px-4 py-3 bg-gray text-gray-100 w-full" placeholder={t.minigamesExtra.enterEmail} />
-              <button onClick={addContact} disabled={email === ''} className="rounded-[0.75rem] bg-turquoise-400 text-black text-3xl mt-5 px-4 py-3 w-full font-semibold">
-                {t.footer.signUp}
-              </button>
-            </div>
+            <NewsletterForm variant="footer" />
             <div className="xl:h-96 lg:h-48 md:h-36 py-10 px-10">
               <p className="text-center">🐙 {randomNewsletterCopy}</p>
             </div>

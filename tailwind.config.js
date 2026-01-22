@@ -51,6 +51,15 @@ module.exports = {
       gridTemplateColumns: {
         left: 'minmax(0, 0.66fr) minmax(0, 1fr)',
         right: 'minmax(0, 1fr) minmax(0, 0.66fr)'
+      },
+      keyframes: {
+        'slide-in-from-right': {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' }
+        }
+      },
+      animation: {
+        'slide-in-from-right': 'slide-in-from-right 1s ease-out'
       }
     }
   },

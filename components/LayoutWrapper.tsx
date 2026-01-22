@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Header from './Header';
 import Footer from './Footer';
 import RootGameComponents from './RootGameComponents';
+import FloatingNewsletterBanner from './FloatingNewsletterBanner';
 import { cookieStorage } from '@/utils/cookieStorage';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     // Check if user has already seen the first visit modal
     const hasSeenFirstVisit = cookieStorage.getItem('has-seen-first-visit');
     if (hasSeenFirstVisit) {
@@ -33,18 +34,18 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       const handleModalComplete = () => {
         setShowHeader(true);
       };
-      
+
       // Wait for content to be ready before showing footer (only for non-root pages)
       const handleContentReady = () => {
         if (!isRootPage) {
           setShowFooter(true);
         }
       };
-      
+
       // Listen for custom event from FirstVisitModal
       window.addEventListener('firstVisitComplete', handleModalComplete);
       window.addEventListener('contentReady', handleContentReady);
-      
+
       return () => {
         window.removeEventListener('firstVisitComplete', handleModalComplete);
         window.removeEventListener('contentReady', handleContentReady);
@@ -69,6 +70,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {showHeader && !isRootPage && (
         <div className="w-full transition-opacity duration-1000 ease-in-out animate-fade-in">
           <Header />
+          <FloatingNewsletterBanner />
         </div>
       )}
       {/* Game components (treasure and krakenlings) for root page */}
