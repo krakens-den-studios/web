@@ -19,21 +19,9 @@ export default function Home() {
   const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
   const [currentGame, setCurrentGame] = useState(0);
-  const { unlockedPages, isPageUnlocked, isLoading } = useUnlockedPages();
+  const { unlockedPages, isLoading } = useUnlockedPages();
   const router = useRouter();
   const isScrolled = useIsScrolled();
-
-  // Wait for loading to complete before checking unlock status
-  useEffect(() => {
-    if (!isLoading && typeof window !== 'undefined' && !isPageUnlocked(Route.HOME)) {
-      router.push('/');
-    }
-  }, [isLoading, isPageUnlocked, router]);
-
-  // Don't render anything while loading or if not unlocked
-  if (isLoading || (typeof window !== 'undefined' && !isPageUnlocked(Route.HOME))) {
-    return null;
-  }
 
   const onScrollClick = () => {
     window?.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
@@ -60,22 +48,22 @@ export default function Home() {
   return (
     <main className="relative w-full h-fit">
       {showJourney && <EmotionJourney onComplete={() => setShowJourney(false)} />}
-      
+
       <section id="welcome" className="relative w-full h-screen md:h-[80vh] lg:h-[66vh] flex flex-col items-center overflow-hidden">
         {/* Video de fons opcional - descomentar quan hi hagi video */}
-        {/* <video
+        <video
           autoPlay
           loop
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-70 z-0"
         >
-          <source src="/hero-video.mp4" type="video/mp4" />
-        </video> */}
-        
+          <source src="/hero-heartweaver.mp4" type="video/mp4" />
+        </video>
+
         {/* Fons de color mentre la imatge carrega */}
         <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-900/50 to-black z-0" />
-        
+
         {/* Imatge de fons - carrega darrere del contingut */}
         <div className="relative w-full h-1/2 lg:h-full z-0">
           <Image
@@ -96,11 +84,11 @@ export default function Home() {
           </div>
 
           <div className="relative w-fit flex flex-col items-center gap-8 lg:flex-row">
-            {unlockedPages.games ? (
-              <Link 
+            {true ? (
+              <Link
                 href={Route.HEART_WEAVER}
               >
-                <Button label={t.home.explore}/>
+                <Button label={t.home.explore} />
               </Link>
             ) : (
               <div className="relative group">
@@ -116,29 +104,13 @@ export default function Home() {
                 </div>
               </div>
             )}
-            {unlockedPages.newsletter ? (
-              <Button label={t.home.subscribe} onClick={scrollToNewsletter} />
-            ) : (
-              <div className="relative group">
-                <button
-                  disabled
-                  className="bg-gray-600 relative w-56 py-4 px-6 border-none select-none flex items-center justify-center h-fit outline-none rounded-2xl opacity-60 cursor-not-allowed"
-                >
-                  <p className="whitespace-nowrap text-xl font-lora font-bold text-white">{t.home.subscribeLocked}</p>
-                </button>
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black bg-opacity-90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                  {t.footer.lockedNewsletterDesc}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-black border-t-opacity-90"></div>
-                </div>
-              </div>
-            )}
+            <Button label={t.home.subscribe} onClick={scrollToNewsletter} />
           </div>
 
           <TiArrowSortedDown
             onClick={onScrollClick}
-            className={`text-white duration-300 transition-opacity ${
-              isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400`}
+            className={`text-white duration-300 transition-opacity ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+              } w-16 h-16 lg:hidden cursor-pointer hover:text-turquoise-400`}
           />
         </div>
       </section>
@@ -157,11 +129,11 @@ export default function Home() {
         <h2 className="font-lora text-4xl w-4/5 max-w-3xl text-center balanced">{t.home.welcomeHeart}</h2>
 
         <p className="text-2xl w-4/5 max-w-3xl text-center text-white balanced">
-        {t.home.descriptionFull}
+          {t.home.descriptionFull}
         </p>
 
         {unlockedPages.team ? (
-          <Link 
+          <Link
             href={Route.TEAM}
           >
             <Button label={t.home.meetUs} />
@@ -191,19 +163,17 @@ export default function Home() {
         <div className="relative w-full h-[24rem] sm:h-[28rem] flex items-center justify-center overflow-hidden px-2">
           <TiArrowSortedDown
             onClick={prevGame}
-            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
-              currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            }`}
+            className={`absolute z-20 left-0 rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${currentGame === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+              }`}
           />
 
           {games.map(({ name, link, imageSrc }, i) => (
             <div
               key={`${name}_${i}`}
-              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-500 ${
-                currentGame === i
-                  ? 'opacity-100 scale-100 z-10'
-                  : 'opacity-0 scale-95 pointer-events-none'
-              }`}
+              className={`absolute h-fit w-11/12 max-w-4xl grid grid-cols-1 grid-rows-[min-content_auto] gap-4 sm:gap-6 transition-all duration-500 ${currentGame === i
+                ? 'opacity-100 scale-100 z-10'
+                : 'opacity-0 scale-95 pointer-events-none'
+                }`}
             >
               <div className="w-full justify-center flex relative pointer-events-none px-2 sm:px-6">
                 <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden bg-black/30 border-2 border-turquoise-400/30 hover:border-turquoise-400/60 transition-all min-h-[16rem] sm:min-h-[18rem] shadow-2xl">
@@ -220,8 +190,8 @@ export default function Home() {
 
               <div className="w-full h-fit relative flex items-center justify-center">
                 {unlockedPages.games ? (
-                  <Link 
-                    href={link} 
+                  <Link
+                    href={link}
                     className="w-fit"
                   >
                     <Button label={name} compact />
@@ -246,9 +216,8 @@ export default function Home() {
 
           <TiArrowSortedDown
             onClick={nextGame}
-            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${
-              currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            }`}
+            className={`absolute z-20 right-0 -rotate-90 text-black w-16 h-16 min-w-16 min-h-16 cursor-pointer hover:text-turquoise-400 mb-10 transition-opacity duration-300 ${currentGame === games.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+              }`}
           />
         </div>
 
@@ -259,11 +228,10 @@ export default function Home() {
               <button
                 key={i}
                 onClick={() => setCurrentGame(i)}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${
-                  currentGame === i
-                    ? 'bg-turquoise-400 w-8 sm:w-10'
-                    : 'bg-turquoise-400/40 hover:bg-turquoise-400/60'
-                }`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${currentGame === i
+                  ? 'bg-turquoise-400 w-8 sm:w-10'
+                  : 'bg-turquoise-400/40 hover:bg-turquoise-400/60'
+                  }`}
                 aria-label={`Go to game ${i + 1}`}
               />
             ))}
@@ -275,7 +243,7 @@ export default function Home() {
           <h3 className="text-2xl sm:text-3xl font-lora font-bold text-center text-white mb-6 sm:mb-8">
             Explora el Món de HeartWeaver
           </h3>
-          
+
           {/* Screenshots - placeholder amb imatges existents */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[

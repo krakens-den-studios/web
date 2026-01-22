@@ -1,9 +1,6 @@
 'use client';
 
-import { Route } from '@/shared/Route';
-import { useUnlockedPages } from '@/hooks/useUnlockedPages';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RiMailFill } from 'react-icons/ri';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,25 +9,10 @@ const MAILERLITE_API_KEY = process.env.NEXT_PUBLIC_MAILERLITE_API_KEY || '';
 const MAILERLITE_CONTACT_GROUP_ID = '172026650194609552';
 
 export default function Contact() {
-  const { isPageUnlocked, isLoading } = useUnlockedPages();
   const { t } = useLanguage();
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const newsletterUnlocked = isPageUnlocked('newsletter');
-
-  useEffect(() => {
-    // If page is not unlocked, redirect to root (wait for loading to complete)
-    if (!isLoading && !isPageUnlocked(Route.CONTACT)) {
-      router.push('/');
-    }
-  }, [isLoading, isPageUnlocked, router]);
-
-  // If page is not unlocked, don't show content
-  if (isLoading || !isPageUnlocked(Route.CONTACT)) {
-    return null;
-  }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -41,7 +23,7 @@ export default function Contact() {
     if (!email || isSubmitting) return;
 
     setIsSubmitting(true);
-    
+
     if (!MAILERLITE_API_KEY) {
       console.error('Missing MailerLite API key');
       setIsSubmitting(false);
@@ -107,7 +89,7 @@ export default function Contact() {
                   {t.contact.email}
                 </h2>
               </div>
-              <a 
+              <a
                 href="mailto:help@krakensdenstudios.com"
                 className="text-turquoise-300 text-lg md:text-xl hover:text-turquoise-200 transition-colors break-all"
               >
@@ -120,45 +102,33 @@ export default function Contact() {
               <h2 className="font-lora text-3xl font-bold text-white mb-6">
                 {t.contact.newsletter}
               </h2>
-              {newsletterUnlocked ? (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={handleEmailChange}
-                    placeholder={t.contact.enterEmail}
-                    className="rounded-xl px-4 py-3 bg-gray-800 text-white border-2 border-gray-600 focus:border-turquoise-400 focus:outline-none transition-colors"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    disabled={!email || isSubmitting || submitted}
-                    className={`rounded-xl px-6 py-3 font-lora font-bold text-lg transition-all ${
-                      submitted
-                        ? 'bg-green-500 text-white cursor-not-allowed'
-                        : email && !isSubmitting
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  placeholder={t.contact.enterEmail}
+                  className="rounded-xl px-4 py-3 bg-gray-800 text-white border-2 border-gray-600 focus:border-turquoise-400 focus:outline-none transition-colors"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={!email || isSubmitting || submitted}
+                  className={`rounded-xl px-6 py-3 font-lora font-bold text-lg transition-all ${submitted
+                      ? 'bg-green-500 text-white cursor-not-allowed'
+                      : email && !isSubmitting
                         ? 'bg-turquoise-400 hover:bg-turquoise-300 text-black cursor-pointer'
                         : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     }`}
-                  >
-                    {submitted ? t.contact.subscribed : isSubmitting ? t.contact.subscribing : t.contact.subscribe}
-                  </button>
-                  {submitted && (
-                    <p className="text-green-400 text-sm text-center">
-                      {t.contact.thankYou}
-                    </p>
-                  )}
-                </form>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-300 text-lg mb-4">
-                    {t.contact.locked}
+                >
+                  {submitted ? t.contact.subscribed : isSubmitting ? t.contact.subscribing : t.contact.subscribe}
+                </button>
+                {submitted && (
+                  <p className="text-green-400 text-sm text-center">
+                    {t.contact.thankYou}
                   </p>
-                  <p className="text-gray-400 text-sm">
-                    {t.contact.lockedDesc}
-                  </p>
-                </div>
-              )}
+                )}
+              </form>
             </div>
           </div>
         </div>

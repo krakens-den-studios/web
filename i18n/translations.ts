@@ -8,7 +8,7 @@ export interface Translations {
     error: string;
     success: string;
   };
-  
+
   // Header
   header: {
     home: string;
@@ -21,8 +21,10 @@ export interface Translations {
     lockedTeam: string;
     lockedGames: string;
     lockedContact: string;
+    enableKrakenlings: string;
+    disableKrakenlings: string;
   };
-  
+
   // Footer
   footer: {
     newsletter: string;
@@ -42,7 +44,7 @@ export interface Translations {
     subscribeError: string;
     newsletterCopies: string[];
   };
-  
+
   // Home page
   home: {
     title: string;
@@ -68,7 +70,14 @@ export interface Translations {
     action: string;
     instruction: string;
   };
-  
+
+  // Krakenlings tutorial modal
+  krakenlingsTutorial: {
+    title: string;
+    message: string;
+    button: string;
+  };
+
   // Kraken Treasure
   treasure: {
     title: string;
@@ -100,23 +109,23 @@ export interface Translations {
     missionRequiredLabel: string;
     missionUnlockHint: string;
     tapToPlay: string;
-      clickNow: string;
-      wait: string;
-      tryAgain: string;
-      followRhythm: string;
-      now: string;
-      hold: string;
-      holdButton: string;
-      progress: string;
-      correctClicks: string;
-      incorrectOrder: string;
-      formed: string;
-      established: string;
-      play: string;
-      therapyNeedsTime: string;
-      finalTreasureMessage: string;
+    clickNow: string;
+    wait: string;
+    tryAgain: string;
+    followRhythm: string;
+    now: string;
+    hold: string;
+    holdButton: string;
+    progress: string;
+    correctClicks: string;
+    incorrectOrder: string;
+    formed: string;
+    established: string;
+    play: string;
+    therapyNeedsTime: string;
+    finalTreasureMessage: string;
   };
-  
+
   // Missions
   missions: {
     visitHome: string;
@@ -165,7 +174,7 @@ export interface Translations {
     healing4: string;
     own3Helpers: string;
   };
-  
+
   // Minigames
   minigames: {
     hope: string;
@@ -178,7 +187,7 @@ export interface Translations {
     formedWord: string;
     foundRhythm: string;
   };
-  
+
   // Contact
   contact: {
     title: string;
@@ -193,7 +202,7 @@ export interface Translations {
     locked: string;
     lockedDesc: string;
   };
-  
+
   // Team
   team: {
     title: string;
@@ -205,7 +214,7 @@ export interface Translations {
     }>;
     finalText: string;
   };
-  
+
   // HeartWeaver
   heartWeaver: {
     coverAlt: string;
@@ -236,14 +245,14 @@ export interface Translations {
     powerEmotionsGifAlts: string[];
     powerEmotionsCenterAlt: string;
   };
-  
+
   // Minigames additional
   minigamesExtra: {
     holdMouse: string;
     holdAndMove: string;
     enterEmail: string;
   };
-  
+
   // Game Data Translations
   gameData: {
     agents: Record<string, { name: string; description: string }>;
@@ -272,7 +281,9 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Locked. Get "Home Page" in The Kraken\'s Treasure to unlock this part of the den.',
       lockedTeam: 'Locked. Get "About Us" in The Kraken\'s Treasure to meet the team.',
       lockedGames: 'Locked. Get "Games Page" in The Kraken\'s Treasure to check our games.',
-      lockedContact: 'Locked. Get "Contact" in The Kraken\'s Treasure to unlock this part of the den.'
+      lockedContact: 'Locked. Get "Contact" in The Kraken\'s Treasure to unlock this part of the den.',
+      enableKrakenlings: 'Enable Krakenlings',
+      disableKrakenlings: 'Disable Krakenlings'
     },
     footer: {
       newsletter: 'Newsletter',
@@ -373,6 +384,11 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'A Krakenling has found you.',
       action: 'Save it',
       instruction: 'Click on the Krakenling to save it'
+    },
+    krakenlingsTutorial: {
+      title: 'Krakenlings Minigame',
+      message: 'If you want to activate the minigame to collect more Krakenlings, you can enable it in the navigation bar.',
+      button: 'Got it!'
     },
     treasure: {
       title: "The Kraken's Treasure",
@@ -700,7 +716,9 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Bloqueado. Obtén "Página de Inicio" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
       lockedTeam: 'Bloqueado. Obtén "Sobre Nosotros" en El Tesoro del Kraken para conocer al equipo.',
       lockedGames: 'Bloqueado. Obtén "Página de Juegos" en El Tesoro del Kraken para ver nuestros juegos.',
-      lockedContact: 'Bloqueado. Obtén "Contacto" en El Tesoro del Kraken para desbloquear esta parte de la guarida.'
+      lockedContact: 'Bloqueado. Obtén "Contacto" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
+      enableKrakenlings: 'Activar Krakenlings',
+      disableKrakenlings: 'Desactivar Krakenlings'
     },
     footer: {
       newsletter: 'Boletín',
@@ -801,6 +819,11 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'Un Krakenling te ha encontrado.',
       action: 'Sálvalo',
       instruction: 'Haz clic sobre el Krakenling para salvarlo'
+    },
+    krakenlingsTutorial: {
+      title: 'Minijuego de Krakenlings',
+      message: 'Si quieres activar el minijuego para recolectar más Krakenlings, puedes activarlo en la barra de navegación.',
+      button: '¡Entendido!'
     },
     treasure: {
       title: 'El Tesoro del Kraken',
@@ -1128,7 +1151,9 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Bloquejat. Obtén "Pàgina d\'Inici" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
       lockedTeam: 'Bloquejat. Obtén "Sobre Nosaltres" al Tresor del Kraken per conèixer l\'equip.',
       lockedGames: 'Bloquejat. Obtén "Pàgina de Jocs" al Tresor del Kraken per veure els nostres jocs.',
-      lockedContact: 'Bloquejat. Obtén "Contacte" al Tresor del Kraken per desbloquejar aquesta part de la guarida.'
+      lockedContact: 'Bloquejat. Obtén "Contacte" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
+      enableKrakenlings: 'Activar Krakenlings',
+      disableKrakenlings: 'Desactivar Krakenlings'
     },
     footer: {
       newsletter: 'Butlletí',
@@ -1229,6 +1254,11 @@ export const translations: Record<Language, Translations> = {
       subtitle: 'Un Krakenling t\'ha trobat.',
       action: 'Salva\'l',
       instruction: 'Fes clic al Krakenling per salvar-lo'
+    },
+    krakenlingsTutorial: {
+      title: 'Minijoc de Krakenlings',
+      message: 'Si vols activar el minijoc per recollir més Krakenlings, pots activar-lo a la barra de navegació.',
+      button: 'Entesos!'
     },
     treasure: {
       title: 'El Tresor del Kraken',

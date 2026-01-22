@@ -41,12 +41,12 @@ export interface UnlockableTemplate {
   type: 'page' | 'feature' | 'treasure' | 'upgrade';
   route?: string;
   upgradeType?:
-    | 'passive'
-    | 'agent-multiplier'
-    | 'minigame-cooldown'
-    | 'minigame-reward-multiplier'
-    | 'audio'
-    | 'collection-multiplier';
+  | 'passive'
+  | 'agent-multiplier'
+  | 'minigame-cooldown'
+  | 'minigame-reward-multiplier'
+  | 'audio'
+  | 'collection-multiplier';
   targetAgentId?: string;
   targetMinigameId?: string;
   multiplierValue?: number;
@@ -206,49 +206,49 @@ export const AGENT_TEMPLATES: AgentTemplate[] = [
   }
 ];
 export const UNLOCKABLE_TEMPLATES: UnlockableTemplate[] = [
-  {
-    id: 'home',
-    name: 'Home Page',
-    description: 'Unlock main page.',
-    cost: 100,
-    route: Route.HOME,
-    type: 'page'
-  },
-  {
-    id: 'games',
-    name: 'Games Page',
-    description: 'Unlock games page.',
-    cost: 1000,
-    route: Route.HEART_WEAVER,
-    type: 'page',
-    missionRequirement: 'visit-home'
-  },
-  {
-    id: 'team',
-    name: 'About Us',
-    description: 'Unlock team page.',
-    cost: 10000,
-    route: Route.TEAM,
-    type: 'page',
-    missionRequirement: 'visit-games'
-  },
-  {
-    id: 'contact',
-    name: 'Contact',
-    description: 'Unlock contact page.',
-    cost: 25000,
-    route: Route.CONTACT,
-    type: 'page',
-    missionRequirement: 'visit-team'
-  },
-  {
-    id: 'newsletter',
-    name: 'Newsletter',
-    description: 'Unlock newsletter.',
-    cost: 50000,
-    type: 'page',
-    missionRequirement: 'visit-contact'
-  },
+  // {
+  //   id: 'home',
+  //   name: 'Home Page',
+  //   description: 'Unlock main page.',
+  //   cost: 100,
+  //   route: Route.HOME,
+  //   type: 'page'
+  // },
+  // {
+  //   id: 'games',
+  //   name: 'Games Page',
+  //   description: 'Unlock games page.',
+  //   cost: 1000,
+  //   route: Route.HEART_WEAVER,
+  //   type: 'page',
+  //   missionRequirement: 'visit-home'
+  // },
+  // {
+  //   id: 'team',
+  //   name: 'About Us',
+  //   description: 'Unlock team page.',
+  //   cost: 10000,
+  //   route: Route.TEAM,
+  //   type: 'page',
+  //   missionRequirement: 'visit-games'
+  // },
+  // {
+  //   id: 'contact',
+  //   name: 'Contact',
+  //   description: 'Unlock contact page.',
+  //   cost: 25000,
+  //   route: Route.CONTACT,
+  //   type: 'page',
+  //   missionRequirement: 'visit-team'
+  // },
+  // {
+  //   id: 'newsletter',
+  //   name: 'Newsletter',
+  //   description: 'Unlock newsletter.',
+  //   cost: 50000,
+  //   type: 'page',
+  //   missionRequirement: 'visit-contact'
+  // },
   {
     id: 'courage-minigame',
     name: 'Therapy: Courage',
@@ -799,7 +799,7 @@ export const MISSION_TEMPLATES: MissionTemplate[] = [
     reward: 1000,
     dependsOn: ['courage-1']
   },
-  
+
   {
     id: 'courage-3',
     name: 'Courage III',
@@ -1323,13 +1323,13 @@ export const deserializeMinigames = (
   const isLegacy = parsed.some(entry => hasKey(entry, 'baseReward'));
   const progress: MinigameProgress[] = isLegacy
     ? parsed.map(entry => ({
-        id: entry.id,
-        unlocked: entry.unlocked,
-        timesCompleted: entry.timesCompleted,
-        lastPlayed: entry.lastPlayed,
-        rewardMultiplier: entry.rewardMultiplier,
-        cooldownReduction: entry.cooldownReduction
-      }))
+      id: entry.id,
+      unlocked: entry.unlocked,
+      timesCompleted: entry.timesCompleted,
+      lastPlayed: entry.lastPlayed,
+      rewardMultiplier: entry.rewardMultiplier,
+      cooldownReduction: entry.cooldownReduction
+    }))
     : parsed;
   return {
     state: buildMinigames(progress),

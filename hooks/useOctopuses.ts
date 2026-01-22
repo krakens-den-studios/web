@@ -29,11 +29,11 @@ export function useOctopuses() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const savedCount = cookieStorage.getItem(OCTOPUS_COUNT_KEY);
     const savedCollected = cookieStorage.getItem(OCTOPUS_COLLECTED_KEY);
     const savedPickedCount = cookieStorage.getItem(OCTOPUS_PICKED_COUNT_KEY);
-    
+
     if (savedCount) {
       try {
         setOctopusCount(parseInt(savedCount, 10));
@@ -41,7 +41,7 @@ export function useOctopuses() {
         setOctopusCount(0);
       }
     }
-    
+
     if (savedCollected) {
       try {
         setCollectedOctopuses(JSON.parse(savedCollected));
@@ -49,7 +49,7 @@ export function useOctopuses() {
         setCollectedOctopuses([]);
       }
     }
-    
+
     // Initialize picked count if it doesn't exist
     if (!savedPickedCount) {
       cookieStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, '0');
@@ -66,17 +66,17 @@ export function useOctopuses() {
   const collectOctopus = (octopusId: string) => {
     if (!collectedOctopuses.includes(octopusId)) {
       const newCollected = [...collectedOctopuses, octopusId];
-      
+
       // Get current fractional count from cookies to maintain precision
       const currentFractional = parseFloat(cookieStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
-      
+
       // Get total manually picked krakenlings (not from agents)
       const pickedCount = parseFloat(cookieStorage.getItem(OCTOPUS_PICKED_COUNT_KEY) || '0');
-      
+
       // Calculate collection value based on upgrades
       // Base: 1 Krakenling, incremented by unlocked upgrades
       let collectionValue = 1;
-      
+
       try {
         const { state: unlockables } = deserializeUnlockables(cookieStorage.getItem(UNLOCKABLES_STORAGE_KEY));
         const tier = resolveManualCollectionTier(unlockables);
@@ -90,22 +90,28 @@ export function useOctopuses() {
       } catch (e) {
         // Ignore errors
       }
-      
+
       const newFractionalCount = currentFractional + collectionValue;
       const newCount = Math.floor(newFractionalCount);
-      
+
       // Update picked count (only the base 1, not the multipliers)
       const newPickedCount = pickedCount + 1;
-      
+
       setCollectedOctopuses(newCollected);
       setOctopusCount(newCount);
-      
+
       if (typeof window !== 'undefined') {
         cookieStorage.setItem(OCTOPUS_COLLECTED_KEY, JSON.stringify(newCollected));
         cookieStorage.setItem(OCTOPUS_COUNT_KEY, newFractionalCount.toString());
         cookieStorage.setItem(OCTOPUS_PICKED_COUNT_KEY, newPickedCount.toString());
+
+        // Check if this is the first manually picked krakenling
+        if (pickedCount === 0) {
+          // Dispatch event to show tutorial
+          window.dispatchEvent(new CustomEvent('firstKrakenlingCollected'));
+        }
       }
-      
+
       // Return the value for display purposes
       return collectionValue;
     }
@@ -116,19 +122,19 @@ export function useOctopuses() {
   // Also synchronizes counter from cookies for external changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     // Use a ref to store fractional count to avoid losing precision
     // Always read from cookies to sync with external changes (like purchases)
     const updateCount = () => {
       try {
         // Always sync fractional count from cookies first to catch external changes
         let fractionalCount = parseFloat(cookieStorage.getItem(OCTOPUS_COUNT_KEY) || '0');
-        
+
         // First, collect from agents if they exist
         const { state: agents } = deserializeAgents(cookieStorage.getItem(AGENTS_STORAGE_KEY));
         if (agents.length > 0) {
           const activeAgents = agents.filter(a => a.owned > 0);
-          
+
           if (activeAgents.length > 0) {
             // Get passive collection upgrades
             let passiveMultiplier = 0;
@@ -159,7 +165,7 @@ export function useOctopuses() {
               const increment = totalKrakenlingsPerSecond * 0.1;
               fractionalCount = fractionalCount + increment;
               const newCountRounded = Math.floor(fractionalCount);
-              
+
               // Update state and cookies with rounded value
               setOctopusCount(newCountRounded);
               cookieStorage.setItem(OCTOPUS_COUNT_KEY, fractionalCount.toString());
@@ -167,7 +173,7 @@ export function useOctopuses() {
             }
           }
         }
-        
+
         // If no active agents, synchronize from cookies
         const currentRounded = Math.floor(fractionalCount);
         setOctopusCount(prev => {

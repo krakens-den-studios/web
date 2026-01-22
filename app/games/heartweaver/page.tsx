@@ -7,8 +7,6 @@ import { useUnlockedPages } from '@/hooks/useUnlockedPages';
 import Image from 'next/image';
 import { TiArrowSortedDown } from 'react-icons/ti';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Route } from '@/shared/Route';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 import AngerGif from '@/public/anger.gif';
@@ -23,16 +21,8 @@ import MarkGif from '@/public/mark.gif';
 export default function HeartWeaver() {
   const { t } = useLanguage();
   const [showJourney, setShowJourney] = useState(false);
-  const { isPageUnlocked, isLoading } = useUnlockedPages();
-  const router = useRouter();
+  const { isLoading } = useUnlockedPages();
   const isScrolled = useIsScrolled();
-
-  // If page is not unlocked, redirect to home (wait for loading to complete)
-  useEffect(() => {
-    if (!isLoading && !isPageUnlocked(Route.HEART_WEAVER)) {
-      router.push(Route.HOME);
-    }
-  }, [isLoading, isPageUnlocked, router]);
 
   const scrollToGame = () => {
     if (typeof window === 'undefined') return;
@@ -43,7 +33,7 @@ export default function HeartWeaver() {
   };
 
   // Don't render anything while loading or if not unlocked (while redirecting)
-  if (isLoading || !isPageUnlocked(Route.HEART_WEAVER)) {
+  if (isLoading) {
     return null;
   }
 
@@ -61,7 +51,7 @@ export default function HeartWeaver() {
         >
           <source src="/gameplay-hero.mp4" type="video/mp4" />
         </video> */}
-        
+
         <div className="relative w-full h-1/2 md:h-2/3 z-10">
           <Image
             src="/heartweaverCover.png"
@@ -87,9 +77,8 @@ export default function HeartWeaver() {
 
           <TiArrowSortedDown
             onClick={scrollToGame}
-            className={`text-white duration-300 transition-opacity ${
-              isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
-            } w-16 h-16 cursor-pointer hover:text-turquoise-400 hover:scale-110 transition-transform`}
+            className={`text-white duration-300 transition-opacity ${isScrolled ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-all'
+              } w-16 h-16 cursor-pointer hover:text-turquoise-400 hover:scale-110 transition-transform`}
           />
         </div>
       </section>
@@ -122,7 +111,7 @@ export default function HeartWeaver() {
           <h2 className="text-3xl sm:text-4xl font-lora font-bold text-center text-turquoise-400 mb-8 sm:mb-12">
             Experiència el Joc
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Intro GIF */}
             <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-turquoise-400/30 hover:border-turquoise-400 transition-all hover:scale-105 shadow-xl bg-black/40">
@@ -292,7 +281,7 @@ export default function HeartWeaver() {
           <h2 className="text-3xl sm:text-4xl font-lora font-bold text-center text-turquoise-400 mb-8 sm:mb-12">
             Més Screenshots
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[
               '/heartweaverCover.png',

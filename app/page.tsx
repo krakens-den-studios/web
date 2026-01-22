@@ -26,7 +26,7 @@ export default function Root() {
     if (showContent) {
       // Show paragraphs one by one with delays
       const delays = [0, 800, 1600, 2400, 3200]; // Added delay for screenshots
-      
+
       delays.forEach((delay, index) => {
         setTimeout(() => {
           setVisibleParagraphs(prev => [...prev, index]);
@@ -63,7 +63,7 @@ export default function Root() {
             >
               <source src="/hero-heartweaver.mp4" type="video/mp4" />
             </video>}
-            
+
             {/* Imatge de fons (fallback si no hi ha video) */}
             {/*<div className="absolute inset-0 w-full h-full">
               <Image
@@ -85,10 +85,9 @@ export default function Root() {
             {/* Contingut del Hero */}
             <div className="relative z-20 max-w-4xl text-center flex flex-col gap-6 sm:gap-8 items-center p-4 sm:p-8">
               <div className="flex flex-col gap-4 sm:gap-6">
-                <h1 
-                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lora font-bold text-turquoise-400 transition-opacity duration-1000 ease-in-out ${
-                    visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
-                  }`}
+                <h1
+                  className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lora font-bold text-turquoise-400 transition-opacity duration-1000 ease-in-out ${visibleParagraphs.includes(0) ? 'opacity-100' : 'opacity-0'
+                    }`}
                 >
                   {t.home.title}
                 </h1>
@@ -110,10 +109,9 @@ export default function Root() {
                 </p>*/}
               </div>
 
-              <div 
-                className={`flex flex-col gap-4 sm:gap-6 items-center mt-4 transition-opacity duration-1000 ease-in-out ${
-                  visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
-                }`}
+              <div
+                className={`flex flex-col gap-4 sm:gap-6 items-center mt-4 transition-opacity duration-1000 ease-in-out ${visibleParagraphs.includes(1) ? 'opacity-100' : 'opacity-0'
+                  }`}
               >
                 <button
                   onClick={() => {
@@ -134,8 +132,8 @@ export default function Root() {
                     </span>
                   )}
                 </button>
-                {unlockedPages.home && (
-                  <Link 
+                {true && (
+                  <Link
                     href={Route.HOME}
                   >
                     <Button label={t.home.enterDen} />

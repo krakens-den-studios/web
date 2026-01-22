@@ -25,36 +25,25 @@ const loadUnlockedPages = (): UnlockedPages => {
       newsletter: false
     };
   }
-  
+
   const saved = cookieStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
       const progress = JSON.parse(saved);
       const emotions = progress.emotions || [];
-      
+
       // Map emotions to pages
       const hopeUnlocked = emotions.find((e: any) => e.id === 'hope')?.unlocked || false;
       const courageUnlocked = emotions.find((e: any) => e.id === 'courage')?.unlocked || false;
       const connectionUnlocked = emotions.find((e: any) => e.id === 'connection')?.unlocked || false;
       const healingUnlocked = emotions.find((e: any) => e.id === 'healing')?.unlocked || false;
 
-      // Check unlockables for contact and newsletter
-      const unlockablesSaved = cookieStorage.getItem('unlockables-progress');
-      let contactUnlocked = false;
-      let newsletterUnlocked = false;
-      
-      if (unlockablesSaved) {
-        const { state: unlockables } = deserializeUnlockables(unlockablesSaved);
-        contactUnlocked = unlockables.some(u => u.id === 'contact' && u.unlocked);
-        newsletterUnlocked = unlockables.some(u => u.id === 'newsletter' && u.unlocked);
-      }
-
       return {
         home: hopeUnlocked, // Esperanza desbloquea Home
         games: courageUnlocked, // Courage unlocks Games
         team: connectionUnlocked, // Connection unlocks Team
-        contact: contactUnlocked, // Contact unlocked via shop
-        newsletter: newsletterUnlocked // Newsletter unlocked via shop
+        contact: true, // Contact always unlocked
+        newsletter: true // Newsletter always unlocked
       };
     } catch (e) {
       // Si hay error, mantener valores por defecto
@@ -64,8 +53,8 @@ const loadUnlockedPages = (): UnlockedPages => {
     home: false, // Home empieza bloqueado
     games: false,
     team: false,
-    contact: false,
-    newsletter: false
+    contact: true, // Contact always unlocked
+    newsletter: true // Newsletter always unlocked
   };
 };
 
@@ -74,11 +63,11 @@ export function useUnlockedPages() {
     home: false,
     games: false,
     team: false,
-    contact: false,
-    newsletter: false
+    contact: true, // Contact always unlocked
+    newsletter: true // Newsletter always unlocked
   });
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Load from cookies on client side only
   useEffect(() => {
     if (typeof window !== 'undefined') {
