@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import Header from './Header';
 import Footer from './Footer';
 import RootGameComponents from './RootGameComponents';
-import FloatingNewsletterBanner from './FloatingNewsletterBanner';
 import { cookieStorage } from '@/utils/cookieStorage';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -70,7 +69,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {showHeader && !isRootPage && (
         <div className="w-full transition-opacity duration-1000 ease-in-out animate-fade-in">
           <Header />
-          <div className="w-full py-20 z-0"></div>
+          <div className="w-full pt-20 pb-10 md:pt-24 md:pb-12 z-0" aria-hidden />
         </div>
       )}
       {/* Game components (treasure and krakenlings) for root page */}

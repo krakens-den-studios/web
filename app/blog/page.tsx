@@ -50,8 +50,6 @@ export default function BlogPage() {
           ))}
         </ul>
       )}
-
-      <p className="text-white/35 text-xs md:text-sm mt-16 max-w-2xl leading-relaxed">{t.blog.authorNote}</p>
     </main>
   );
 }
