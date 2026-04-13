@@ -10,82 +10,63 @@ const randomizeQuote = (copies: string[]) => {
 };
 
 const getRandomDelay = () => {
-  // Random delay between 10 and 20 seconds
-  return Math.random() * 10000 + 20000;
+  return Math.random() * 20000;
 };
 
 export default function FloatingNewsletterBanner() {
   const { t } = useLanguage();
   const [currentQuote, setCurrentQuote] = useState<string>('');
-  const [isVisible, setIsVisible] = useState(false);
-  const [isAnimatingIn, setIsAnimatingIn] = useState(false);
-  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const showBanner = () => {
-      if (!t.footer.newsletterCopies || t.footer.newsletterCopies.length === 0) return;
+    if (!t.footer.newsletterCopies || t.footer.newsletterCopies.length === 0) return;
 
-      const quote = randomizeQuote(t.footer.newsletterCopies);
-      setCurrentQuote(quote);
-      setIsVisible(true);
-      setIsAnimatingIn(true);
-      setIsAnimatingOut(false);
+    // Set initial quote
+    const initialQuote = randomizeQuote(t.footer.newsletterCopies);
+    setCurrentQuote(initialQuote);
 
-      // After slide-in animation completes (1.5s), stop animating in
-      setTimeout(() => {
-        setIsAnimatingIn(false);
+    const changeQuote = () => {
+      // Fade out banner completely
+      setIsFadingOut(true);
 
-        // Show for 8-12 seconds, then animate out
-        const showDuration = Math.random() * 8000 + 10000;
-        hideTimeoutRef.current = setTimeout(() => {
-          setIsAnimatingOut(true);
+      // After fade out completes, change quote and fade in
+      fadeTimeoutRef.current = setTimeout(() => {
+        const newQuote = randomizeQuote(t.footer.newsletterCopies);
+        setCurrentQuote(newQuote);
+        setIsFadingOut(false);
 
-          // After slide-out animation completes (1.5s), hide completely
-          setTimeout(() => {
-            setIsVisible(false);
-            setIsAnimatingOut(false);
-
-            // Schedule next appearance with random delay
-            timeoutRef.current = setTimeout(showBanner, getRandomDelay());
-          }, 1500);
-        }, showDuration);
-      }, 2000);
+        // Schedule next change
+        timeoutRef.current = setTimeout(changeQuote, getRandomDelay());
+      }, 8000); // Very slow fade out duration for calm feeling
     };
 
-    // Initial delay before first appearance
-    timeoutRef.current = setTimeout(showBanner, getRandomDelay());
+    // Start changing quotes after initial delay
+    timeoutRef.current = setTimeout(changeQuote, getRandomDelay());
 
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     };
   }, [t.footer.newsletterCopies]);
 
-  if (!isVisible || !currentQuote) return null;
-
-  const getTransformClass = () => {
-    if (isAnimatingIn) return 'translate-x-full';
-    if (isAnimatingOut) return 'translate-x-full';
-    return 'translate-x-0';
-  };
+  if (!currentQuote) return null;
 
   return (
-    <Link href={Route.CONTACT} className="block">
-      <div
-        ref={bannerRef}
-        className={`fixed top-20 left-0 right-0 z-50 pointer-events-auto transition-transform duration-1500 ease-out ${getTransformClass()}`}
-      >
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-turquoise-800/95 backdrop-blur-sm border-2 border-turquoise-400 rounded-xl px-6 py-4 shadow-2xl cursor-pointer hover:bg-turquoise-700/95 transition-colors">
-            <p className="text-white text-center text-sm md:text-base font-lora">
+    <div
+      className={`z-30 w-full py-4 bg-turquoise-800/95 backdrop-blur-sm border-2 border-turquoise-400/50 transition-opacity duration-[8000ms] ease-in-out ${isFadingOut ? 'opacity-0' : 'opacity-100'
+        }`}
+    >
+      <Link href={Route.CONTACT} className="block w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="cursor-pointer hover:bg-turquoise-700/20 transition-colors rounded-lg px-4 py-2">
+            <p className="text-white text-center text-xs sm:text-sm md:text-base font-lora">
               🐙 {currentQuote}
             </p>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

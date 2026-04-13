@@ -60,6 +60,9 @@ module.exports = {
       },
       animation: {
         'slide-in-from-right': 'slide-in-from-right 1s ease-out'
+      },
+      zIndex: {
+        '35': '35'
       }
     }
   },

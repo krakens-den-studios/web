@@ -3,5 +3,6 @@ export enum Route {
   CONTACT = '/contact',
   ROOT = '/',
   TEAM = '/team',
-  HEART_WEAVER = '/games/heartweaver'
+  HEART_WEAVER = '/games/heartweaver',
+  BLOG = '/blog',
 }

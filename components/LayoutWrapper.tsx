@@ -70,7 +70,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       {showHeader && !isRootPage && (
         <div className="w-full transition-opacity duration-1000 ease-in-out animate-fade-in">
           <Header />
-          <FloatingNewsletterBanner />
+          <div className="w-full py-20 z-0"></div>
         </div>
       )}
       {/* Game components (treasure and krakenlings) for root page */}

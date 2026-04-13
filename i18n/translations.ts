@@ -15,6 +15,7 @@ export interface Translations {
     team: string;
     games: string;
     contact: string;
+    blog: string;
     openTreasure: string;
     aboutUs: string;
     lockedHome: string;
@@ -206,6 +207,16 @@ export interface Translations {
     lockedDesc: string;
   };
 
+  // Blog
+  blog: {
+    title: string;
+    subtitle: string;
+    readMore: string;
+    backToList: string;
+    empty: string;
+    authorNote: string;
+  };
+
   // Team
   team: {
     title: string;
@@ -281,6 +292,7 @@ export const translations: Record<Language, Translations> = {
       team: 'Team',
       games: 'Games',
       contact: 'Contact',
+      blog: 'Blog',
       openTreasure: "Open Treasure",
       aboutUs: 'About Us',
       lockedHome: 'Locked. Get "Home Page" in The Kraken\'s Treasure to unlock this part of the den.',
@@ -515,6 +527,15 @@ export const translations: Record<Language, Translations> = {
       locked: 'Newsletter is locked',
       lockedDesc: 'Unlock the Newsletter in The Kraken\'s Treasure to subscribe.'
     },
+    blog: {
+      title: 'Blog',
+      subtitle: 'News, dev diaries, and stories from the den.',
+      readMore: 'Read more',
+      backToList: '← All posts',
+      empty: 'No posts yet. Check back soon!',
+      authorNote:
+        'Posts live in shared/blogPosts.ts — add objects to the blogPosts array. A commented template and full examples are at the bottom of that file. CMS or MDX can be added later.',
+    },
     team: {
       title: 'Our Team',
       subtitle: 'Meet the people behind the Kraken\'s Den',
@@ -558,7 +579,8 @@ export const translations: Record<Language, Translations> = {
       introText: 'When the self shatters into a thousand pieces, when you can no longer be yourself, embark on an adventure, feel again...',
       mainTitle: 'Let the HeartWeaver mend your heart',
       storyBegins: 'A Story Begins...',
-      storyDescription1: 'HeartWeaver is an emotional story-driven, action adventure with a dynamic ability system.',
+      storyDescription1:
+        'HeartWeaver is an emotional indie game—a story-driven narrative puzzle game about emotion, with a deep story and a dynamic ability system.',
       storyDescription2: 'Loss and guilt have made Ace wish they could never feel anything again...',
       aceAlt: 'HeartWeaver Ace',
       friendsAndFoes: 'Friends & Foes',
@@ -721,6 +743,7 @@ export const translations: Record<Language, Translations> = {
       team: 'Equipo',
       games: 'Juegos',
       contact: 'Contacto',
+      blog: 'Blog',
       openTreasure: 'Abrir Tesoro',
       aboutUs: 'Sobre Nosotros',
       lockedHome: 'Bloqueado. Obtén "Página de Inicio" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
@@ -955,6 +978,15 @@ export const translations: Record<Language, Translations> = {
       locked: 'El boletín está bloqueado',
       lockedDesc: 'Desbloquea el Boletín en El Tesoro del Kraken para suscribirte.'
     },
+    blog: {
+      title: 'Blog',
+      subtitle: 'Noticias, diarios de desarrollo e historias desde la guarida.',
+      readMore: 'Leer más',
+      backToList: '← Todas las entradas',
+      empty: 'Aún no hay entradas. ¡Vuelve pronto!',
+      authorNote:
+        'Las entradas están en shared/blogPosts.ts — añadid objetos al array blogPosts. Al final del mismo archivo hay una plantilla y ejemplos completos en comentarios. Más adelante se puede usar CMS o MDX.',
+    },
     team: {
       title: 'Nuestro Equipo',
       subtitle: 'Conoce a las personas detrás de la Guarida del Kraken',
@@ -998,7 +1030,8 @@ export const translations: Record<Language, Translations> = {
       introText: 'Cuando el yo se rompe en mil pedazos, cuando ya no puedes ser tú mismo, embárcate en una aventura, siente de nuevo...',
       mainTitle: 'Deja que HeartWeaver repare tu corazón',
       storyBegins: 'Una Historia Comienza...',
-      storyDescription1: 'HeartWeaver es una aventura de acción emocional y narrativa con un sistema de habilidades dinámico.',
+      storyDescription1:
+        'HeartWeaver es un indie emocional con una historia profunda: un juego de puzzles narrativo e impulsado por la historia, un juego sobre la emoción, con acción-aventura y un sistema de habilidades dinámico.',
       storyDescription2: 'La pérdida y la culpa han hecho que Ace desee nunca volver a sentir nada...',
       aceAlt: 'Ace de HeartWeaver',
       friendsAndFoes: 'Amigos y Enemigos',
@@ -1161,6 +1194,7 @@ export const translations: Record<Language, Translations> = {
       team: 'Equip',
       games: 'Jocs',
       contact: 'Contacte',
+      blog: 'Blog',
       openTreasure: 'Obrir Tresor',
       aboutUs: 'Sobre Nosaltres',
       lockedHome: 'Bloquejat. Obtén "Pàgina d\'Inici" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
@@ -1395,6 +1429,15 @@ export const translations: Record<Language, Translations> = {
       locked: 'El butlletí està bloquejat',
       lockedDesc: 'Desbloqueja el Butlletí al Tresor del Kraken per subscriure\'t.'
     },
+    blog: {
+      title: 'Blog',
+      subtitle: 'Novetats, dietaris de desenvolupament i històries des de la guarida.',
+      readMore: 'Llegir més',
+      backToList: '← Totes les entrades',
+      empty: 'Encara no hi ha entrades. Torna aviat!',
+      authorNote:
+        'Les entrades són a shared/blogPosts.ts — afegiu objectes a l’array blogPosts. Al final del fitxer hi ha una plantilla i exemples complets en comentaris. Es pot afegir CMS o MDX més endavant.',
+    },
     team: {
       title: 'El Nostre Equip',
       subtitle: 'Coneix les persones darrere de la Guarida del Kraken',
@@ -1438,7 +1481,8 @@ export const translations: Record<Language, Translations> = {
       introText: 'Quan el jo es trenca en mil trossos, quan ja no pots ser tu mateix, embarca\'t en una aventura, sent de nou...',
       mainTitle: 'Deixa que HeartWeaver repari el teu cor',
       storyBegins: 'Una Història Comença...',
-      storyDescription1: 'HeartWeaver és una aventura d\'acció emocional i narrativa amb un sistema d\'habilitats dinàmic.',
+      storyDescription1:
+        'HeartWeaver és un indie emocional amb una història profunda: un joc de trencaclosques narratiu i impulsat per la història, un joc sobre l\'emoció, amb acció-aventura i un sistema d\'habilitats dinàmic.',
       storyDescription2: 'La pèrdua i la culpa han fet que Ace desitgi mai més tornar a sentir res...',
       aceAlt: 'Ace de HeartWeaver',
       friendsAndFoes: 'Amics i Enemics',

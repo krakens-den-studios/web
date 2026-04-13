@@ -77,6 +77,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     if (pathname === '/games/heartweaver') maxLimit += 20;
     if (pathname === '/team') maxLimit += 30;
     if (pathname === '/contact') maxLimit += 40;
+    if (pathname === '/blog' || pathname.startsWith('/blog/')) maxLimit += 15;
 
     return { shouldSpawn: true, multiplier, maxLimit };
   }, [unlockedPages, pathname]);
