@@ -1448,9 +1448,9 @@ export const translations: Record<Language, Translations> = {
           description: 'L\'artista de l\'equip.'
         },
         {
-          name: 'Maybe you?',
+          name: 'Pots ser tú!',
           role: '3D Artist',
-          description: 'La descripció l\'escull cada persona.
+          description: 'La descripció l\'escull cada persona.'
         },
         {
           name: 'Enric',
