@@ -547,26 +547,21 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'David Tàrrega',
-          role: 'Level Designer',
+          role: 'Tech Artist',
           description: 'He started as a student and someday he will become a master. He could totally show up in that volleyball anime series.'
         },
         {
-          name: 'Meritxell',
-          role: 'Narrative Designer',
-          description: 'In charge of the stories and texts that—ideally—make everyone laugh, cry, and feel moved. She likes turquoise and cats.'
+          name: 'Victoria Plata',
+          role: '2D Artist',
+          description: 'Our main drawer.'
         },
         {
-          name: 'José Manuel Correa',
-          role: 'Animator',
-          description: 'Responsible for bringing characters to life. He also helps with modeling and with whatever else is needed.'
-        },
-        {
-          name: 'Ergoni',
+          name: 'Maybe you?',
           role: '3D Artist',
-          description: 'The one to blame for our 3D models being so beautiful.'
+          description: 'Soon to be known'
         },
         {
-          name: 'Enric',
+          name: 'Enric Mir',
           role: 'Many',
           description: 'Team management, code, production, programming... Whatever it takes. I am required to write that no one told me to write that I have not been forced to work extra hours in order to buy my dog and 2 cats more toys and food.'
         }
@@ -998,23 +993,18 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'David Tàrrega',
-          role: 'Diseñador de Niveles',
+          role: 'Artista técnico',
           description: 'Empezó como estudiante y algún día se convertirá en maestro. Podría aparecer en la serie de anime de voleibol.'
         },
         {
-          name: 'Meritxell',
-          role: 'Diseñadora Narrativa',
-          description: 'Encargada de las historias y de los textos con los que, idealmente, todo el mundo reirá, llorará y se emocionará. Le gusta el color turquesa y los gatos.'
+          name: 'Victoria Plata',
+          role: 'Artista 2D',
+          description: 'Nuestra artista.'
         },
         {
-          name: 'José Manuel Correa',
-          role: 'Animador',
-          description: 'Encargado de dar vida a los personajes. También ayuda a modelar y en lo que sea necesario.'
-        },
-        {
-          name: 'Ergoni',
+          name: 'Tu?',
           role: 'Artista 3D',
-          description: 'El culpable de que tengamos modelos 3D tan bonitos.'
+          description: 'La descripción la escoge cada uno.'
         },
         {
           name: 'Enric',
@@ -1449,23 +1439,18 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'David Tàrrega',
-          role: 'Dissenyador de Nivells',
+          role: 'Artista tècnic',
           description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime,'
         },
         {
-          name: 'Meritxell',
-          role: 'Dissenyadora Narrativa',
-          description: 'Encarregada de les històries i dels textos amb les que - idealment - tothom riurà, plorarà i se sentirà emocionat. Li agrada el color turquesa i els gats.'
+          name: 'Victoria Plata',
+          role: '2D Artist',
+          description: 'L\'artista de l\'equip.'
         },
         {
-          name: 'José Manuel Correa',
-          role: 'Animador',
-          description: 'Encarregat de donar vida als personatges. També ajuda a modelar i en allò que sigui necessari.'
-        },
-        {
-          name: 'Ergoni',
-          role: 'Artista 3D',
-          description: 'El culpable de tenir uns models 3d tan bonics.'
+          name: 'Maybe you?',
+          role: '3D Artist',
+          description: 'La descripció l\'escull cada persona.
         },
         {
           name: 'Enric',
