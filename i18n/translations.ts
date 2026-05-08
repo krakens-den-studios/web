@@ -556,7 +556,7 @@ export const translations: Record<Language, Translations> = {
           description: 'Our main drawer.'
         },
         {
-          name: 'Maybe you?',
+          name: 'This can be you, contact us!',
           role: '3D Artist',
           description: 'Soon to be known'
         },
@@ -1002,7 +1002,7 @@ export const translations: Record<Language, Translations> = {
           description: 'Nuestra artista.'
         },
         {
-          name: 'Tu?',
+          name: 'Puedes ser tú, contáctanos.',
           role: 'Artista 3D',
           description: 'La descripción la escoge cada uno.'
         },
@@ -1444,12 +1444,12 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Victoria Plata',
-          role: '2D Artist',
+          role: 'Artista 2D',
           description: 'L\'artista de l\'equip.'
         },
         {
-          name: 'Pots ser tú!',
-          role: '3D Artist',
+          name: 'Pots ser tu, contacta\'ns!',
+          role: 'Artista 3D',
           description: 'La descripció l\'escull cada persona.'
         },
         {
