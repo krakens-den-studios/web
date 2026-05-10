@@ -34,7 +34,8 @@ import {
   serializeAgentProgress,
   serializeMinigameProgress,
   serializeMissionProgress,
-  serializeUnlockableProgress
+  serializeUnlockableProgress,
+  HELPER_TYPE_COUNT
 } from '@/shared/gameData';
 
 const persistMissionProgress = (missions: Mission[]) => {
@@ -1051,7 +1052,18 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                           <span className="text-turquoise-400 text-sm">{t.treasure.readyToClaim}!</span>
                         )}
                       </div>
-                      <p className="text-white opacity-70 text-xs">{t.gameData.missions[mission.id]?.description || mission.description}</p>
+                      <p className="text-white opacity-70 text-xs">
+                        {(() => {
+                          const baseDesc = t.gameData.missions[mission.id]?.description || mission.description;
+                          if (mission.id === 'own-10-helpers') {
+                            return baseDesc.replaceAll(
+                              '{n}',
+                              String(mission.targetCount ?? HELPER_TYPE_COUNT)
+                            );
+                          }
+                          return baseDesc;
+                        })()}
+                      </p>
                       {mission.reward && (
                         <p className="text-turquoise-300 text-[11px] sm:text-xs mt-1">
                           {t.treasure.reward} +{formatKrakenValue(mission.reward)} {t.treasure.krakenlings}

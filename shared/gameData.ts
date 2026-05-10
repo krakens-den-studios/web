@@ -205,6 +205,10 @@ export const AGENT_TEMPLATES: AgentTemplate[] = [
     missionRequirement: 'healing-4'
   }
 ];
+
+/** Distinct helper types in the idle game; used e.g. for the "all helpers" mission target. */
+export const HELPER_TYPE_COUNT = AGENT_TEMPLATES.length;
+
 export const UNLOCKABLE_TEMPLATES: UnlockableTemplate[] = [
   // {
   //   id: 'home',
@@ -926,10 +930,10 @@ export const MISSION_TEMPLATES: MissionTemplate[] = [
   },
   {
     id: 'own-10-helpers',
-    name: 'Full Team',
-    description: 'Get 10 different helpers working at the same time.',
+    name: "We're a family",
+    description: 'Get {n} different helpers working at the same time.',
     type: 'helpers-owned',
-    targetCount: 10,
+    targetCount: HELPER_TYPE_COUNT,
     reward: 40000,
     dependsOn: ['own-5-helpers']
   },
