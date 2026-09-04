@@ -45,16 +45,6 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     return `floating-${baseId}-${timestamp}-${floatingIdRef.current}`;
   }, []);
 
-  // Check if shop was just closed using a timestamp stored in cookies
-  const wasShopJustClosed = useCallback(() => {
-    if (typeof window === 'undefined') return false;
-    const shopClosedTime = cookieStorage.getItem('shop-closed-time');
-    if (!shopClosedTime) return false;
-    const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
-    // Consider "just closed" if less than 1 second ago (minimum delay)
-    return timeSinceClose < 1000;
-  }, []);
-
   // Check if current page allows krakenlings and calculate spawn rate and max limit
   const getSpawnInfo = useCallback(() => {
     const unlockedCount = Object.values(unlockedPages).filter(Boolean).length;
@@ -107,79 +97,43 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     }
 
     const multiplier = spawnInfo.multiplier;
-    const maxLimit = spawnInfo.maxLimit;
 
-    // Check if shop was just closed
-    const shopJustClosed = wasShopJustClosed();
-
-    // Calculate delay before starting to spawn
-    let spawnDelay = 0;
-    if (shopJustClosed) {
-      // If shop was just closed, wait at least 1 second before spawning
-      const shopClosedTime = typeof window !== 'undefined' ? cookieStorage.getItem('shop-closed-time') : null;
-      if (shopClosedTime) {
-        const timeSinceClose = Date.now() - parseInt(shopClosedTime, 10);
-        const remainingDelay = Math.max(0, 1000 - timeSinceClose);
-        spawnDelay = remainingDelay;
-
-        // Clear the timestamp after checking
-        if (typeof window !== 'undefined') {
-          cookieStorage.removeItem('shop-closed-time');
-        }
-      }
-    } else {
-      // Normal behavior: generate initial krakenlings after a small delay
-      spawnDelay = 100;
-    }
-
-    // Generate initial krakenlings after delay (only a few, not up to maxLimit)
+    // Generate initial krakenlings after a small delay (only a few, not up to maxLimit)
     const initialSpawnTimeout = setTimeout(() => {
-      if (!shopJustClosed || spawnDelay >= 1000) {
-        const initialSpawnCount = 1; // Always spawn only 3 initially
-        const initialOctopuses = Array.from({ length: initialSpawnCount }, () => generateOctopus());
-        setOctopuses(initialOctopuses);
-      }
-    }, spawnDelay);
+      const initialSpawnCount = 1;
+      const initialOctopuses = Array.from({ length: initialSpawnCount }, () => generateOctopus());
+      setOctopuses(initialOctopuses);
+    }, 100);
 
     // Generate new krakenlings - slower spawn rate with reduced multiplier effect
-    // Also delay the interval start if shop was just closed
     const baseInterval = 5000 + Math.random() * 3000; // Increased from 3000-5000ms to 5000-8000ms
-    const intervalStartDelay = shopJustClosed ? Math.max(1000, spawnDelay) : 0;
-
-    // Reduce multiplier effect on spawn rate (use square root for slower growth)
     const spawnRateMultiplier = 1 + (multiplier - 1) * 0.3; // Only 30% of multiplier effect
 
-    let intervalId: NodeJS.Timeout | null = null;
-    const intervalTimeout = setTimeout(() => {
-      intervalId = setInterval(() => {
-        const currentSpawnInfo = getSpawnInfo();
-        if (!currentSpawnInfo.shouldSpawn) {
-          // Stop spawning if page is no longer unlocked
-          setOctopuses([]);
-          return;
-        }
+    const intervalId = setInterval(() => {
+      const currentSpawnInfo = getSpawnInfo();
+      if (!currentSpawnInfo.shouldSpawn) {
+        // Stop spawning if page is no longer unlocked
+        setOctopuses([]);
+        return;
+      }
 
-        setOctopuses(prev => {
-          // Clean up krakenlings that have completely disappeared
-          const active = prev.filter(o => !o.fading || (o.collectedAt && Date.now() - o.collectedAt < 2000));
-          const currentMaxLimit = currentSpawnInfo.maxLimit;
-          // Only spawn if we haven't reached the max limit
-          if (active.length < currentMaxLimit) {
-            return [...active, generateOctopus()];
-          }
-          return active;
-        });
-      }, baseInterval / spawnRateMultiplier); // Slower spawn with reduced multiplier effect
-    }, intervalStartDelay);
+      setOctopuses(prev => {
+        // Clean up krakenlings that have completely disappeared
+        const active = prev.filter(o => !o.fading || (o.collectedAt && Date.now() - o.collectedAt < 2000));
+        const currentMaxLimit = currentSpawnInfo.maxLimit;
+        // Only spawn if we haven't reached the max limit
+        if (active.length < currentMaxLimit) {
+          return [...active, generateOctopus()];
+        }
+        return active;
+      });
+    }, baseInterval / spawnRateMultiplier); // Slower spawn with reduced multiplier effect
 
     return () => {
       clearTimeout(initialSpawnTimeout);
-      clearTimeout(intervalTimeout);
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
+      clearInterval(intervalId);
     };
-  }, [generateOctopus, getSpawnInfo, wasShopJustClosed]);
+  }, [generateOctopus, getSpawnInfo]);
 
 
 
@@ -199,32 +153,6 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
     }, 100);
 
     return () => clearInterval(cleanupInterval);
-  }, []);
-
-  // Listen for shop open/close events
-  useEffect(() => {
-    const handleShopOpen = () => {
-      // Clear all krakenlings when shop opens
-      setOctopuses([]);
-      if (typeof window !== 'undefined') {
-        cookieStorage.removeItem('shop-closed-time');
-      }
-    };
-
-    const handleShopClose = () => {
-      // Mark timestamp when shop closes
-      if (typeof window !== 'undefined') {
-        cookieStorage.setItem('shop-closed-time', Date.now().toString());
-      }
-    };
-
-    window.addEventListener('shopOpened', handleShopOpen);
-    window.addEventListener('shopClosed', handleShopClose);
-
-    return () => {
-      window.removeEventListener('shopOpened', handleShopOpen);
-      window.removeEventListener('shopClosed', handleShopClose);
-    };
   }, []);
 
   const handleOctopusClick = (octopus: Octopus) => {
@@ -373,7 +301,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
             return (
               <div
                 key={octopus.id}
-                className="absolute pointer-events-auto z-[9999]"
+                className="absolute pointer-events-auto"
                 style={{
                   left: `${octopus.x}%`,
                   top: `${octopus.y}%`,
@@ -417,7 +345,7 @@ export default function OctopusCollector({ onCollect, collectedOctopuses }: Octo
                   onMouseDown={(e) => {
                     e.stopPropagation();
                   }}
-                  className={`flex items-center justify-center cursor-pointer p-0 m-0 bg-transparent border-none outline-none z-[10000] ${isCollected ? '' : 'hover:scale-125 animate-bounce transition-transform duration-200 ease-out'
+                  className={`flex items-center justify-center cursor-pointer p-0 m-0 bg-transparent border-none outline-none ${isCollected ? '' : 'hover:scale-125 animate-bounce transition-transform duration-200 ease-out'
                     }`}
                   style={{
                     position: 'absolute',

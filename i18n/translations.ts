@@ -22,8 +22,6 @@ export interface Translations {
     lockedTeam: string;
     lockedGames: string;
     lockedContact: string;
-    enableKrakenlings: string;
-    disableKrakenlings: string;
   };
 
   // Footer
@@ -298,9 +296,7 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Locked. Get "Home Page" in The Kraken\'s Treasure to unlock this part of the den.',
       lockedTeam: 'Locked. Get "About Us" in The Kraken\'s Treasure to meet the team.',
       lockedGames: 'Locked. Get "Games Page" in The Kraken\'s Treasure to check our games.',
-      lockedContact: 'Locked. Get "Contact" in The Kraken\'s Treasure to unlock this part of the den.',
-      enableKrakenlings: 'Enable Krakenlings',
-      disableKrakenlings: 'Disable Krakenlings'
+      lockedContact: 'Locked. Get "Contact" in The Kraken\'s Treasure to unlock this part of the den.'
     },
     footer: {
       newsletter: 'Newsletter',
@@ -744,9 +740,7 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Bloqueado. Obtén "Página de Inicio" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
       lockedTeam: 'Bloqueado. Obtén "Sobre Nosotros" en El Tesoro del Kraken para conocer al equipo.',
       lockedGames: 'Bloqueado. Obtén "Página de Juegos" en El Tesoro del Kraken para ver nuestros juegos.',
-      lockedContact: 'Bloqueado. Obtén "Contacto" en El Tesoro del Kraken para desbloquear esta parte de la guarida.',
-      enableKrakenlings: 'Activar Krakenlings',
-      disableKrakenlings: 'Desactivar Krakenlings'
+      lockedContact: 'Bloqueado. Obtén "Contacto" en El Tesoro del Kraken para desbloquear esta parte de la guarida.'
     },
     footer: {
       newsletter: 'Boletín',
@@ -1190,9 +1184,7 @@ export const translations: Record<Language, Translations> = {
       lockedHome: 'Bloquejat. Obtén "Pàgina d\'Inici" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
       lockedTeam: 'Bloquejat. Obtén "Sobre Nosaltres" al Tresor del Kraken per conèixer l\'equip.',
       lockedGames: 'Bloquejat. Obtén "Pàgina de Jocs" al Tresor del Kraken per veure els nostres jocs.',
-      lockedContact: 'Bloquejat. Obtén "Contacte" al Tresor del Kraken per desbloquejar aquesta part de la guarida.',
-      enableKrakenlings: 'Activar Krakenlings',
-      disableKrakenlings: 'Desactivar Krakenlings'
+      lockedContact: 'Bloquejat. Obtén "Contacte" al Tresor del Kraken per desbloquejar aquesta part de la guarida.'
     },
     footer: {
       newsletter: 'Butlletí',

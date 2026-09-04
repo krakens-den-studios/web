@@ -24,13 +24,11 @@ export default function RootGameComponents() {
 
   return (
     <>
-      {/* Collectable krakenlings on root page - only show when treasure is closed */}
-      {!showTreasure && (
-        <OctopusCollector
-          onCollect={collectOctopus}
-          collectedOctopuses={collectedOctopuses}
-        />
-      )}
+      {/* Collectable krakenlings keep spawning even while the treasure shop is open */}
+      <OctopusCollector
+        onCollect={collectOctopus}
+        collectedOctopuses={collectedOctopuses}
+      />
       
       {showTreasure && (
         <KrakenTreasure

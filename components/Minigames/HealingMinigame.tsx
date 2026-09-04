@@ -183,7 +183,7 @@ export default function HealingMinigame({ onComplete, onClose }: HealingMinigame
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] bg-black bg-opacity-90 flex items-center justify-center">
       <div className="relative bg-turquoise-800 rounded-2xl p-4 sm:p-6 md:p-10 lg:p-16 max-w-3xl mx-4 border-2 border-turquoise-400 w-full h-[90vh] max-h-[90vh] flex flex-col overflow-hidden" style={{ minHeight: '600px', maxHeight: '90vh' }}>
         <button
           onClick={onClose}

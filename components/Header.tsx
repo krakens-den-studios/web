@@ -1,14 +1,13 @@
 'use client';
 
 import { useIsScrolled } from '@/hooks/useIsScrolled';
-import { useKrakenlingsToggle } from '@/hooks/useKrakenlingsToggle';
 import { Route } from '@/shared/Route';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiOutlineX } from 'react-icons/hi';
-import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiShoppingBagLine, RiVolumeMuteLine, RiVolumeUpLine, RiToggleLine, RiToggleFill } from 'react-icons/ri';
+import { RiDiscordFill, RiInstagramFill, RiMailFill, RiTiktokFill, RiTwitterFill, RiVolumeMuteLine, RiVolumeUpLine } from 'react-icons/ri';
 import { DISCORD_INVITE_URL } from '@/shared/social';
 import Dialog from './Dialog';
 import KrakenTreasure from './KrakenTreasure';
@@ -35,7 +34,6 @@ const Header = () => {
   const unclaimedMissionsCount = useUnclaimedMissions();
   const availablePurchasesCount = useAvailablePurchases();
   const { t } = useLanguage();
-  const { isEnabled: isKrakenlingsEnabled, toggle: toggleKrakenlings } = useKrakenlingsToggle();
   useMissionChecker(); // Check missions even when shop is closed
 
   const renderMobileNavItem = (route: Route, label: string, activeOverride?: boolean) => {
@@ -126,13 +124,11 @@ const Header = () => {
       )}
       <div className="w-full fixed z-30 top-0 left-0">
         <header className="w-full flex justify-center">
-          {/* Collectable krakenlings on all pages - only show when treasure is closed and enabled */}
-          {!showTreasure && isKrakenlingsEnabled && (
-            <OctopusCollector
-              onCollect={collectOctopus}
-              collectedOctopuses={collectedOctopuses}
-            />
-          )}
+          {/* Collectable krakenlings keep spawning even while the treasure shop is open */}
+          <OctopusCollector
+            onCollect={collectOctopus}
+            collectedOctopuses={collectedOctopuses}
+          />
 
           {showTreasure && (
             <KrakenTreasure
@@ -166,7 +162,7 @@ const Header = () => {
               </div>
             </Link>
 
-            {/* Mobile: Audio toggle, Krakenlings toggle, Krakenlings counter & menu button */}
+            {/* Mobile: Audio toggle, Krakenlings counter & menu button */}
             <div className="flex items-center gap-3 lg:hidden">
               {hasAudioUnlock && (
                 <button
@@ -185,22 +181,6 @@ const Header = () => {
                   )}
                 </button>
               )}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  playButtonClick();
-                  toggleKrakenlings();
-                }}
-                className="p-2 text-white hover:text-turquoise-400 transition-colors"
-                title={isKrakenlingsEnabled ? t.header.disableKrakenlings : t.header.enableKrakenlings}
-                aria-label={isKrakenlingsEnabled ? t.header.disableKrakenlings : t.header.enableKrakenlings}
-              >
-                {isKrakenlingsEnabled ? (
-                  <RiToggleFill className="h-6 w-6 text-turquoise-400" />
-                ) : (
-                  <RiToggleLine className="h-6 w-6" />
-                )}
-              </button>
               <button
                 className="flex items-center gap-2 text-white whitespace-nowrap px-3 py-1.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors relative"
                 onClick={() => {
@@ -319,24 +299,6 @@ const Header = () => {
                   )}
                 </button>
               )}
-
-              {/* Krakenlings toggle button on desktop */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  playButtonClick();
-                  toggleKrakenlings();
-                }}
-                className="p-2 text-white hover:text-turquoise-400 transition-colors"
-                title={isKrakenlingsEnabled ? t.header.disableKrakenlings : t.header.enableKrakenlings}
-                aria-label={isKrakenlingsEnabled ? t.header.disableKrakenlings : t.header.enableKrakenlings}
-              >
-                {isKrakenlingsEnabled ? (
-                  <RiToggleFill className="h-6 w-6 text-turquoise-400" />
-                ) : (
-                  <RiToggleLine className="h-6 w-6" />
-                )}
-              </button>
 
               {/* krakenlings counter on desktop */}
               <button
