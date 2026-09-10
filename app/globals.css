@@ -139,3 +139,25 @@ a {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+@keyframes purchase-available-glow {
+  0%, 100% {
+    background-color: rgba(41, 227, 235, 0.52);
+    box-shadow:
+      0 0 24px rgba(41, 227, 235, 0.7),
+      inset 0 0 80px rgba(41, 227, 235, 0.5);
+  }
+  50% {
+    background-color: rgba(41, 227, 235, 0.78);
+    box-shadow:
+      0 0 42px rgba(41, 227, 235, 0.95),
+      inset 0 0 110px rgba(41, 227, 235, 0.72);
+  }
+}
+
+.purchase-available {
+  opacity: 1;
+  border-color: #29e3eb;
+  background-color: rgba(41, 227, 235, 0.52);
+  animation: purchase-available-glow 1.8s ease-in-out infinite;
+}

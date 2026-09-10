@@ -84,6 +84,9 @@ const persistAudioSettings = (settings: typeof defaultAudioSettings) => {
   cookieStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(settings));
 };
 
+const purchasableCardClass =
+  'border-turquoise-300 opacity-100 purchase-available';
+
 const updateAudioSettingsForUnlockable = (unlockableId: string) => {
   const current = getAudioSettingsFromCookie();
   let changed = false;
@@ -1105,6 +1108,17 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                 };
                 const minigameTranslatedName = getMinigameName(minigame.id) || minigame.name;
                 const emotionName = getEmotionName(minigameTranslatedName);
+                const unlockable = unlockables.find(u => u.type === 'feature' && u.id.includes(minigame.emotionId));
+                const missionRequirementId = unlockable?.missionRequirement || minigame.missionRequirement;
+                const missionName = getMissionName(missionRequirementId);
+                const missionCompleted = missionRequirementId ? isMissionCompleted(missionRequirementId) : false;
+                const canAffordUnlockable = unlockable ? displayOctopusCount >= unlockable.cost : false;
+                const canUnlock = Boolean(
+                  !minigame.unlocked &&
+                  unlockable &&
+                  canAffordUnlockable &&
+                  (missionCompleted || !missionRequirementId)
+                );
 
                 return (
                   <div
@@ -1114,7 +1128,9 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         ? canPlay
                           ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300 cursor-pointer'
                           : 'bg-gray-800 border-gray-600 opacity-70'
-                        : 'bg-gray-800 border-gray-600 opacity-60'
+                        : canUnlock
+                          ? purchasableCardClass
+                          : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
                     onClick={() => {
                       if (minigame.unlocked && canPlay) {
@@ -1170,11 +1186,6 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         )}
                       </>
                     ) : (() => {
-                      const unlockable = unlockables.find(u => u.type === 'feature' && u.id.includes(minigame.emotionId));
-                      const missionRequirementId = unlockable?.missionRequirement || minigame.missionRequirement;
-                      const missionName = getMissionName(missionRequirementId);
-                      const missionCompleted = missionRequirementId ? isMissionCompleted(missionRequirementId) : false;
-                      
                       if (!unlockable) {
                         // Show locked minigame with only mission requirement
                         return (
@@ -1202,9 +1213,6 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                         );
                       }
                       
-                      const canAfford = displayOctopusCount >= unlockable.cost;
-                      const canUnlock = canAfford && (missionCompleted || !missionRequirementId);
-                      
                       return (
                         <div className="flex flex-col gap-3">
                           <div className="flex items-center justify-between gap-2 overflow-hidden">
@@ -1212,7 +1220,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                               {emotionName}
                             </h3>
                           </div>
-                          {missionName && (
+                          {missionName && !canUnlock && (
                             <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3 sm:p-4 border border-gray-600">
                               <p className="text-gray-400 text-xs sm:text-sm mb-1.5 sm:mb-2 font-semibold">{t.treasure.missionRequiredLabel}</p>
                               <p className={`text-sm sm:text-base font-bold ${missionCompleted ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -1304,7 +1312,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       key={agent.id}
                       className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
                         canPurchase
-                          ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                          ? purchasableCardClass
                           : 'bg-gray-800 border-gray-600 opacity-60'
                       }`}
                     >
@@ -1407,6 +1415,10 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                 }).map((unlockable) => {
                   const missionName = getMissionName(unlockable.missionRequirement);
                   const missionCompleted = isMissionCompleted(unlockable.missionRequirement);
+                  const canPurchaseTreasure =
+                    !unlockable.unlocked &&
+                    displayOctopusCount >= unlockable.cost &&
+                    missionCompleted;
                   
                   return (
                   <div
@@ -1414,8 +1426,8 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                     className={`flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border-2 transition-all overflow-hidden ${
                       unlockable.unlocked
                         ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
-                        : displayOctopusCount >= unlockable.cost
-                        ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                        : canPurchaseTreasure
+                        ? purchasableCardClass
                         : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
                   >
@@ -1544,7 +1556,7 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
                       unlockable.unlocked
                         ? 'bg-turquoise-400 bg-opacity-20 border-turquoise-400'
                         : canPurchase
-                        ? 'bg-turquoise-800 border-turquoise-400 hover:border-turquoise-300'
+                        ? purchasableCardClass
                         : 'bg-gray-800 border-gray-600 opacity-60'
                     }`}
                   >
