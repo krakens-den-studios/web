@@ -360,7 +360,6 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
           }
           case 'collect-krakenlings': {
             const targetCollectCount = parseInt(mission.target || '0', 10);
-            const pickedCount = parseFloat(cookieStorage.getItem('octopus-picked-count') || '0');
             if (pickedCount >= targetCollectCount) {
               isCompleted = true;
             }
@@ -412,17 +411,19 @@ export default function KrakenTreasure({ collectedOctopuses, onOctopusChange, on
         return mission;
       });
       
-      if (hasChanges) {
-        persistMissionProgress(updatedMissions);
-        // Dispatch event when missions change
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('missionChanged'));
-        }
+      if (!hasChanges) {
+        return prevMissions;
+      }
+
+      persistMissionProgress(updatedMissions);
+      // Dispatch event when missions change
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('missionChanged'));
       }
 
       return updatedMissions;
     });
-  }, [pathname, minigames, totalPulpitosPerSecond, missionsLoaded, unlockables, agents]);
+  }, [pathname, minigames, totalPulpitosPerSecond, missionsLoaded, unlockables, agents, pickedCount]);
 
   // Calculate total krakenlings per second (with multipliers)
   useEffect(() => {
