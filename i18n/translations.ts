@@ -560,26 +560,26 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Juan Carlos Fadinho',
-          role: '',
-          description: '',
+          role: '3D Artist',
+          description: 'He handles the 3D. His mind runs a little wild, and the models are better for it.',
           image: '/team/juan-carlos-fadinho.jpg'
         },
         {
           name: 'Marta Antolín',
-          role: '',
-          description: '',
+          role: '2D Artist',
+          description: '2D artist. She is very responsible, and the quality of her drawings and animations shows.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
-          role: '',
-          description: '',
+          role: '2D Artist',
+          description: '2D artist, and she does concept too. The drawings and animations she makes are amazing.',
           image: '/team/rocio-pacheco.jpg'
         },
         {
           name: 'Meritxell Tesifón',
-          role: '',
-          description: '',
+          role: 'Narrative Designer',
+          description: 'Narrative designer. She makes sure every line makes sense, and every emotion too.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
@@ -1023,26 +1023,26 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Juan Carlos Fadinho',
-          role: '',
-          description: '',
+          role: 'Artista 3D',
+          description: 'Se encarga del 3D. La cabeza le va un poco loca, y los modelos salen mejor por eso.',
           image: '/team/juan-carlos-fadinho.jpg'
         },
         {
           name: 'Marta Antolín',
-          role: '',
-          description: '',
+          role: 'Artista 2D',
+          description: 'Artista 2D. Muy responsable, y la calidad de sus dibujos y animaciones se nota.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
-          role: '',
-          description: '',
+          role: 'Artista 2D',
+          description: 'Artista 2D, y también hace concept. Los dibujos y las animaciones que crea son una pasada.',
           image: '/team/rocio-pacheco.jpg'
         },
         {
           name: 'Meritxell Tesifón',
-          role: '',
-          description: '',
+          role: 'Diseñadora narrativa',
+          description: 'Diseñadora narrativa. Se asegura de que cada frase tenga sentido, y cada emoción también.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
@@ -1486,26 +1486,26 @@ export const translations: Record<Language, Translations> = {
         },
         {
           name: 'Juan Carlos Fadinho',
-          role: '',
-          description: '',
+          role: 'Artista 3D',
+          description: 'S\'encarrega del 3D. El cap li va una mica boig, i els models en surten millor.',
           image: '/team/juan-carlos-fadinho.jpg'
         },
         {
           name: 'Marta Antolín',
-          role: '',
-          description: '',
+          role: 'Artista 2D',
+          description: 'Artista 2D. Molt responsable, i la qualitat dels seus dibuixos i animacions es nota.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
-          role: '',
-          description: '',
+          role: 'Artista 2D',
+          description: 'Artista 2D, i també fa concept. Els dibuixos i les animacions que crea són una passada.',
           image: '/team/rocio-pacheco.jpg'
         },
         {
           name: 'Meritxell Tesifón',
-          role: '',
-          description: '',
+          role: 'Dissenyadora narrativa',
+          description: 'Dissenyadora narrativa. S\'assegura que cada frase tingui sentit, i cada emoció també.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
