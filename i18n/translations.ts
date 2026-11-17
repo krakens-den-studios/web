@@ -542,7 +542,7 @@ export const translations: Record<Language, Translations> = {
       members: [
         {
           name: 'Enric Mir',
-          role: 'Many',
+          role: 'Programmer, Producer',
           description: 'Team management, code, production, programming... Whatever it takes. I am required to write that no one told me to write that I have not been forced to work extra hours in order to buy my dog and 2 cats more toys and food.',
           image: '/team/enric-mir.jpg'
         },
@@ -567,13 +567,13 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Marta Antolín',
           role: '2D Artist',
-          description: '2D artist. She is very responsible, and the quality of her drawings and animations shows.',
+          description: 'She draws characters and things that probably shouldn\'t be alive, but now they are. I\'d rather not know how many layers she works with. Sometimes she animates things. Sometimes those things cooperate.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
           role: '2D Artist',
-          description: '2D artist, and she does concept too. The drawings and animations she makes are amazing.',
+          description: 'Illustrator, concept artist, and 2D animator. She loves to create and jumps from one interest to the next, each one pushing her to try new things and give her best. That\'s how she got where she is!',
           image: '/team/rocio-pacheco.jpg'
         },
         {
@@ -1005,7 +1005,7 @@ export const translations: Record<Language, Translations> = {
       members: [
         {
           name: 'Enric Mir',
-          role: 'Muchos',
+          role: 'Programador y Productor',
           description: 'Gestión del equipo, del código, de la producción, de la programación... Lo que haga falta. Me obligan a escribir que nadie me ha dicho que no me están obligando a hacer horas extra para comprarle más juguetes y comida a mi perro y a mis dos gatos.',
           image: '/team/enric-mir.jpg'
         },
@@ -1030,13 +1030,13 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Marta Antolín',
           role: 'Artista 2D',
-          description: 'Artista 2D. Muy responsable, y la calidad de sus dibujos y animaciones se nota.',
+          description: 'Dibuja personajes y cosas que probablemente no deberían estar vivas, pero ahora lo están. Preferiría no conocer el número de capas con las que trabaja. A veces anima cosas. A veces esas cosas cooperan.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
           role: 'Artista 2D',
-          description: 'Artista 2D, y también hace concept. Los dibujos y las animaciones que crea son una pasada.',
+          description: 'Ilustradora, concept artist y animadora 2d. Apasionada por crear, salta de interés en interés, cada cual motivándole más a probar cosas nuevas y dar lo mejor de si. Así ha llegado donde está!',
           image: '/team/rocio-pacheco.jpg'
         },
         {
@@ -1317,8 +1317,8 @@ export const translations: Record<Language, Translations> = {
       exploreLocked: 'EXPLORAR 🔒',
       subscribe: 'SUBSCRIURE\'S',
       subscribeLocked: 'SUBSCRIURE\'S 🔒',
-      meetUs: 'CONÈIX-NOS!',
-      meetUsLocked: 'CONÈIX-NOS! 🔒',
+      meetUs: 'CONEIX-NOS!',
+      meetUsLocked: 'CONEIX-NOS! 🔒',
       krakensGames: 'Els nostres Jocs',
       learnMore: 'Saber-ne Més',
       steam: 'Steam',
@@ -1468,20 +1468,20 @@ export const translations: Record<Language, Translations> = {
       members: [
         {
           name: 'Enric Mir',
-          role: 'Alguns',
+          role: 'Programació i Producció',
           description: 'Gestió de l\'equip, del codi, de la producció, de la programació... El que calgui. M\'obliguen a escriure que ningú m\'ha dit que no m\'estan obligant a fer hores extra per comprar-li més joguines i menjar al meu gos i als meus dos gats.',
           image: '/team/enric-mir.jpg'
         },
         {
           name: 'Carlos Martínez',
-          role: 'Dissenyador de Jocs',
+          role: 'Dissenyador de jocs',
           description: 'La cara de l\'equip, està present allà on faci falta ser sociable i amable. També és el responsable de fer que el joc no sigui un simulador de caminar.',
           image: '/team/carlos-martinez.jpg'
         },
         {
           name: 'David Tàrrega',
           role: 'Artista tècnic',
-          description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime,',
+          description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime.',
           image: '/team/david-tarrega.jpg'
         },
         {
@@ -1493,13 +1493,13 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Marta Antolín',
           role: 'Artista 2D',
-          description: 'Artista 2D. Molt responsable, i la qualitat dels seus dibuixos i animacions es nota.',
+          description: 'Dibuixa personatges i coses que probablement no haurien d\'estar vives, però ara ho estan. Preferiria no saber el nombre de capes amb què treballa. De vegades anima coses. De vegades aquestes coses cooperen.',
           image: '/team/marta-antolin.jpg'
         },
         {
           name: 'Rocío Pacheco',
           role: 'Artista 2D',
-          description: 'Artista 2D, i també fa concept. Els dibuixos i les animacions que crea són una passada.',
+          description: 'Il·lustradora, concept artist i animadora 2D. Apassionada per crear, salta d\'interès en interès, i cadascun la motiva més a provar coses noves i a donar el millor de si. Així ha arribat on és!',
           image: '/team/rocio-pacheco.jpg'
         },
         {
