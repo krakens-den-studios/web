@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import Image from 'next/image';
 
 
 export default function Team() {
@@ -8,10 +9,9 @@ export default function Team() {
 
   return (
     <main className="relative w-full h-fit">
-      {/* First section: title and subtitle with black background */}
       <section className="relative w-full h-fit pt-32 md:pt-40 pb-0">
         <div className="w-full max-w-7xl mx-auto px-8 md:px-12">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h1 className="font-lora text-5xl md:text-6xl font-bold text-turquoise-400 mb-6">
               {t.team.title}
             </h1>
@@ -22,68 +22,56 @@ export default function Team() {
         </div>
       </section>
 
-      {/* Second section: team members with turquoise-800 background */}
       <section className="relative w-full h-fit bg-turquoise-800 pb-20">
         <div className="w-full max-w-7xl mx-auto px-8 md:px-12 pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-            {t.team.members.slice(0, 3).map((member, index) => (
+          <div className="relative w-full rounded-2xl overflow-hidden border-2 border-turquoise-400 mb-12 md:mb-16">
+            <Image
+              src="/team/team.jpg"
+              alt={t.team.photoAlt}
+              width={1436}
+              height={1021}
+              className="w-full h-auto"
+              sizes="(max-width: 1280px) 100vw, 1152px"
+              priority
+            />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+            {t.team.members.map((member) => (
               <div
-                key={index}
-                className="bg-black bg-opacity-40 rounded-2xl p-6 md:p-8 border-2 border-turquoise-400 hover:border-turquoise-300 transition-all flex flex-col items-center text-center min-h-[400px]"
+                key={member.image}
+                className="w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-2rem)] bg-black bg-opacity-40 rounded-2xl p-6 md:p-8 border-2 border-turquoise-400 hover:border-turquoise-300 transition-all flex flex-col items-center text-center"
               >
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-turquoise-400 bg-opacity-20 border-2 border-turquoise-400 flex items-center justify-center mb-6">
-                  <span className="text-4xl md:text-5xl">🐙</span>
+                <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-2 border-turquoise-400 mb-6">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    className="object-cover object-[center_18%]"
+                    sizes="144px"
+                  />
                 </div>
 
                 <h3 className="font-lora text-xl md:text-2xl font-bold text-white mb-2">
                   {member.name}
                 </h3>
 
-                <p className="text-turquoise-300 text-base md:text-lg font-semibold mb-4">
-                  {member.role}
-                </p>
-
-                <p className="text-gray-200 text-sm md:text-base leading-relaxed flex-grow">
-                  {member.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Third section: last members with turquoise-800 background */}
-      <section className="relative w-full h-fit bg-turquoise-800 py-20">
-        <div className="w-full max-w-7xl mx-auto px-8 md:px-12">
-          {/* Last members in the second section */}
-          {t.team.members.length > 3 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 mb-16">
-              {t.team.members.slice(3).map((member, index) => (
-                <div
-                  key={index + 3}
-                  className="bg-black bg-opacity-40 rounded-2xl p-6 md:p-8 border-2 border-turquoise-400 hover:border-turquoise-300 transition-all flex flex-col items-center text-center min-h-[400px]"
-                >
-                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-turquoise-400 bg-opacity-20 border-2 border-turquoise-400 flex items-center justify-center mb-6">
-                    <span className="text-4xl md:text-5xl">🐙</span>
-                  </div>
-
-                  <h3 className="font-lora text-xl md:text-2xl font-bold text-white mb-2">
-                    {member.name}
-                  </h3>
-
+                {member.role ? (
                   <p className="text-turquoise-300 text-base md:text-lg font-semibold mb-4">
                     {member.role}
                   </p>
+                ) : null}
 
-                  <p className="text-gray-200 text-sm md:text-base leading-relaxed flex-grow">
+                {member.description ? (
+                  <p className="text-gray-200 text-sm md:text-base leading-relaxed">
                     {member.description}
                   </p>
-                </div>
-              ))}
-            </div>
-          )}
+                ) : null}
+              </div>
+            ))}
+          </div>
 
-          <div className="text-center">
+          <div className="text-center mt-16">
             <p className="text-white text-lg md:text-xl max-w-2xl mx-auto">
               {t.team.finalText}
             </p>

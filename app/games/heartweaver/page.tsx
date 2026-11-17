@@ -306,6 +306,19 @@ export default function HeartWeaver() {
           </div>
         </div>
       </section>
+
+      <section className="relative w-full flex flex-col items-center justify-center gap-6 py-12 md:py-16 px-6">
+        <p className="text-white text-lg md:text-xl text-center max-w-2xl">
+          {t.heartWeaver.fundedBy}
+        </p>
+        <div className="bg-white rounded-2xl px-5 py-4">
+          <img
+            src="/funders/Logotipo_del_Gobierno_de_la_Comunidad_de_Madrid.webp"
+            alt={t.heartWeaver.funderLogoAlt}
+            className="h-36 md:h-44 w-auto"
+          />
+        </div>
+      </section>
     </main >
   );
 }

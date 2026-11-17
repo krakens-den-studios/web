@@ -219,10 +219,12 @@ export interface Translations {
   team: {
     title: string;
     subtitle: string;
+    photoAlt: string;
     members: Array<{
       name: string;
       role: string;
       description: string;
+      image: string;
     }>;
     finalText: string;
   };
@@ -258,6 +260,8 @@ export interface Translations {
     powerEmotionsCenterAlt: string;
     wishlistNow: string;
     followUs: string;
+    fundedBy: string;
+    funderLogoAlt: string;
   };
 
   // Minigames additional
@@ -535,31 +539,49 @@ export const translations: Record<Language, Translations> = {
     team: {
       title: 'Our Team',
       subtitle: 'Meet the people behind the Kraken\'s Den',
+      photoAlt: 'The Kraken\'s Den team together',
       members: [
+        {
+          name: 'Enric Mir',
+          role: 'Many',
+          description: 'Team management, code, production, programming... Whatever it takes. I am required to write that no one told me to write that I have not been forced to work extra hours in order to buy my dog and 2 cats more toys and food.',
+          image: '/team/enric-mir.jpg'
+        },
         {
           name: 'Carlos Martínez',
           role: 'Game Designer',
-          description: 'The face of the team, present wherever being sociable and friendly is needed. He is also responsible for making sure the game is not just a walking simulator.'
+          description: 'The face of the team, present wherever being sociable and friendly is needed. He is also responsible for making sure the game is not just a walking simulator.',
+          image: '/team/carlos-martinez.jpg'
         },
         {
           name: 'David Tàrrega',
           role: 'Tech Artist',
-          description: 'He started as a student and someday he will become a master. He could totally show up in that volleyball anime series.'
+          description: 'He started as a student and someday he will become a master. He could totally show up in that volleyball anime series.',
+          image: '/team/david-tarrega.jpg'
         },
         {
-          name: 'Victoria Plata',
-          role: '2D Artist',
-          description: 'Our main drawer.'
+          name: 'Juan Carlos Fadinho',
+          role: '',
+          description: '',
+          image: '/team/juan-carlos-fadinho.jpg'
         },
         {
-          name: 'This can be you, contact us!',
-          role: '3D Artist',
-          description: 'Soon to be known'
+          name: 'Marta Antolín',
+          role: '',
+          description: '',
+          image: '/team/marta-antolin.jpg'
         },
         {
-          name: 'Enric Mir',
-          role: 'Many',
-          description: 'Team management, code, production, programming... Whatever it takes. I am required to write that no one told me to write that I have not been forced to work extra hours in order to buy my dog and 2 cats more toys and food.'
+          name: 'Rocío Pacheco',
+          role: '',
+          description: '',
+          image: '/team/rocio-pacheco.jpg'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: '',
+          description: '',
+          image: '/team/meritxell-tesifon.jpg'
         }
       ],
       finalText: 'Just some people trying to make a positive impact in some other people\'s lives while living out of it.'
@@ -598,7 +620,9 @@ export const translations: Record<Language, Translations> = {
       ],
       powerEmotionsCenterAlt: 'Transparent Heart Weaver emblem',
       wishlistNow: 'Wishlist now!',
-      followUs: 'Follow us!'
+      followUs: 'Follow us!',
+      fundedBy: 'HeartWeaver is being funded by the Comunidad de Madrid.',
+      funderLogoAlt: 'Logo of the Comunidad de Madrid'
     },
     minigamesExtra: {
       holdMouse: 'Hold your mouse button to start',
@@ -979,34 +1003,52 @@ export const translations: Record<Language, Translations> = {
     team: {
       title: 'Nuestro Equipo',
       subtitle: 'Conoce a las personas detrás de la Guarida del Kraken',
+      photoAlt: 'El equipo de la Guarida del Kraken, juntos',
       members: [
+        {
+          name: 'Enric Mir',
+          role: 'Muchos',
+          description: 'Gestión del equipo, del código, de la producción, de la programación... Lo que haga falta. Me obligan a escribir que nadie me ha dicho que no me están obligando a hacer horas extra para comprarle más juguetes y comida a mi perro y a mis dos gatos.',
+          image: '/team/enric-mir.jpg'
+        },
         {
           name: 'Carlos Martínez',
           role: 'Diseñador de Juegos',
-          description: 'La cara del equipo, está presente donde haga falta ser sociable y amable. También es el responsable de que el juego no sea un simulador de caminar.'
+          description: 'La cara del equipo, está presente donde haga falta ser sociable y amable. También es el responsable de que el juego no sea un simulador de caminar.',
+          image: '/team/carlos-martinez.jpg'
         },
         {
           name: 'David Tàrrega',
           role: 'Artista técnico',
-          description: 'Empezó como estudiante y algún día se convertirá en maestro. Podría aparecer en la serie de anime de voleibol.'
+          description: 'Empezó como estudiante y algún día se convertirá en maestro. Podría aparecer en la serie de anime de voleibol.',
+          image: '/team/david-tarrega.jpg'
         },
         {
-          name: 'Victoria Plata',
-          role: 'Artista 2D',
-          description: 'Nuestra artista.'
+          name: 'Juan Carlos Fadinho',
+          role: '',
+          description: '',
+          image: '/team/juan-carlos-fadinho.jpg'
         },
         {
-          name: 'Puedes ser tú, contáctanos.',
-          role: 'Artista 3D',
-          description: 'La descripción la escoge cada uno.'
+          name: 'Marta Antolín',
+          role: '',
+          description: '',
+          image: '/team/marta-antolin.jpg'
         },
         {
-          name: 'Enric',
-          role: 'Muchos',
-          description: 'Gestión del equipo, del código, de la producción, de la programación... Lo que haga falta. Me obligan a escribir que nadie me ha dicho que no me están obligando a hacer horas extra para comprarle más juguetes y comida a mi perro y a mis dos gatos.'
+          name: 'Rocío Pacheco',
+          role: '',
+          description: '',
+          image: '/team/rocio-pacheco.jpg'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: '',
+          description: '',
+          image: '/team/meritxell-tesifon.jpg'
         }
       ],
-      finalText: 'Unidos por la pasión de crear experiencias que sanan y transforman, trabajamos juntos para dar vida a historias que resuenan en el corazón.'
+      finalText: 'Solo unas personas intentando aportar algo bueno a la vida de otra gente, mientras vivimos de ello.'
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',
@@ -1042,7 +1084,9 @@ export const translations: Record<Language, Translations> = {
       ],
       powerEmotionsCenterAlt: 'Emblema transparente de Heart Weaver',
       wishlistNow: '¡Añadir a la lista de deseos!',
-      followUs: '¡Síguenos!'
+      followUs: '¡Síguenos!',
+      fundedBy: 'HeartWeaver cuenta con la financiación de la Comunidad de Madrid.',
+      funderLogoAlt: 'Logotipo de la Comunidad de Madrid'
     },
     minigamesExtra: {
       holdMouse: 'Presiona el botón del ratón para empezar',
@@ -1423,34 +1467,52 @@ export const translations: Record<Language, Translations> = {
     team: {
       title: 'El Nostre Equip',
       subtitle: 'Coneix les persones darrere de la Guarida del Kraken',
+      photoAlt: 'L\'equip de la Guarida del Kraken, junts',
       members: [
+        {
+          name: 'Enric Mir',
+          role: 'Alguns',
+          description: 'Gestió de l\'equip, del codi, de la producció, de la programació... El que calgui. M\'obliguen a escriure que ningú m\'ha dit que no m\'estan obligant a fer hores extra per comprar-li més joguines i menjar al meu gos i als meus dos gats.',
+          image: '/team/enric-mir.jpg'
+        },
         {
           name: 'Carlos Martínez',
           role: 'Dissenyador de Jocs',
-          description: 'La cara de l\'equip, està present allà on faci falta ser sociable i amable. També és el responsable de fer que el joc no sigui un simulador de caminar.'
+          description: 'La cara de l\'equip, està present allà on faci falta ser sociable i amable. També és el responsable de fer que el joc no sigui un simulador de caminar.',
+          image: '/team/carlos-martinez.jpg'
         },
         {
           name: 'David Tàrrega',
           role: 'Artista tècnic',
-          description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime,'
+          description: 'Va començar com a estudiant i algun dia es convertirà en mestre. Podria sortir a la serie de Volleyball anime,',
+          image: '/team/david-tarrega.jpg'
         },
         {
-          name: 'Victoria Plata',
-          role: 'Artista 2D',
-          description: 'L\'artista de l\'equip.'
+          name: 'Juan Carlos Fadinho',
+          role: '',
+          description: '',
+          image: '/team/juan-carlos-fadinho.jpg'
         },
         {
-          name: 'Pots ser tu, contacta\'ns!',
-          role: 'Artista 3D',
-          description: 'La descripció l\'escull cada persona.'
+          name: 'Marta Antolín',
+          role: '',
+          description: '',
+          image: '/team/marta-antolin.jpg'
         },
         {
-          name: 'Enric',
-          role: 'Alguns',
-          description: 'Gestió de l\'equip, del codi, de la producció, de la programació... El que calgui. M\'obliguen a escriure que ningú m\'ha dit que no m\'estan obligant a fer hores extra per comprar-li més joguines i menjar al meu gos i als meus dos gats.'
+          name: 'Rocío Pacheco',
+          role: '',
+          description: '',
+          image: '/team/rocio-pacheco.jpg'
+        },
+        {
+          name: 'Meritxell Tesifón',
+          role: '',
+          description: '',
+          image: '/team/meritxell-tesifon.jpg'
         }
       ],
-      finalText: 'Units per la passió de crear experiències que sanen i transformen, treballem junts per donar vida a històries que ressonen al cor.'
+      finalText: 'Només unes persones intentant aportar alguna cosa bona a la vida d\'altra gent, mentre en vivim.'
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',
@@ -1486,7 +1548,9 @@ export const translations: Record<Language, Translations> = {
       ],
       powerEmotionsCenterAlt: 'Emblema transparent de Heart Weaver',
       wishlistNow: 'Afegeix a la llista de desitjos!',
-      followUs: 'Segueix-nos!'
+      followUs: 'Segueix-nos!',
+      fundedBy: 'HeartWeaver compta amb el finançament de la Comunitat de Madrid.',
+      funderLogoAlt: 'Logotip de la Comunitat de Madrid'
     },
     minigamesExtra: {
       holdMouse: 'Manté pressionat el botó del ratolí per començar',
