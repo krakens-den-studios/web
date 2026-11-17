@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Route } from '@/shared/Route';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -32,7 +33,10 @@ function scheduleIdle(cb: () => void) {
 
 export default function FloatingNewsletterBanner() {
   const { t } = useLanguage();
+  const pathname = usePathname();
   const copies = t.footer.newsletterCopies;
+  /** La navegación al contacto tarda; marcar el clic al momento. */
+  const [opening, setOpening] = useState(false);
 
   /** Aún no escuchamos interacción (tras carga diferida). */
   const [listening, setListening] = useState(false);
@@ -151,6 +155,10 @@ export default function FloatingNewsletterBanner() {
     return () => clearRotateTimers();
   }, [clearRotateTimers]);
 
+  useEffect(() => {
+    setOpening(false);
+  }, [pathname]);
+
   return (
     <div
       className="z-30 w-full overflow-hidden transition-[max-height,opacity,padding] ease-[cubic-bezier(0.22,1,0.36,1)] border-b border-transparent"
@@ -166,16 +174,34 @@ export default function FloatingNewsletterBanner() {
         }`}
       >
         {currentQuote ? (
-          <Link href={Route.CONTACT} className="block w-full">
+          <Link
+            href={Route.CONTACT}
+            aria-busy={opening}
+            onClick={() => {
+              if (pathname === Route.CONTACT) return;
+              setOpening(true);
+            }}
+            className={`block w-full ${opening ? 'pointer-events-none' : ''}`}
+          >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3">
-              <div className="cursor-pointer hover:bg-turquoise-700/20 transition-colors duration-500 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
+              <div
+                className={`rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 transition-colors duration-200 active:bg-turquoise-700/50 ${
+                  opening ? 'cursor-wait bg-turquoise-700/55' : 'cursor-pointer hover:bg-turquoise-700/20'
+                }`}
+              >
                 <p
-                  className={`text-white text-center text-xs sm:text-sm md:text-base font-lora transition-opacity ease-in-out ${
-                    textFadingOut ? 'opacity-0' : 'opacity-100'
+                  className={`flex items-center justify-center gap-2 text-white text-center text-xs sm:text-sm md:text-base font-lora transition-opacity ease-in-out ${
+                    textFadingOut && !opening ? 'opacity-0' : 'opacity-100'
                   }`}
                   style={{ transitionDuration: `${FADE_MS}ms` }}
                 >
-                  🐙 {currentQuote}
+                  {opening ? (
+                    <span
+                      className="inline-block h-4 w-4 shrink-0 rounded-full border-2 border-white/35 border-t-white animate-spin"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <span>🐙 {currentQuote}</span>
                 </p>
               </div>
             </div>
