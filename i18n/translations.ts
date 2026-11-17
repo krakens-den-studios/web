@@ -579,7 +579,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Meritxell Tesifón',
           role: 'Narrative Designer',
-          description: 'Narrative designer. She makes sure every line makes sense, and every emotion too.',
+          description: 'Designer of everything that is read and felt within the soul. She makes sure every line makes sense, every emotion has its space, and every thought its reason.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
@@ -1042,7 +1042,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Meritxell Tesifón',
           role: 'Diseñadora narrativa',
-          description: 'Diseñadora narrativa. Se asegura de que cada frase tenga sentido, y cada emoción también.',
+          description: 'Diseñadora de todo aquello que se lee y se siente dentro del alma. Se asegura de que cada frase tenga sentido, cada emoción su espacio y cada pensamiento su razón.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
@@ -1505,7 +1505,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Meritxell Tesifón',
           role: 'Dissenyadora narrativa',
-          description: 'Dissenyadora narrativa. S\'assegura que cada frase tingui sentit, i cada emoció també.',
+          description: 'Dissenyadora de tot allò que es llegeix i se sent dins l\'ànima. S\'assegura que cada frase tingui sentit, cada emoció el seu espai i cada pensament la seva raó.',
           image: '/team/meritxell-tesifon.jpg'
         }
       ]
