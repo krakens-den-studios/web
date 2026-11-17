@@ -226,7 +226,6 @@ export interface Translations {
       description: string;
       image: string;
     }>;
-    finalText: string;
   };
 
   // HeartWeaver
@@ -583,8 +582,7 @@ export const translations: Record<Language, Translations> = {
           description: '',
           image: '/team/meritxell-tesifon.jpg'
         }
-      ],
-      finalText: 'Just some people trying to make a positive impact in some other people\'s lives while living out of it.'
+      ]
     },
     heartWeaver: {
       coverAlt: 'Heart Weaver cover',
@@ -1047,8 +1045,7 @@ export const translations: Record<Language, Translations> = {
           description: '',
           image: '/team/meritxell-tesifon.jpg'
         }
-      ],
-      finalText: 'Solo unas personas intentando aportar algo bueno a la vida de otra gente, mientras vivimos de ello.'
+      ]
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',
@@ -1511,8 +1508,7 @@ export const translations: Record<Language, Translations> = {
           description: '',
           image: '/team/meritxell-tesifon.jpg'
         }
-      ],
-      finalText: 'Només unes persones intentant aportar alguna cosa bona a la vida d\'altra gent, mentre en vivim.'
+      ]
     },
     heartWeaver: {
       coverAlt: 'Portada de Heart Weaver',

@@ -70,12 +70,6 @@ export default function Team() {
               </div>
             ))}
           </div>
-
-          <div className="text-center mt-16">
-            <p className="text-white text-lg md:text-xl max-w-2xl mx-auto">
-              {t.team.finalText}
-            </p>
-          </div>
         </div>
       </section>
     </main>
