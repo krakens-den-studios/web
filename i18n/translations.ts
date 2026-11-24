@@ -549,7 +549,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Game Designer',
-          description: 'The face of the team, present wherever being sociable and friendly is needed. He is also responsible for making sure the game is not just a walking simulator.',
+          description: 'A triple threat: gorgeous, sharp, and charismatic. The face of the team, present wherever being sociable is needed. With her mind constantly running at 200, she might design a puzzle or a new mechanic in a heartbeat, or give you a lecture on Pokémon lore.',
           image: '/team/carlos-martinez.jpg'
         },
         {
@@ -1012,7 +1012,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Diseñador de Juegos',
-          description: 'La cara del equipo, está presente donde haga falta ser sociable y amable. También es el responsable de que el juego no sea un simulador de caminar.',
+          description: 'Una triple amenaza: guapa, lista y carismática. La cara del equipo, está presente donde haga falta ser sociable. Con la cabeza yendo a 200 de forma constante lo mismo te diseña un puzle o una mecánica nueva en un santiamén que te da una chapa sobre lore de Pokémon.',
           image: '/team/carlos-martinez.jpg'
         },
         {
@@ -1475,7 +1475,7 @@ export const translations: Record<Language, Translations> = {
         {
           name: 'Carlos Martínez',
           role: 'Dissenyador de jocs',
-          description: 'La cara de l\'equip, està present allà on faci falta ser sociable i amable. També és el responsable de fer que el joc no sigui un simulador de caminar.',
+          description: 'Una triple amenaça: guapa, llesta i carismàtica. La cara de l\'equip, està present allà on faci falta ser sociable. Amb el cap anant a 200 de forma constant, tant et dissenya un puzle o una mecànica nova en un tres i no res com et clava una xapa sobre el lore de Pokémon.',
           image: '/team/carlos-martinez.jpg'
         },
         {
